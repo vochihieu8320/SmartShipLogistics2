@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Truck, Package, Search, ChevronRight, Clock, MapPin } from "lucide-react";
+import { Truck, Package, Search, AlertCircle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { Link } from "wouter";
+import TrackingDetail from "@/components/shipping/tracking-detail";
 
 // Tracking form schema
 const trackingSchema = z.object({
@@ -14,14 +15,6 @@ const trackingSchema = z.object({
 });
 
 type TrackingFormValues = z.infer<typeof trackingSchema>;
-
-// Step interface for the tracking timeline
-interface TrackingStep {
-  status: string;
-  location: string;
-  timestamp: Date;
-  description: string;
-}
 
 export default function TrackingPage() {
   const [trackingNumber, setTrackingNumber] = useState("");
@@ -190,111 +183,9 @@ export default function TrackingPage() {
               </div>
             )}
 
-            {/* This section would show actual tracking data when available */}
+            {/* Show enhanced tracking detail when tracking data is available */}
             {trackingData && (
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex justify-between items-center">
-                      <span>Shipment #{trackingData.trackingNumber}</span>
-                      <span className={`text-sm px-3 py-1 rounded-full ${
-                        trackingData.status === "delivered" 
-                          ? "bg-green-100 text-green-800" 
-                          : trackingData.status === "in_transit" 
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-amber-100 text-amber-800"
-                      }`}>
-                        {trackingData.status === "delivered" 
-                          ? "Delivered" 
-                          : trackingData.status === "in_transit" 
-                          ? "In Transit"
-                          : "Processing"}
-                      </span>
-                    </CardTitle>
-                    <CardDescription>
-                      Estimated delivery: {new Date(trackingData.estimatedDelivery).toLocaleDateString()}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-500 mb-2">Shipment Details</h4>
-                        <div className="space-y-2">
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Service</span>
-                            <span className="text-sm font-medium">{trackingData.serviceType}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Carrier</span>
-                            <span className="text-sm font-medium">{trackingData.carrier}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Weight</span>
-                            <span className="text-sm font-medium">{trackingData.packageWeight} kg</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Dimensions</span>
-                            <span className="text-sm font-medium">
-                              {trackingData.packageLength} × {trackingData.packageWidth} × {trackingData.packageHeight} cm
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-500 mb-2">Delivery Address</h4>
-                        <p className="text-sm mb-4">
-                          {trackingData.recipient.name}<br />
-                          {trackingData.recipient.streetAddress}<br />
-                          {trackingData.recipient.city}, {trackingData.recipient.postalCode}<br />
-                          {trackingData.recipient.country}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Tracking Timeline */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Tracking History</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      {trackingData.trackingSteps.map((step: TrackingStep, index: number) => (
-                        <div key={index} className="flex gap-4">
-                          <div className="flex flex-col items-center">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                              index === 0 ? "bg-primary text-white" : "bg-gray-200"
-                            }`}>
-                              {index === 0 ? (
-                                <ChevronRight className="h-4 w-4" />
-                              ) : (
-                                <div className="w-3 h-3 rounded-full bg-gray-400" />
-                              )}
-                            </div>
-                            {index < trackingData.trackingSteps.length - 1 && (
-                              <div className="w-0.5 h-16 bg-gray-200" />
-                            )}
-                          </div>
-                          <div>
-                            <div className="flex items-start mb-1">
-                              <span className="font-medium">{step.status}</span>
-                              <span className="ml-auto text-sm text-gray-500">
-                                {new Date(step.timestamp).toLocaleString()}
-                              </span>
-                            </div>
-                            <div className="flex items-center text-gray-600 mb-1">
-                              <MapPin className="h-4 w-4 mr-1" />
-                              {step.location}
-                            </div>
-                            <p className="text-sm text-gray-600">{step.description}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              <TrackingDetail trackingNumber={trackingNumber} />
             )}
           </div>
         </div>

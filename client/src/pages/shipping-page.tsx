@@ -15,9 +15,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Truck, Package, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { Truck, Package, ArrowRight, CheckCircle2, Loader2, Calculator } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
+import RateComparisonTool from "@/components/shipping/rate-comparison";
 
 // Define the shipping form schema
 const addressSchema = z.object({
