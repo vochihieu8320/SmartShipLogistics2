@@ -158,7 +158,7 @@ export default function TrackingPage() {
                       className="w-full"
                     />
                   </div>
-                  <Button type="submit" className="gap-2" disabled={isLoading}>
+                  <Button type="submit" className="gap-2" disabled={isLoading || isDemoLoading}>
                     {isLoading ? (
                       <>
                         <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -174,6 +174,25 @@ export default function TrackingPage() {
                     )}
                   </Button>
                 </form>
+                
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-gray-500 mb-2">Don't have a tracking number?</p>
+                  <Button 
+                    variant="outline" 
+                    onClick={loadDemoTracking} 
+                    disabled={isLoading || isDemoLoading} 
+                    className="mx-auto"
+                  >
+                    {isDemoLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Loading demo...
+                      </>
+                    ) : (
+                      "Try a demo tracking number"
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 

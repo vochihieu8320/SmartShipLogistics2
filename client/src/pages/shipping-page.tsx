@@ -68,51 +68,51 @@ export default function ShippingPage() {
   const { toast } = useToast();
   const { user } = useAuth();
   
-  // Default values for the form
+  // Default values for the form with sample data for demonstration
   const defaultValues: Partial<ShippingFormValues> = {
     sender: user ? {
       name: user.fullName,
       email: user.email,
-      phone: "",
-      company: "",
-      streetAddress: "",
-      city: "",
-      postalCode: "",
-      country: ""
+      phone: "+1 (555) 123-4567",
+      company: "SmartShip Enterprises",
+      streetAddress: "100 Main Street",
+      city: "New York",
+      postalCode: "10001",
+      country: "United States"
     } : {
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      streetAddress: "",
-      city: "",
-      postalCode: "",
-      country: ""
+      name: "John Smith",
+      email: "john@example.com",
+      phone: "+1 (555) 123-4567",
+      company: "SmartShip Enterprises",
+      streetAddress: "100 Main Street",
+      city: "New York",
+      postalCode: "10001",
+      country: "United States"
     },
     recipient: {
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      streetAddress: "",
-      city: "",
-      postalCode: "",
-      country: ""
+      name: "Sarah Johnson",
+      email: "sarah@example.com",
+      phone: "+1 (555) 987-6543",
+      company: "Tech Solutions Inc.",
+      streetAddress: "400 Market Street",
+      city: "San Francisco",
+      postalCode: "94105",
+      country: "United States"
     },
-    shipmentType: "",
-    serviceType: "",
-    packageType: "",
-    packageWeight: undefined,
-    packageLength: undefined,
-    packageWidth: undefined,
-    packageHeight: undefined,
+    shipmentType: "parcel",
+    serviceType: "express",
+    packageType: "medium_box",
+    packageWeight: 5.5,
+    packageLength: 30,
+    packageWidth: 25,
+    packageHeight: 20,
     packageQuantity: 1,
-    description: "",
-    declaredValue: undefined,
-    carrier: "",
-    shippingDate: "",
-    insurance: false,
-    signature: false,
+    description: "Electronics equipment - fragile",
+    declaredValue: 500,
+    carrier: "fedex",
+    shippingDate: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
+    insurance: true,
+    signature: true,
     priority: false
   };
   
