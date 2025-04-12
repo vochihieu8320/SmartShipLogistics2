@@ -184,15 +184,52 @@ export function registerRoutes(app: Express): Server {
       phone: "+1 415-555-6789"
     };
     
-    // Generate tracking steps
-    const trackingSteps = generateMockTrackingInfo("SHIP123456789", "FedEx", "in_transit");
+    // Create the tracking steps manually
+    const trackingSteps = [
+      {
+        status: "order_placed",
+        location: "New York, NY",
+        timestamp: new Date(Date.now() - 86400000 * 3), // 3 days ago
+        description: "Order has been placed and payment confirmed"
+      },
+      {
+        status: "pickup_scheduled",
+        location: "New York, NY",
+        timestamp: new Date(Date.now() - 86400000 * 2.5), // 2.5 days ago
+        description: "Pickup has been scheduled from the sender location"
+      },
+      {
+        status: "package_received",
+        location: "New York, NY",
+        timestamp: new Date(Date.now() - 86400000 * 2), // 2 days ago
+        description: "Package has been received at origin facility"
+      },
+      {
+        status: "in_transit",
+        location: "Memphis, TN",
+        timestamp: new Date(Date.now() - 86400000 * 1), // 1 day ago
+        description: "Package is in transit to the destination"
+      },
+      {
+        status: "customs_clearance",
+        location: "Memphis, TN",
+        timestamp: new Date(Date.now() - 43200000), // 12 hours ago
+        description: "Package has cleared customs inspection"
+      },
+      {
+        status: "out_for_delivery",
+        location: "San Francisco, CA",
+        timestamp: new Date(Date.now() - 14400000), // 4 hours ago
+        description: "Package is out for delivery to the recipient"
+      }
+    ];
     
     // Create the response
     const orderDate = new Date();
     orderDate.setDate(orderDate.getDate() - 3); // 3 days ago
     
     const estimatedDelivery = new Date();
-    estimatedDelivery.setDate(estimatedDelivery.getDate() + 2); // 2 days from now
+    estimatedDelivery.setDate(estimatedDelivery.getDate() + 1); // 1 day from now
     
     res.json({
       trackingNumber: "SHIP123456789",
@@ -208,7 +245,7 @@ export function registerRoutes(app: Express): Server {
       estimatedDelivery,
       sender,
       recipient,
-      trackingSteps
+      trackingEvents: trackingSteps
     });
   });
 
