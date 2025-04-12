@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -22,6 +22,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 
 interface NavItemProps {
   href: string;
@@ -57,19 +58,18 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const { user, logoutMutation } = useAuth();
+  const [, navigate] = useLocation();
   
-  // Mock user for development purposes
-  const user = {
-    id: 1,
-    username: "admin",
-    email: "admin@example.com",
-    fullName: "Admin User",
-    role: UserRole.ADMIN,
-    createdAt: new Date()
-  };
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+    }
+  }, [user, navigate]);
 
   // Get user initials for avatar
-  const getInitials = (name: string) => {
+  const getInitials = (name?: string) => {
     if (!name) return "U";
     return name
       .split(" ")
@@ -83,13 +83,15 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
   
   // Handle logout
   const handleLogout = () => {
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out",
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast({
+          title: "Logged out",
+          description: "You have been successfully logged out",
+        });
+        navigate('/auth');
+      }
     });
-    setTimeout(() => {
-      window.location.href = '/auth';
-    }, 1000);
   };
   
   return (
@@ -113,38 +115,38 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
           
           <ul>
             <NavItem 
-              href="/" 
+              href="/admin" 
               icon={<LayoutDashboard className="h-5 w-5" />} 
               label="Dashboard" 
-              active={location === "/"} 
+              active={location === "/admin"} 
             />
             
             <NavItem 
-              href="/booking" 
+              href="/admin/booking" 
               icon={<Package className="h-5 w-5" />} 
               label="New Booking" 
-              active={location === "/booking"} 
+              active={location === "/admin/booking"} 
             />
             
             <NavItem 
-              href="/orders" 
+              href="/admin/orders" 
               icon={<ShoppingCart className="h-5 w-5" />} 
               label="Orders" 
-              active={location === "/orders"} 
+              active={location === "/admin/orders"} 
             />
             
             <NavItem 
-              href="/finance" 
+              href="/admin/finance" 
               icon={<CreditCard className="h-5 w-5" />} 
               label="Finance" 
-              active={location === "/finance"} 
+              active={location === "/admin/finance"} 
             />
             
             <NavItem 
-              href="/reports" 
+              href="/admin/reports" 
               icon={<BarChart2 className="h-5 w-5" />} 
               label="Reports" 
-              active={location === "/reports"} 
+              active={location === "/admin/reports"} 
             />
             
             {/* Admin only sections */}
@@ -156,18 +158,18 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                 
                 {user?.role === UserRole.ADMIN && (
                   <NavItem 
-                    href="/users" 
+                    href="/admin/users" 
                     icon={<Users className="h-5 w-5" />} 
                     label="User Management" 
-                    active={location === "/users"} 
+                    active={location === "/admin/users"} 
                   />
                 )}
                 
                 <NavItem 
-                  href="/settings" 
+                  href="/admin/settings" 
                   icon={<Settings className="h-5 w-5" />} 
                   label="System Settings" 
-                  active={location === "/settings"} 
+                  active={location === "/admin/settings"} 
                 />
               </>
             )}
