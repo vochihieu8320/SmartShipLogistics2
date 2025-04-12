@@ -38,7 +38,104 @@ export function registerRoutes(app: Express): Server {
   
   // Public API endpoints for client-facing interface
   
-  // Tracking API endpoint
+  // Demo tracking data for the demo tracking number
+  // IMPORTANT: This specific route MUST come before the general tracking route with parameters
+  app.get("/api/tracking/SHIP123456789", async (req, res) => {
+    console.log("[DEBUG] Serving demo tracking data");
+    
+    // Create a realistic sender and recipient
+    const sender = {
+      id: 1,
+      name: "John Smith",
+      company: "SmartShip Enterprises",
+      street: "100 Main Street",
+      city: "New York",
+      state: "NY",
+      postalCode: "10001",
+      country: "USA",
+      email: "john@example.com",
+      phone: "+1 212-555-1234"
+    };
+    
+    const recipient = {
+      id: 2,
+      name: "Sarah Johnson",
+      company: "Tech Solutions Inc.",
+      street: "400 Market Street",
+      city: "San Francisco",
+      state: "CA",
+      postalCode: "94105",
+      country: "USA",
+      email: "sarah@example.com",
+      phone: "+1 415-555-6789"
+    };
+    
+    // Create the tracking steps manually
+    const trackingSteps = [
+      {
+        status: "order_placed",
+        location: "New York, NY",
+        timestamp: new Date(Date.now() - 86400000 * 3), // 3 days ago
+        description: "Order has been placed and payment confirmed"
+      },
+      {
+        status: "pickup_scheduled",
+        location: "New York, NY",
+        timestamp: new Date(Date.now() - 86400000 * 2.5), // 2.5 days ago
+        description: "Pickup has been scheduled from the sender location"
+      },
+      {
+        status: "package_received",
+        location: "New York, NY",
+        timestamp: new Date(Date.now() - 86400000 * 2), // 2 days ago
+        description: "Package has been received at origin facility"
+      },
+      {
+        status: "in_transit",
+        location: "Memphis, TN",
+        timestamp: new Date(Date.now() - 86400000 * 1), // 1 day ago
+        description: "Package is in transit to the destination"
+      },
+      {
+        status: "customs_clearance",
+        location: "Memphis, TN",
+        timestamp: new Date(Date.now() - 43200000), // 12 hours ago
+        description: "Package has cleared customs inspection"
+      },
+      {
+        status: "out_for_delivery",
+        location: "San Francisco, CA",
+        timestamp: new Date(Date.now() - 14400000), // 4 hours ago
+        description: "Package is out for delivery to the recipient"
+      }
+    ];
+    
+    // Create the response
+    const orderDate = new Date();
+    orderDate.setDate(orderDate.getDate() - 3); // 3 days ago
+    
+    const estimatedDelivery = new Date();
+    estimatedDelivery.setDate(estimatedDelivery.getDate() + 1); // 1 day from now
+    
+    res.json({
+      trackingNumber: "SHIP123456789",
+      awbNumber: "AWB987654321",
+      orderNumber: "ORD123456",
+      status: "in_transit",
+      carrier: "FedEx",
+      serviceType: "Express",
+      packageWeight: 5.5,
+      packageLength: 30,
+      packageWidth: 25,
+      packageHeight: 20,
+      estimatedDelivery,
+      sender,
+      recipient,
+      trackingEvents: trackingSteps
+    });
+  });
+  
+  // General tracking API endpoint
   app.get("/api/tracking/:trackingNumber", async (req, res, next) => {
     try {
       const trackingNumber = req.params.trackingNumber;
@@ -161,99 +258,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
   
-  // Demo tracking data for the demo tracking number
-  app.get("/api/tracking/SHIP123456789", async (req, res) => {
-    // Create a realistic sender and recipient
-    const sender = {
-      id: 1,
-      name: "John Smith",
-      company: "SmartShip Enterprises",
-      street: "100 Main Street",
-      city: "New York",
-      state: "NY",
-      postalCode: "10001",
-      country: "USA",
-      email: "john@example.com",
-      phone: "+1 212-555-1234"
-    };
-    
-    const recipient = {
-      id: 2,
-      name: "Sarah Johnson",
-      company: "Tech Solutions Inc.",
-      street: "400 Market Street",
-      city: "San Francisco",
-      state: "CA",
-      postalCode: "94105",
-      country: "USA",
-      email: "sarah@example.com",
-      phone: "+1 415-555-6789"
-    };
-    
-    // Create the tracking steps manually
-    const trackingSteps = [
-      {
-        status: "order_placed",
-        location: "New York, NY",
-        timestamp: new Date(Date.now() - 86400000 * 3), // 3 days ago
-        description: "Order has been placed and payment confirmed"
-      },
-      {
-        status: "pickup_scheduled",
-        location: "New York, NY",
-        timestamp: new Date(Date.now() - 86400000 * 2.5), // 2.5 days ago
-        description: "Pickup has been scheduled from the sender location"
-      },
-      {
-        status: "package_received",
-        location: "New York, NY",
-        timestamp: new Date(Date.now() - 86400000 * 2), // 2 days ago
-        description: "Package has been received at origin facility"
-      },
-      {
-        status: "in_transit",
-        location: "Memphis, TN",
-        timestamp: new Date(Date.now() - 86400000 * 1), // 1 day ago
-        description: "Package is in transit to the destination"
-      },
-      {
-        status: "customs_clearance",
-        location: "Memphis, TN",
-        timestamp: new Date(Date.now() - 43200000), // 12 hours ago
-        description: "Package has cleared customs inspection"
-      },
-      {
-        status: "out_for_delivery",
-        location: "San Francisco, CA",
-        timestamp: new Date(Date.now() - 14400000), // 4 hours ago
-        description: "Package is out for delivery to the recipient"
-      }
-    ];
-    
-    // Create the response
-    const orderDate = new Date();
-    orderDate.setDate(orderDate.getDate() - 3); // 3 days ago
-    
-    const estimatedDelivery = new Date();
-    estimatedDelivery.setDate(estimatedDelivery.getDate() + 1); // 1 day from now
-    
-    res.json({
-      trackingNumber: "SHIP123456789",
-      awbNumber: "AWB987654321",
-      orderNumber: "ORD123456",
-      status: "in_transit",
-      carrier: "FedEx",
-      serviceType: "Express",
-      packageWeight: 5.5,
-      packageLength: 30,
-      packageWidth: 25,
-      packageHeight: 20,
-      estimatedDelivery,
-      sender,
-      recipient,
-      trackingEvents: trackingSteps
-    });
-  });
+  // Removed duplicate endpoint
 
   // Order endpoints
   app.get("/api/orders", isAuthenticated, async (req, res, next) => {

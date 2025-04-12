@@ -43,7 +43,8 @@ interface TrackingInfo {
     postalCode: string;
     country: string;
   };
-  trackingEvents: TrackingStep[]; // API response uses this field name
+  // API response may use either trackingEvents or trackingSteps
+  trackingEvents: TrackingStep[];
 }
 
 interface TrackingDetailProps {
@@ -150,7 +151,7 @@ export default function TrackingDetail({ trackingNumber }: TrackingDetailProps) 
   }
   
   // Sort tracking steps by date (latest first for display)
-  const sortedSteps = [...trackingInfo.trackingEvents].sort((a, b) => 
+  const sortedSteps = [...(trackingInfo.trackingEvents || [])].sort((a, b) => 
     new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
   );
   
