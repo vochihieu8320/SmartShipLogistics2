@@ -146,6 +146,10 @@ async function main() {
       shippingDate: lastWeek,
       status: "delivered",
       paymentStatus: "paid",
+      basePrice: "65.50",
+      insurancePrice: "5.00",
+      additionalFees: "3.00",
+      tax: "2.00",
       totalPrice: "75.50",
       senderId: senderAddress2.id,
       recipientId: recipientAddress1.id,
@@ -174,6 +178,10 @@ async function main() {
       shippingDate: yesterday,
       status: "in_transit",
       paymentStatus: "paid",
+      basePrice: "20.00",
+      insurancePrice: "2.00",
+      additionalFees: "1.00",
+      tax: "2.00",
       totalPrice: "25.00",
       senderId: senderAddress2.id,
       recipientId: recipientAddress2.id,
@@ -202,6 +210,10 @@ async function main() {
       shippingDate: nextWeek,
       status: "processing",
       paymentStatus: "unpaid",
+      basePrice: "300.00",
+      insurancePrice: "25.00",
+      additionalFees: "15.00",
+      tax: "10.00",
       totalPrice: "350.00",
       senderId: senderAddress2.id,
       recipientId: recipientAddress3.id,
@@ -217,6 +229,12 @@ async function main() {
     for (let i = 0; i < 5; i++) {
       const orderDate = new Date();
       orderDate.setDate(orderDate.getDate() - Math.floor(Math.random() * 30));
+      
+      const totalPrice = (Math.floor(Math.random() * 500) + 20).toString();
+      const basePrice = (Math.floor(parseInt(totalPrice) * 0.8)).toString();
+      const insurancePrice = (Math.floor(parseInt(totalPrice) * 0.1)).toString();
+      const additionalFees = (Math.floor(parseInt(totalPrice) * 0.05)).toString();
+      const tax = (parseInt(totalPrice) - parseInt(basePrice) - parseInt(insurancePrice) - parseInt(additionalFees)).toString();
       
       const [order] = await db.insert(orders).values({
         orderNumber: `ORD${400000 + i}`,
@@ -234,7 +252,11 @@ async function main() {
         shippingDate: new Date(orderDate),
         status: ["processing", "in_transit", "delivered"][Math.floor(Math.random() * 3)],
         paymentStatus: ["paid", "unpaid"][Math.floor(Math.random() * 2)],
-        totalPrice: (Math.floor(Math.random() * 500) + 20).toString(),
+        basePrice,
+        insurancePrice, 
+        additionalFees,
+        tax,
+        totalPrice,
         senderId: senderAddress1.id,
         recipientId: [recipientAddress1.id, recipientAddress2.id, recipientAddress3.id][Math.floor(Math.random() * 3)],
         description: ["Electronic parts", "Documents", "Clothing", "Books", "Office supplies"][Math.floor(Math.random() * 5)],
