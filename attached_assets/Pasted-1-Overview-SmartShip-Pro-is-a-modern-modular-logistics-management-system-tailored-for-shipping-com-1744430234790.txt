@@ -1,0 +1,114 @@
+1. Overview
+SmartShip Pro is a modern, modular logistics management system tailored for shipping companies and service providers. It enables users to book shipments via major global carriers (UPS, FedEx, DHL, SF Express), manage shipping orders, track delivery status, manage payments and debts, and generate insightful financial reports. The platform offers multi-role user access for efficient operations and secure data segregation.
+
+2. Key Features
+2.1. User Account & Role Management
+Roles:
+Admin: Full access to all modules, user and permission management.
+
+Manager: Manage shipments, finances, and view reports.
+
+Staff/User: Book shipments, view own orders and payment status.
+
+Functionalities:
+User registration & login.
+
+Create, view, edit, delete user accounts (Admin only).
+
+Role-based permission management.
+
+Profile and password management.
+
+2.2. Booking & Quoting (Book Bill)
+Functionalities:
+Create shipment bookings (domestic & international).
+
+Generate automatic quotes by integrating carrier APIs (UPS, FedEx, DHL, SF).
+
+Support multi-step form for entering shipment details (sender, receiver, package dimensions, service type, insurance, etc).
+
+Return:
+
+AWB (Air Waybill)
+
+House Bill
+
+Invoice
+
+API Integration:
+Real-time rate fetching from carrier APIs.
+
+AWB number generation and PDF downloads.
+
+Shipment tracking URLs.
+
+2.3. Order Management
+Functionalities:
+View list of all orders (filters: time range, user, carrier, status).
+
+Store full order data in the database.
+
+Track and update shipment status (in transit, delivered, returned, canceled).
+
+Payment tracking (paid/unpaid/partial).
+
+View and export full shipment history (per user or customer).
+
+2.4. Financial Management
+Functionalities:
+Generate and send price quotes for shipments.
+
+Record payments (by order or bulk).
+
+Track outstanding debts by customer/user.
+
+Export debit statements in Excel/PDF.
+
+Support various payment statuses: Paid, Unpaid, Partial, Overdue.
+
+Manual and automated reminders for pending payments.
+
+2.5. Financial Reporting Dashboard
+Filters:
+Time range (daily, weekly, monthly, custom)
+
+By user/customer
+
+By shipping carrier
+
+Visuals & Insights:
+Revenue over time (charts)
+
+Top customers by order volume
+
+Carrier usage breakdown
+
+Outstanding debts summary
+
+Payment collection rate
+
+3. Technical Requirements
+Frontend
+Tech Stack: React.js + Tailwind CSS
+
+Authentication: JWT or OAuth2
+
+Role-based views: Admin, Manager, Staff
+
+Responsiveness: Mobile and desktop supported
+
+Backend
+Tech Stack: Ruby on Rails (API-first)
+
+Database: PostgreSQL (RDS)
+
+Background Jobs: Sidekiq for scheduling API calls, reminders
+
+APIs: RESTful API endpoints with token-based auth
+
+External Integrations
+UPS, FedEx, DHL, SF Express API
+
+Email/SMS service for notifications
+
+AWS S3 for file storage (AWB, invoices)
