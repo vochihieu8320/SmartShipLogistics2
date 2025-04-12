@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "wouter";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,13 +11,32 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Package, ArrowRight, Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
   const { toast } = useToast();
   const [, navigate] = useLocation();
+  const { user, isLoading } = useAuth();
+  
+  // If user is already logged in, redirect to home
+  useEffect(() => {
+    if (user && !isLoading) {
+      if (user.role === "admin" || user.role === "manager") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
+    }
+  }, [user, isLoading, navigate]);
+
+  // Check for register parameter in URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get("register") === "true") {
+      setActiveTab("register");
+    }
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-neutral-50">
@@ -46,7 +65,7 @@ export default function AuthPage() {
               </TabsContent>
               
               <TabsContent value="register">
-                <RegisterForm />
+                <RegisterForm onSuccess={() => setActiveTab("login")} />
               </TabsContent>
             </Tabs>
           </CardContent>
@@ -87,9 +106,9 @@ export default function AuthPage() {
 }
 
 function LoginForm() {
+  const { loginMutation } = useAuth();
   const { toast } = useToast();
   const [, navigate] = useLocation();
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
   
   const form = useForm<LoginCredentials>({
     resolver: zodResolver(loginUserSchema),
@@ -100,26 +119,21 @@ function LoginForm() {
   });
   
   function onSubmit(data: LoginCredentials) {
-    setIsLoggingIn(true);
-    
-    // Simple login
-    if (data.username === 'admin' && data.password === 'password') {
-      toast({
-        title: "Login successful",
-        description: "Welcome back, Admin User!",
-      });
-      
-      setTimeout(() => {
-        navigate('/');
-      }, 1000);
-    } else {
-      setIsLoggingIn(false);
-      toast({
-        title: "Login failed",
-        description: "Invalid username or password",
-        variant: "destructive",
-      });
-    }
+    loginMutation.mutate(data, {
+      onSuccess: (user) => {
+        toast({
+          title: "Login successful",
+          description: `Welcome back, ${user.fullName}!`,
+        });
+        
+        // Navigate based on user role
+        if (user.role === "admin" || user.role === "manager") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
+      }
+    });
   }
   
   return (
@@ -153,8 +167,8 @@ function LoginForm() {
           )}
         />
         
-        <Button type="submit" className="w-full" disabled={isLoggingIn}>
-          {isLoggingIn ? (
+        <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+          {loginMutation.isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Logging in...
@@ -168,10 +182,13 @@ function LoginForm() {
   );
 }
 
-function RegisterForm() {
+interface RegisterFormProps {
+  onSuccess: () => void;
+}
+
+function RegisterForm({ onSuccess }: RegisterFormProps) {
+  const { registerMutation } = useAuth();
   const { toast } = useToast();
-  const [, navigate] = useLocation();
-  const [isRegistering, setIsRegistering] = useState(false);
   
   const form = useForm<InsertUser>({
     resolver: zodResolver(insertUserSchema),
@@ -185,17 +202,16 @@ function RegisterForm() {
   });
   
   function onSubmit(data: InsertUser) {
-    setIsRegistering(true);
-    
-    // Simple mock registration
-    setTimeout(() => {
-      toast({
-        title: "Registration successful",
-        description: "Your account has been created. You can now log in.",
-      });
-      setIsRegistering(false);
-      form.reset();
-    }, 1500);
+    registerMutation.mutate(data, {
+      onSuccess: () => {
+        toast({
+          title: "Registration successful",
+          description: "Your account has been created. You can now log in.",
+        });
+        form.reset();
+        onSuccess();
+      }
+    });
   }
   
   return (
@@ -280,8 +296,8 @@ function RegisterForm() {
           )}
         />
         
-        <Button type="submit" className="w-full" disabled={isRegistering}>
-          {isRegistering ? (
+        <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
+          {registerMutation.isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Creating Account...
