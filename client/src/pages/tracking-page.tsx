@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Truck, Package, Search, AlertCircle } from "lucide-react";
+import { Truck, Package, Search, AlertCircle, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -18,7 +18,32 @@ type TrackingFormValues = z.infer<typeof trackingSchema>;
 
 export default function TrackingPage() {
   const [trackingNumber, setTrackingNumber] = useState("");
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
   const { toast } = useToast();
+
+  // Function to load a demo tracking number
+  const loadDemoTracking = async () => {
+    try {
+      setIsDemoLoading(true);
+      // Use our fixed demo tracking number
+      setTrackingNumber("SHIP123456789");
+      
+      // Wait a moment to simulate loading and then trigger the tracking query
+      setTimeout(() => {
+        refetch();
+        setIsDemoLoading(false);
+      }, 500);
+      
+    } catch (error) {
+      console.error("Error using demo tracking:", error);
+      setIsDemoLoading(false);
+      toast({
+        title: "Error",
+        description: "Failed to load demo tracking. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Query to fetch tracking information
   const { data: trackingData, isLoading, isError, refetch } = useQuery({

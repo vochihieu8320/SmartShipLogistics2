@@ -144,25 +144,72 @@ export function registerRoutes(app: Express): Server {
   // Generate mock tracking number for demonstration
   app.get("/api/demo-tracking", async (req, res, next) => {
     try {
-      // Get a random order from the database to use for demonstration
-      const orders = await storage.getAllOrders();
-      
-      if (orders.length === 0) {
-        return res.status(404).json({ error: "No orders found in the system" });
-      }
-      
-      // Pick a random order
-      const randomIndex = Math.floor(Math.random() * orders.length);
-      const randomOrder = orders[randomIndex];
-      
+      // Fixed demo tracking number for easy access
+      const demoTrackingNumber = "SHIP123456789";
       res.json({
-        trackingNumber: randomOrder.orderNumber,
-        awbNumber: randomOrder.awbNumber,
+        trackingNumber: demoTrackingNumber,
         message: "Use this tracking number for demonstration"
       });
     } catch (error) {
       next(error);
     }
+  });
+  
+  // Demo tracking data for the demo tracking number
+  app.get("/api/tracking/SHIP123456789", async (req, res) => {
+    // Create a realistic sender and recipient
+    const sender = {
+      id: 1,
+      name: "John Smith",
+      company: "SmartShip Enterprises",
+      street: "100 Main Street",
+      city: "New York",
+      state: "NY",
+      postalCode: "10001",
+      country: "USA",
+      email: "john@example.com",
+      phone: "+1 212-555-1234"
+    };
+    
+    const recipient = {
+      id: 2,
+      name: "Sarah Johnson",
+      company: "Tech Solutions Inc.",
+      street: "400 Market Street",
+      city: "San Francisco",
+      state: "CA",
+      postalCode: "94105",
+      country: "USA",
+      email: "sarah@example.com",
+      phone: "+1 415-555-6789"
+    };
+    
+    // Generate tracking steps
+    const trackingSteps = generateMockTrackingInfo("SHIP123456789", "FedEx", "in_transit");
+    
+    // Create the response
+    const orderDate = new Date();
+    orderDate.setDate(orderDate.getDate() - 3); // 3 days ago
+    
+    const estimatedDelivery = new Date();
+    estimatedDelivery.setDate(estimatedDelivery.getDate() + 2); // 2 days from now
+    
+    res.json({
+      trackingNumber: "SHIP123456789",
+      awbNumber: "AWB987654321",
+      orderNumber: "ORD123456",
+      status: "in_transit",
+      carrier: "FedEx",
+      serviceType: "Express",
+      packageWeight: 5.5,
+      packageLength: 30,
+      packageWidth: 25,
+      packageHeight: 20,
+      estimatedDelivery,
+      sender,
+      recipient,
+      trackingSteps
+    });
   });
 
   // Order endpoints

@@ -542,10 +542,6 @@ export default function ShippingPage() {
                         <Button
                           type="button"
                           onClick={() => setStep(2)}
-                          disabled={
-                            !form.formState.isValid ||
-                            Object.keys(form.formState.errors).some(key => key.startsWith('sender') || key.startsWith('recipient'))
-                          }
                         >
                           Next <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
@@ -819,12 +815,6 @@ export default function ShippingPage() {
                         <Button
                           type="button"
                           onClick={() => setStep(3)}
-                          disabled={
-                            !form.formState.isValid ||
-                            Object.keys(form.formState.errors).some(key => 
-                              !key.startsWith('sender') && !key.startsWith('recipient')
-                            )
-                          }
                         >
                           Next <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
