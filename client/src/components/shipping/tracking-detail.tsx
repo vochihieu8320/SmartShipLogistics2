@@ -43,7 +43,7 @@ interface TrackingInfo {
     postalCode: string;
     country: string;
   };
-  trackingEvents: TrackingStep[];
+  trackingEvents: TrackingStep[]; // API response uses this field name
 }
 
 interface TrackingDetailProps {
