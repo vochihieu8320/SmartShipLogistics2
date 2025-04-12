@@ -56,6 +56,12 @@ export default function TrackingDetail({ trackingNumber }: TrackingDetailProps) 
   
   const { data: trackingInfo, isLoading, error } = useQuery<TrackingInfo>({
     queryKey: ['/api/tracking', trackingNumber],
+    queryFn: async () => {
+      if (!trackingNumber) throw new Error("No tracking number provided");
+      const response = await fetch(`/api/tracking/${trackingNumber}`);
+      if (!response.ok) throw new Error("Tracking information not found");
+      return await response.json();
+    },
     enabled: trackingNumber.length > 0,
     refetchOnWindowFocus: false
   });

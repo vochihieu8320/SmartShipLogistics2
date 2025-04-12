@@ -29,6 +29,7 @@ function App() {
               {/* Public client-facing routes */}
               <Route path="/" component={HomePage} />
               <Route path="/track" component={TrackingPage} />
+              <Route path="/tracking" component={TrackingPage} /> {/* Added alias route for tracking page */}
               <Route path="/shipping" component={ShippingPage} />
               <Route path="/auth" component={AuthPage} />
               

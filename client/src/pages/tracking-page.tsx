@@ -107,7 +107,7 @@ export default function TrackingPage() {
             <Link href="/shipping">
               <a className="font-medium text-gray-600 hover:text-primary">Shipping</a>
             </Link>
-            <Link href="/track">
+            <Link href="/tracking">
               <a className="font-medium text-primary">Track</a>
             </Link>
             <a href="/#services" className="font-medium text-gray-600 hover:text-primary">Services</a>
@@ -254,7 +254,7 @@ export default function TrackingPage() {
               <ul className="space-y-1">
                 <li><a href="/" className="hover:text-primary">Home</a></li>
                 <li><a href="/shipping" className="hover:text-primary">Shipping</a></li>
-                <li><a href="/track" className="hover:text-primary">Tracking</a></li>
+                <li><a href="/tracking" className="hover:text-primary">Tracking</a></li>
               </ul>
             </div>
             
