@@ -30,6 +30,12 @@ export function registerRoutes(app: Express): Server {
   // Set up authentication
   setupAuth(app);
 
+  // For debugging purposes
+  app.use((req, res, next) => {
+    console.log(`[DEBUG] ${req.method} ${req.path}`);
+    next();
+  });
+  
   // Public API endpoints for client-facing interface
   
   // Tracking API endpoint
