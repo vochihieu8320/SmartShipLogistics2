@@ -23,6 +23,126 @@ export function registerRoutes(app: Express): Server {
   // Set up authentication
   setupAuth(app);
 
+  // Public API endpoints for client-facing interface
+  
+  // Tracking API endpoint
+  app.get("/api/tracking/:trackingNumber", async (req, res, next) => {
+    try {
+      const trackingNumber = req.params.trackingNumber;
+      
+      // Try to find by order number or AWB number
+      const order = await storage.getOrderByNumber(trackingNumber);
+      
+      if (!order) {
+        return res.status(404).json({ error: "Tracking information not found" });
+      }
+      
+      // Get sender and recipient addresses
+      const [sender, recipient] = await Promise.all([
+        storage.getAddress(order.senderId),
+        storage.getAddress(order.recipientId)
+      ]);
+      
+      // Create tracking steps based on status
+      let trackingSteps = [];
+      const orderDate = new Date(order.createdAt);
+      const today = new Date();
+      
+      // Always include order creation step
+      trackingSteps.push({
+        status: "Order Created",
+        location: sender?.city || "N/A",
+        timestamp: orderDate,
+        description: "Your shipment has been created and is pending processing."
+      });
+      
+      // Add steps based on current status
+      if (order.status === "processing") {
+        // No additional steps
+      } else if (order.status === "in_transit") {
+        // Get random transit date between order date and today
+        const transitDate = new Date(
+          orderDate.getTime() + Math.random() * (today.getTime() - orderDate.getTime())
+        );
+        
+        trackingSteps.push({
+          status: "Package Picked Up",
+          location: sender?.city || "N/A",
+          timestamp: new Date(transitDate.setDate(transitDate.getDate() - 1)),
+          description: "Your package has been picked up by the carrier."
+        });
+        
+        trackingSteps.push({
+          status: "In Transit",
+          location: "Transit Hub",
+          timestamp: transitDate,
+          description: `Your package is in transit with ${order.carrier.toUpperCase()}.`
+        });
+      } else if (order.status === "delivered") {
+        // Get random transit date between order date and today
+        const transitDate = new Date(
+          orderDate.getTime() + Math.random() * (today.getTime() - orderDate.getTime())
+        );
+        
+        // Get random delivery date after transit date
+        const deliveryDate = new Date(transitDate);
+        deliveryDate.setDate(deliveryDate.getDate() + 2);
+        
+        trackingSteps.push({
+          status: "Package Picked Up",
+          location: sender?.city || "N/A",
+          timestamp: new Date(transitDate.setDate(transitDate.getDate() - 1)),
+          description: "Your package has been picked up by the carrier."
+        });
+        
+        trackingSteps.push({
+          status: "In Transit",
+          location: "Transit Hub",
+          timestamp: transitDate,
+          description: `Your package is in transit with ${order.carrier.toUpperCase()}.`
+        });
+        
+        trackingSteps.push({
+          status: "Out for Delivery",
+          location: recipient?.city || "N/A",
+          timestamp: new Date(deliveryDate.setHours(deliveryDate.getHours() - 5)),
+          description: "Your package is out for delivery."
+        });
+        
+        trackingSteps.push({
+          status: "Delivered",
+          location: recipient?.city || "N/A",
+          timestamp: deliveryDate,
+          description: "Your package has been delivered."
+        });
+      }
+      
+      // Calculate estimated delivery date (5 days from order creation)
+      const estimatedDelivery = new Date(orderDate);
+      estimatedDelivery.setDate(estimatedDelivery.getDate() + 5);
+      
+      // Format response
+      const response = {
+        trackingNumber: trackingNumber,
+        status: order.status,
+        carrier: order.carrier,
+        serviceType: order.serviceType,
+        packageWeight: order.packageWeight,
+        packageLength: order.packageLength,
+        packageWidth: order.packageWidth,
+        packageHeight: order.packageHeight,
+        estimatedDelivery: estimatedDelivery,
+        sender,
+        recipient,
+        trackingSteps
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   // Order endpoints
   app.get("/api/orders", isAuthenticated, async (req, res, next) => {
     try {
