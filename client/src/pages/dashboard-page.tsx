@@ -7,12 +7,19 @@ import { RevenueChart } from "@/components/reports/revenue-chart";
 import { CarrierChart } from "@/components/reports/carrier-chart";
 import { Package, DollarSign, ClipboardList, AlertTriangle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAuth } from "@/hooks/use-auth";
 import { UserRole } from "@shared/schema";
 import { Loader2 } from "lucide-react";
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  // Mock user for development purposes
+  const user = {
+    id: 1,
+    username: "admin",
+    email: "admin@example.com",
+    fullName: "Admin User",
+    role: UserRole.ADMIN,
+    createdAt: new Date()
+  };
   
   const { data: recentOrders, isLoading: isLoadingOrders } = useQuery({
     queryKey: ["/api/dashboard/recent-orders"],

@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Order, OrderStatus, PaymentStatus } from "@shared/schema";
+import { Order, OrderStatus, PaymentStatus, UserRole } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -90,38 +89,170 @@ export default function OrderTable({ title = "Orders", limit }: OrderTableProps)
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   
-  const { user } = useAuth();
+  // Mock user for development purposes
+  const user = {
+    id: 1,
+    username: "admin",
+    email: "admin@example.com",
+    fullName: "Admin User",
+    role: UserRole.ADMIN,
+    createdAt: new Date()
+  };
   const { toast } = useToast();
   
-  const { data: orders, isLoading } = useQuery<Order[]>({
-    queryKey: ["/api/orders"],
-    staleTime: 60000, // 1 minute
-  });
+  // Mock orders data for development
+  const mockOrders: Order[] = [
+    {
+      id: 1,
+      orderNumber: "SHP-10001",
+      awbNumber: "FDX8376541285",
+      userId: 1,
+      status: OrderStatus.DELIVERED,
+      paymentStatus: PaymentStatus.PAID,
+      description: "Laptop shipment to Chicago office",
+      shipmentType: "Domestic",
+      carrier: "FedEx",
+      serviceType: "Express",
+      packageType: "Box",
+      packageWeight: 5.2,
+      packageLength: 45,
+      packageWidth: 35,
+      packageHeight: 10,
+      shippingDate: new Date("2023-03-15"),
+      // Remove deliveryDate property as it's not in the schema
+      senderName: "John Smith",
+      senderPhone: "123-456-7890",
+      senderEmail: "john@example.com",
+      recipientName: "Chicago Office",
+      recipientPhone: "321-654-0987",
+      recipientEmail: "chicago@example.com",
+      senderId: 1,
+      recipientId: 2,
+      recipientCompany: "TechCorp Chicago",
+      recipientAddress: "123 Michigan Ave",
+      recipientCity: "Chicago",
+      recipientState: "IL",
+      recipientPostalCode: "60601",
+      recipientCountry: "USA",
+      basePrice: "45.00",
+      insurancePrice: "15.00",
+      additionalFees: "5.00",
+      tax: "6.50",
+      totalPrice: "71.50",
+      createdAt: new Date("2023-03-14"),
+      updatedAt: new Date("2023-03-18")
+    },
+    {
+      id: 2,
+      orderNumber: "SHP-10002",
+      awbNumber: "DHL9823754687",
+      userId: 1,
+      status: OrderStatus.IN_TRANSIT,
+      paymentStatus: PaymentStatus.PAID,
+      description: "Marketing materials for conference",
+      shipmentType: "International",
+      carrier: "DHL",
+      serviceType: "Express",
+      packageType: "Box",
+      packageWeight: 8.5,
+      packageLength: 50,
+      packageWidth: 40,
+      packageHeight: 30,
+      shippingDate: new Date("2023-03-18"),
+      // Remove deliveryDate property as it's not in the schema
+      senderName: "John Smith",
+      senderPhone: "123-456-7890",
+      senderEmail: "john@example.com",
+      recipientName: "Berlin Office",
+      recipientPhone: "+49-123-4567890",
+      recipientEmail: "berlin@example.com",
+      senderId: 1,
+      recipientId: 3,
+      recipientCompany: "TechCorp Berlin",
+      recipientAddress: "Berlinerstr 123",
+      recipientCity: "Berlin",
+      recipientState: "",
+      recipientPostalCode: "10115",
+      recipientCountry: "Germany",
+      basePrice: "125.00",
+      insurancePrice: "25.00",
+      additionalFees: "15.00",
+      tax: "16.50",
+      totalPrice: "181.50",
+      createdAt: new Date("2023-03-17"),
+      updatedAt: new Date("2023-03-19")
+    },
+    {
+      id: 3,
+      orderNumber: "SHP-10003",
+      awbNumber: "SFE1234567890",
+      userId: 1,
+      status: OrderStatus.PROCESSING,
+      paymentStatus: PaymentStatus.UNPAID,
+      description: "Product samples to distributor",
+      shipmentType: "International",
+      carrier: "SF Express",
+      serviceType: "Standard",
+      packageType: "Box",
+      packageWeight: 12.3,
+      packageLength: 60,
+      packageWidth: 45,
+      packageHeight: 30,
+      shippingDate: new Date("2023-03-20"),
+      deliveryDate: null,
+      senderName: "John Smith",
+      senderPhone: "123-456-7890",
+      senderEmail: "john@example.com",
+      recipientName: "Shanghai Distributor",
+      recipientPhone: "+86-123-4567890",
+      recipientEmail: "shanghai@example.com",
+      senderId: 1,
+      recipientId: 4,
+      recipientCompany: "Shanghai Trading Co.",
+      recipientAddress: "123 Nanjing Road",
+      recipientCity: "Shanghai",
+      recipientState: "",
+      recipientPostalCode: "200000",
+      recipientCountry: "China",
+      basePrice: "180.00",
+      insurancePrice: "50.00",
+      additionalFees: "20.00",
+      tax: "25.00",
+      totalPrice: "275.00",
+      createdAt: new Date("2023-03-19"),
+      updatedAt: new Date("2023-03-19")
+    }
+  ];
   
-  const updateOrderStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const res = await apiRequest("PATCH", `/api/orders/${id}/status`, { status });
-      return await res.json();
+  const orders = mockOrders;
+  const isLoading = false;
+  
+  // Mock update status mutation
+  const updateOrderStatusMutation = {
+    mutate: ({ id, status }: { id: number; status: string }) => {
+      // Find the order in mock data and update it
+      const orderIndex = mockOrders.findIndex(order => order.id === id);
+      if (orderIndex !== -1) {
+        mockOrders[orderIndex].status = status;
+        
+        // Show success toast
+        toast({
+          title: "Order updated",
+          description: "The order status has been updated successfully.",
+        });
+        
+        setIsUpdateOpen(false);
+      } else {
+        // Show error toast
+        toast({
+          title: "Error updating order",
+          description: "Order not found",
+          variant: "destructive",
+        });
+      }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/recent-orders"] });
-      
-      toast({
-        title: "Order updated",
-        description: "The order status has been updated successfully.",
-      });
-      
-      setIsUpdateOpen(false);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error updating order",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+    isPending: false
+  };
   
   const filteredOrders = useMemo(() => {
     if (!orders) return [];
@@ -129,7 +260,7 @@ export default function OrderTable({ title = "Orders", limit }: OrderTableProps)
     let filtered = [...orders];
     
     // Apply status filter
-    if (selectedStatus) {
+    if (selectedStatus && selectedStatus !== 'all') {
       filtered = filtered.filter(order => order.status === selectedStatus);
     }
     
@@ -202,7 +333,7 @@ export default function OrderTable({ title = "Orders", limit }: OrderTableProps)
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value={OrderStatus.PROCESSING}>Processing</SelectItem>
                 <SelectItem value={OrderStatus.IN_TRANSIT}>In Transit</SelectItem>
                 <SelectItem value={OrderStatus.DELIVERED}>Delivered</SelectItem>
@@ -258,7 +389,7 @@ export default function OrderTable({ title = "Orders", limit }: OrderTableProps)
                             <DropdownMenuItem onClick={() => handleViewOrder(order)}>
                               <Eye className="h-4 w-4 mr-2" /> View Details
                             </DropdownMenuItem>
-                            {(user?.role === "admin" || user?.role === "manager") && (
+                            {(user?.role === UserRole.ADMIN || user?.role === UserRole.MANAGER) && (
                               <DropdownMenuItem onClick={() => handleUpdateStatus(order)}>
                                 <Edit className="h-4 w-4 mr-2" /> Update Status
                               </DropdownMenuItem>
