@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Truck, Package, ArrowRight, CheckCircle2, Loader2, Calculator } from "lucide-react";
+import { Truck, Package, ArrowRight, CheckCircle2, Loader2, Calculator, X } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import RateComparisonTool from "@/components/shipping/rate-comparison";
@@ -64,6 +64,7 @@ type ShippingFormValues = z.infer<typeof shippingFormSchema>;
 export default function ShippingPage() {
   const [step, setStep] = useState(1);
   const [isComplete, setIsComplete] = useState(false);
+  const [displayRateComparison, setDisplayRateComparison] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
   
@@ -213,11 +214,42 @@ export default function ShippingPage() {
       {/* Main Content */}
       <main className="flex-1 bg-gray-50 py-12">
         <div className="container mx-auto px-4">
+          {/* Rate Comparison Modal */}
+          {displayRateComparison && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+              <div className="bg-white rounded-lg shadow-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold">Compare Shipping Rates</h2>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => setDisplayRateComparison(false)}
+                    >
+                      <X className="h-5 w-5" />
+                    </Button>
+                  </div>
+                  <RateComparisonTool />
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">Create a Shipment</h1>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Fill out the form below to create a new shipment. We'll provide you with tracking information and a receipt for your records.
             </p>
+            <div className="flex items-center justify-center gap-2 mt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setDisplayRateComparison(true)}
+                className="flex items-center gap-2"
+              >
+                <Calculator className="h-4 w-4" />
+                Compare Shipping Rates
+              </Button>
+            </div>
           </div>
 
           {!isComplete ? (
