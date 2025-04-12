@@ -4,6 +4,13 @@ import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertOrderSchema, insertPaymentSchema, insertAddressSchema } from "@shared/schema";
 import { z } from "zod";
+import {
+  getAllCarrierRates,
+  generateMockTrackingInfo,
+  RateRequest,
+  RateQuote,
+  TrackingEvent
+} from "./services/carrier-api";
 
 function isAuthenticated(req: Request, res: Response, next: Function) {
   if (req.isAuthenticated()) {
@@ -43,87 +50,23 @@ export function registerRoutes(app: Express): Server {
         storage.getAddress(order.recipientId)
       ]);
       
-      // Create tracking steps based on status
-      let trackingSteps = [];
+      // Use the improved tracking event generator
+      const trackingSteps = generateMockTrackingInfo(
+        trackingNumber, 
+        order.carrier, 
+        order.status
+      );
+      
+      // Calculate estimated delivery date (5 days from order creation for consistent API)
       const orderDate = new Date(order.createdAt);
-      const today = new Date();
-      
-      // Always include order creation step
-      trackingSteps.push({
-        status: "Order Created",
-        location: sender?.city || "N/A",
-        timestamp: orderDate,
-        description: "Your shipment has been created and is pending processing."
-      });
-      
-      // Add steps based on current status
-      if (order.status === "processing") {
-        // No additional steps
-      } else if (order.status === "in_transit") {
-        // Get random transit date between order date and today
-        const transitDate = new Date(
-          orderDate.getTime() + Math.random() * (today.getTime() - orderDate.getTime())
-        );
-        
-        trackingSteps.push({
-          status: "Package Picked Up",
-          location: sender?.city || "N/A",
-          timestamp: new Date(transitDate.setDate(transitDate.getDate() - 1)),
-          description: "Your package has been picked up by the carrier."
-        });
-        
-        trackingSteps.push({
-          status: "In Transit",
-          location: "Transit Hub",
-          timestamp: transitDate,
-          description: `Your package is in transit with ${order.carrier.toUpperCase()}.`
-        });
-      } else if (order.status === "delivered") {
-        // Get random transit date between order date and today
-        const transitDate = new Date(
-          orderDate.getTime() + Math.random() * (today.getTime() - orderDate.getTime())
-        );
-        
-        // Get random delivery date after transit date
-        const deliveryDate = new Date(transitDate);
-        deliveryDate.setDate(deliveryDate.getDate() + 2);
-        
-        trackingSteps.push({
-          status: "Package Picked Up",
-          location: sender?.city || "N/A",
-          timestamp: new Date(transitDate.setDate(transitDate.getDate() - 1)),
-          description: "Your package has been picked up by the carrier."
-        });
-        
-        trackingSteps.push({
-          status: "In Transit",
-          location: "Transit Hub",
-          timestamp: transitDate,
-          description: `Your package is in transit with ${order.carrier.toUpperCase()}.`
-        });
-        
-        trackingSteps.push({
-          status: "Out for Delivery",
-          location: recipient?.city || "N/A",
-          timestamp: new Date(deliveryDate.setHours(deliveryDate.getHours() - 5)),
-          description: "Your package is out for delivery."
-        });
-        
-        trackingSteps.push({
-          status: "Delivered",
-          location: recipient?.city || "N/A",
-          timestamp: deliveryDate,
-          description: "Your package has been delivered."
-        });
-      }
-      
-      // Calculate estimated delivery date (5 days from order creation)
       const estimatedDelivery = new Date(orderDate);
       estimatedDelivery.setDate(estimatedDelivery.getDate() + 5);
       
       // Format response
       const response = {
         trackingNumber: trackingNumber,
+        awbNumber: order.awbNumber,
+        orderNumber: order.orderNumber,
         status: order.status,
         carrier: order.carrier,
         serviceType: order.serviceType,
@@ -138,6 +81,85 @@ export function registerRoutes(app: Express): Server {
       };
       
       res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Carrier rate comparison endpoint
+  app.post("/api/shipping/rates", async (req, res, next) => {
+    try {
+      // Validate request body with zod schema
+      const rateRequestSchema = z.object({
+        sender: z.object({
+          name: z.string(),
+          company: z.string().optional(),
+          street: z.string(),
+          street2: z.string().optional(),
+          city: z.string(),
+          state: z.string(),
+          postalCode: z.string(),
+          country: z.string(),
+          phone: z.string().optional()
+        }),
+        recipient: z.object({
+          name: z.string(),
+          company: z.string().optional(),
+          street: z.string(),
+          street2: z.string().optional(),
+          city: z.string(),
+          state: z.string(),
+          postalCode: z.string(),
+          country: z.string(),
+          phone: z.string().optional()
+        }),
+        package: z.object({
+          length: z.number(),
+          width: z.number(),
+          height: z.number(),
+          weight: z.number(),
+          quantity: z.number().optional()
+        }),
+        serviceType: z.string().optional(),
+        shipmentType: z.string().optional()
+      });
+      
+      const requestData = rateRequestSchema.parse(req.body);
+      
+      // Get rates from all carriers
+      const rates = await getAllCarrierRates(requestData);
+      
+      // Sort rates by price
+      rates.sort((a, b) => a.totalRate - b.totalRate);
+      
+      res.json({ rates });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      next(error);
+    }
+  });
+  
+  // Generate mock tracking number for demonstration
+  app.get("/api/demo-tracking", async (req, res, next) => {
+    try {
+      // Get a random order from the database to use for demonstration
+      const orders = await storage.getAllOrders();
+      
+      if (orders.length === 0) {
+        return res.status(404).json({ error: "No orders found in the system" });
+      }
+      
+      // Pick a random order
+      const randomIndex = Math.floor(Math.random() * orders.length);
+      const randomOrder = orders[randomIndex];
+      
+      res.json({
+        trackingNumber: randomOrder.orderNumber,
+        awbNumber: randomOrder.awbNumber,
+        message: "Use this tracking number for demonstration"
+      });
     } catch (error) {
       next(error);
     }
