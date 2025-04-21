@@ -48,8 +48,18 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [expandedModules, setExpandedModules] = useState<string[]>([]);
   
-  // Permission actions
-  const permissionActions = ["create", "read", "update", "delete"];
+  interface PermissionAction {
+    name: string;
+    display: string;
+  }
+  
+  // Permission actions with display names
+  const permissionActions: PermissionAction[] = [
+    { name: "create", display: "Create" },
+    { name: "read", display: "Read" },
+    { name: "update", display: "Update" },
+    { name: "delete", display: "Delete" }
+  ];
   
   useEffect(() => {
     loadPermissions();
@@ -60,7 +70,7 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
       setIsLoading(true);
       
       // In a real application, you'd fetch this from an API
-      // For now, using the provided JSON data
+      // For now, using the provided JSON data for manager role
       const mockData = {
         "modules": {
           "Home & Login": {
@@ -154,6 +164,109 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
               },
               "Create Invoice": {
                 "feature_id": 6,
+                "permissions": [
+                  { "id": 27, "name": "read", "action_name": "read" }
+                ]
+              },
+              "Create Shipment": {
+                "feature_id": 7,
+                "permissions": [
+                  { "id": 27, "name": "read", "action_name": "read" }
+                ]
+              },
+              "Custom Pricing": {
+                "feature_id": 9,
+                "permissions": [
+                  { "id": 27, "name": "read", "action_name": "read" }
+                ]
+              },
+              "Booking Management": {
+                "feature_id": 10,
+                "permissions": [
+                  { "id": 27, "name": "read", "action_name": "read" }
+                ]
+              },
+              "Weight Update": {
+                "feature_id": 11,
+                "permissions": [
+                  { "id": 27, "name": "read", "action_name": "read" }
+                ]
+              }
+            }
+          },
+          "Financial Management": {
+            "module_id": 9,
+            "features": {
+              "Price Management": {
+                "feature_id": 12,
+                "permissions": [
+                  { "id": 26, "name": "create", "action_name": "create" },
+                  { "id": 27, "name": "read", "action_name": "read" },
+                  { "id": 28, "name": "update", "action_name": "update" }
+                ]
+              },
+              "Daily Transactions": {
+                "feature_id": 13,
+                "permissions": [
+                  { "id": 26, "name": "create", "action_name": "create" },
+                  { "id": 27, "name": "read", "action_name": "read" },
+                  { "id": 28, "name": "update", "action_name": "update" }
+                ]
+              },
+              "Debit Export": {
+                "feature_id": 14,
+                "permissions": [
+                  { "id": 27, "name": "read", "action_name": "read" }
+                ]
+              },
+              "Customer Debt": {
+                "feature_id": 15,
+                "permissions": [
+                  { "id": 27, "name": "read", "action_name": "read" }
+                ]
+              },
+              "Growth Reports": {
+                "feature_id": 16,
+                "permissions": [
+                  { "id": 27, "name": "read", "action_name": "read" }
+                ]
+              }
+            }
+          },
+          "Notifications": {
+            "module_id": 11,
+            "features": {
+              "Change Notifications": {
+                "feature_id": 21,
+                "permissions": [
+                  { "id": 27, "name": "read", "action_name": "read" }
+                ]
+              }
+            }
+          },
+          "Reporting": {
+            "module_id": 12,
+            "features": {
+              "Dashboard": {
+                "feature_id": 22,
+                "permissions": [
+                  { "id": 27, "name": "read", "action_name": "read" }
+                ]
+              },
+              "Growth Trends": {
+                "feature_id": 23,
+                "permissions": [
+                  { "id": 27, "name": "read", "action_name": "read" }
+                ]
+              },
+              "User Performance": {
+                "feature_id": 24,
+                "permissions": [
+                  { "id": 27, "name": "read", "action_name": "read" }
+                ]
+              },
+              "Role Assessment": {
+                "feature_id": 25,
                 "permissions": [
                   { "id": 27, "name": "read", "action_name": "read" }
                 ]
@@ -306,7 +419,7 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
                   <div className="py-2 px-4 bg-muted text-sm font-medium grid grid-cols-5">
                     <div>Feature</div>
                     {permissionActions.map(action => (
-                      <div key={action} className="text-center capitalize">{action}</div>
+                      <div key={action.name} className="text-center">{action.display}</div>
                     ))}
                   </div>
                   {Object.entries(moduleData.features).map(([featureName, featureData]) => (
@@ -316,11 +429,11 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
                     >
                       <div className="text-sm">{featureName}</div>
                       {permissionActions.map(action => (
-                        <div key={action} className="flex justify-center">
+                        <div key={action.name} className="flex justify-center">
                           <Checkbox 
-                            id={`${moduleName}-${featureName}-${action}`}
-                            checked={hasPermission(moduleName, featureName, action)}
-                            onCheckedChange={() => togglePermission(moduleName, featureName, action)}
+                            id={`${moduleName}-${featureName}-${action.name}`}
+                            checked={hasPermission(moduleName, featureName, action.name)}
+                            onCheckedChange={() => togglePermission(moduleName, featureName, action.name)}
                           />
                         </div>
                       ))}

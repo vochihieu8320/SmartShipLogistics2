@@ -49,8 +49,7 @@ export default function UserForm({ onSuccess }: UserFormProps) {
       email: "",
       password: "",
       password_confirmation: "",
-      role_id: "",
-      role_name: "" // Added for role selection
+      role_name: ""
     }
   });
 
