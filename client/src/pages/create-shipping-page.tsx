@@ -124,19 +124,7 @@ export default function CreateShippingPage() {
           currency: "USD",
           type_shipping: "items",
           packaging: "box",
-          items_attributes: [
-            {
-              weight: 15.0,
-              length: 120,
-              width: 80,
-              height: 50,
-              quantity: 1,
-              description: "Furniture",
-              value: 1200,
-              country_of_origin: "VN",
-              hs_code: "940350",
-            },
-          ],
+          items_attributes: [], // Empty array - items will be added via the table interface
         },
       ],
     }
