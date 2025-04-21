@@ -23,9 +23,6 @@ export default function HomePage() {
             <Link href="/auth">
               <Button variant="outline" className="hidden md:inline-flex">Log In</Button>
             </Link>
-            <Link href="/auth?register=true">
-              <Button className="hidden md:inline-flex">Sign Up</Button>
-            </Link>
             <Button variant="ghost" className="md:hidden p-2">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />

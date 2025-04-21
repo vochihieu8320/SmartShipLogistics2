@@ -54,20 +54,7 @@ export default function AuthPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as "login" | "register")}>
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="login">
-                <LoginForm />
-              </TabsContent>
-              
-              <TabsContent value="register">
-                <RegisterForm onSuccess={() => setActiveTab("login")} />
-              </TabsContent>
-            </Tabs>
+            <LoginForm />
           </CardContent>
         </Card>
       </div>
