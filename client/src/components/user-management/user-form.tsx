@@ -50,18 +50,53 @@ export default function UserForm() {
   });
 
   const loadPermissions = async (roleName: string) => {
-    const token = localStorage.getItem('token');
     try {
       setIsLoading(true);
-      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.ROLE_PERMISSIONS}?role_name=${roleName}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      // Mock response
+      const mockResponse = {
+        "success": true,
+        "role": {
+          "id": 27,
+          "name": roleName
+        },
+        "modules": {
+          "Home & Login": {
+            "module_id": 7,
+            "features": {
+              "User Registration": {
+                "feature_id": 1,
+                "permissions": [
+                  { "id": 26, "name": "create", "action_name": "create" },
+                  { "id": 27, "name": "read", "action_name": "read" },
+                  { "id": 28, "name": "update", "action_name": "update" }
+                ]
+              },
+              "User Login": {
+                "feature_id": 2,
+                "permissions": [
+                  { "id": 26, "name": "create", "action_name": "create" },
+                  { "id": 27, "name": "read", "action_name": "read" },
+                  { "id": 28, "name": "update", "action_name": "update" }
+                ]
+              }
+            }
+          },
+          "Account Management": {
+            "module_id": 10,
+            "features": {
+              "Create Account": {
+                "feature_id": 17,
+                "permissions": [
+                  { "id": 26, "name": "create", "action_name": "create" },
+                  { "id": 27, "name": "read", "action_name": "read" },
+                  { "id": 28, "name": "update", "action_name": "update" }
+                ]
+              }
+            }
+          }
         }
-      });
-      if (!res.ok) throw new Error('Failed to load permissions');
-      const data = await res.json();
-      setPermissions(data.modules);
+      };
+      setPermissions(mockResponse.modules);
     } catch (error) {
       toast({
         title: "Error",
@@ -205,34 +240,36 @@ export default function UserForm() {
                 <TableRow>
                   <TableHead>Module</TableHead>
                   <TableHead>Feature</TableHead>
-                  <TableHead>Permissions</TableHead>
+                  <TableHead>Create</TableHead>
+                  <TableHead>Read</TableHead>
+                  <TableHead>Update</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {Object.entries(permissions).map(([moduleName, moduleData]: [string, any]) =>
-                  Object.entries(moduleData.features).map(([featureName, featureData]: [string, any]) => (
-                    <TableRow key={`${moduleName}-${featureName}`}>
-                      <TableCell className="font-medium">{moduleName}</TableCell>
-                      <TableCell>{featureName}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {featureData.permissions.map((p: any) => (
-                            <span 
-                              key={p.id} 
-                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                                ${p.name === 'read' ? 'bg-blue-100 text-blue-800' :
-                                  p.name === 'create' ? 'bg-green-100 text-green-800' :
-                                  p.name === 'update' ? 'bg-yellow-100 text-yellow-800' :
-                                  'bg-slate-100 text-slate-800'}`
-                              }
-                            >
-                              {p.name}
-                            </span>
-                          ))}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  Object.entries(moduleData.features).map(([featureName, featureData]: [string, any]) => {
+                    const permissionMap = {
+                      create: featureData.permissions.some((p: any) => p.name === 'create'),
+                      read: featureData.permissions.some((p: any) => p.name === 'read'),
+                      update: featureData.permissions.some((p: any) => p.name === 'update')
+                    };
+                    
+                    return (
+                      <TableRow key={`${moduleName}-${featureName}`}>
+                        <TableCell className="font-medium">{moduleName}</TableCell>
+                        <TableCell>{featureName}</TableCell>
+                        <TableCell>
+                          {permissionMap.create ? '✓' : '-'}
+                        </TableCell>
+                        <TableCell>
+                          {permissionMap.read ? '✓' : '-'}
+                        </TableCell>
+                        <TableCell>
+                          {permissionMap.update ? '✓' : '-'}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>
