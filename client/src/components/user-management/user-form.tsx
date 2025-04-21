@@ -34,7 +34,11 @@ import { useToast } from "@/hooks/use-toast";
 
 const ROLES = ["manager", "cs", "sales", "accounting"] as const;
 
-export default function UserForm() {
+interface UserFormProps {
+  onSuccess?: () => void;
+}
+
+export default function UserForm({ onSuccess }: UserFormProps) {
   const { toast } = useToast();
   const [permissions, setPermissions] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +49,8 @@ export default function UserForm() {
       email: "",
       password: "",
       password_confirmation: "",
-      role_id: ""
+      role_id: "",
+      role_name: "" // Added for role selection
     }
   });
 
@@ -130,6 +135,11 @@ export default function UserForm() {
       
       form.reset();
       setPermissions(null);
+      
+      // Call the onSuccess callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       toast({
         title: "Error",

@@ -1,0 +1,437 @@
+ "modules": {
+        "Home & Login": {
+            "module_id": 7,
+            "features": {
+                "User Registration": {
+                    "feature_id": 1,
+                    "permissions": [
+                        {
+                            "id": 26,
+                            "name": "create",
+                            "action_name": "create"
+                        },
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        },
+                        {
+                            "id": 28,
+                            "name": "update",
+                            "action_name": "update"
+                        }
+                    ]
+                },
+                "User Login": {
+                    "feature_id": 2,
+                    "permissions": [
+                        {
+                            "id": 26,
+                            "name": "create",
+                            "action_name": "create"
+                        },
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        },
+                        {
+                            "id": 28,
+                            "name": "update",
+                            "action_name": "update"
+                        }
+                    ]
+                },
+                "Role Assignment": {
+                    "feature_id": 3,
+                    "permissions": [
+                        {
+                            "id": 26,
+                            "name": "create",
+                            "action_name": "create"
+                        },
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        },
+                        {
+                            "id": 28,
+                            "name": "update",
+                            "action_name": "update"
+                        }
+                    ]
+                }
+            }
+        },
+        "Account Management": {
+            "module_id": 10,
+            "features": {
+                "Create Account": {
+                    "feature_id": 17,
+                    "permissions": [
+                        {
+                            "id": 26,
+                            "name": "create",
+                            "action_name": "create"
+                        },
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        },
+                        {
+                            "id": 28,
+                            "name": "update",
+                            "action_name": "update"
+                        }
+                    ]
+                },
+                "Discount Setup": {
+                    "feature_id": 18,
+                    "permissions": [
+                        {
+                            "id": 26,
+                            "name": "create",
+                            "action_name": "create"
+                        },
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        },
+                        {
+                            "id": 28,
+                            "name": "update",
+                            "action_name": "update"
+                        }
+                    ]
+                },
+                "KPI Setup": {
+                    "feature_id": 20,
+                    "permissions": [
+                        {
+                            "id": 26,
+                            "name": "create",
+                            "action_name": "create"
+                        },
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        },
+                        {
+                            "id": 28,
+                            "name": "update",
+                            "action_name": "update"
+                        }
+                    ]
+                },
+                "Module Permissions": {
+                    "feature_id": 19,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                }
+            }
+        },
+        "Order Management": {
+            "module_id": 8,
+            "features": {
+                "Create Order": {
+                    "feature_id": 4,
+                    "permissions": [
+                        {
+                            "id": 26,
+                            "name": "create",
+                            "action_name": "create"
+                        },
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        },
+                        {
+                            "id": 28,
+                            "name": "update",
+                            "action_name": "update"
+                        }
+                    ]
+                },
+                "Price Quote": {
+                    "feature_id": 8,
+                    "permissions": [
+                        {
+                            "id": 26,
+                            "name": "create",
+                            "action_name": "create"
+                        },
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        },
+                        {
+                            "id": 28,
+                            "name": "update",
+                            "action_name": "update"
+                        }
+                    ]
+                },
+                "Create House Bill": {
+                    "feature_id": 5,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                },
+                "Create Invoice": {
+                    "feature_id": 6,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                },
+                "Create Shipment": {
+                    "feature_id": 7,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                },
+                "Custom Pricing": {
+                    "feature_id": 9,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                },
+                "Booking Management": {
+                    "feature_id": 10,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                },
+                "Weight Update": {
+                    "feature_id": 11,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                }
+            }
+        },
+        "Financial Management": {
+            "module_id": 9,
+            "features": {
+                "Price Management": {
+                    "feature_id": 12,
+                    "permissions": [
+                        {
+                            "id": 26,
+                            "name": "create",
+                            "action_name": "create"
+                        },
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        },
+                        {
+                            "id": 28,
+                            "name": "update",
+                            "action_name": "update"
+                        }
+                    ]
+                },
+                "Daily Transactions": {
+                    "feature_id": 13,
+                    "permissions": [
+                        {
+                            "id": 26,
+                            "name": "create",
+                            "action_name": "create"
+                        },
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        },
+                        {
+                            "id": 28,
+                            "name": "update",
+                            "action_name": "update"
+                        }
+                    ]
+                },
+                "Debit Export": {
+                    "feature_id": 14,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                },
+                "Customer Debt": {
+                    "feature_id": 15,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                },
+                "Growth Reports": {
+                    "feature_id": 16,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                }
+            }
+        },
+        "Notifications": {
+            "module_id": 11,
+            "features": {
+                "Change Notifications": {
+                    "feature_id": 21,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                }
+            }
+        },
+        "Reporting": {
+            "module_id": 12,
+            "features": {
+                "Dashboard": {
+                    "feature_id": 22,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                },
+                "Growth Trends": {
+                    "feature_id": 23,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                },
+                "User Performance": {
+                    "feature_id": 24,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                },
+                "Role Assessment": {
+                    "feature_id": 25,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                },
+                "KPI Reports": {
+                    "feature_id": 26,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                },
+                "Service Reports": {
+                    "feature_id": 27,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                }
+            }
+        },
+        "Data & Pricing": {
+            "module_id": 13,
+            "features": {
+                "Market Reports": {
+                    "feature_id": 28,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                },
+                "Price Export": {
+                    "feature_id": 30,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                },
+                "Weight-based Discounts": {
+                    "feature_id": 31,
+                    "permissions": [
+                        {
+                            "id": 27,
+                            "name": "read",
+                            "action_name": "read"
+                        }
+                    ]
+                }
+            }
+        }
+    }

@@ -1,16 +1,22 @@
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import UserTable from "@/components/user-management/user-table";
 import UserForm from "@/components/user-management/user-form";
+import RolePermissions from "@/components/user-management/role-permissions";
 import { useState } from "react";
 
 export default function UsersPage() {
   const [activeTab, setActiveTab] = useState("list");
+  const [selectedRole, setSelectedRole] = useState("manager");
+  
+  // Available roles
+  const ROLES = ["manager", "cs", "sales", "accounting"];
   
   return (
     <DashboardLayout title="User Management">
-      <Card>
+      <Card className="mb-8">
         <CardHeader>
           <CardTitle>User Management</CardTitle>
           <CardDescription>
@@ -27,6 +33,7 @@ export default function UsersPage() {
             <TabsList>
               <TabsTrigger value="list">User List</TabsTrigger>
               <TabsTrigger value="create">Create User</TabsTrigger>
+              <TabsTrigger value="permissions">Role Permissions</TabsTrigger>
             </TabsList>
             
             <TabsContent value="list" className="space-y-4">
@@ -35,6 +42,29 @@ export default function UsersPage() {
             
             <TabsContent value="create" className="space-y-4">
               <UserForm onSuccess={() => setActiveTab("list")} />
+            </TabsContent>
+            
+            <TabsContent value="permissions" className="space-y-4">
+              <div className="mb-6 max-w-md">
+                <label className="block text-sm font-medium mb-2">Select Role to Manage</label>
+                <Select 
+                  value={selectedRole}
+                  onValueChange={setSelectedRole}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROLES.map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {role.charAt(0).toUpperCase() + role.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <RolePermissions roleName={selectedRole} />
             </TabsContent>
           </Tabs>
         </CardContent>
