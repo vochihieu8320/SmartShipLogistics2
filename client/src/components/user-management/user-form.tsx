@@ -32,13 +32,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const ROLES = [
-  { name: "admin", id: 26 },
-  { name: "manager", id: 27 },
-  { name: "cs", id: 28 },
-  { name: "sales", id: 29 },
-  { name: "accounting", id: 30 }
-];
+const ROLES = ["manager", "cs", "sales", "accounting"] as const;
 
 export default function UserForm() {
   const { toast } = useToast();
@@ -160,15 +154,14 @@ export default function UserForm() {
           
           <FormField
             control={form.control}
-            name="role_id"
+            name="role_name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Role</FormLabel>
                 <Select 
                   onValueChange={(value) => {
                     field.onChange(value);
-                    const role = ROLES.find(r => r.id.toString() === value);
-                    if (role) loadPermissions(role.name);
+                    loadPermissions(value);
                   }}
                   value={field.value}
                 >
@@ -179,8 +172,8 @@ export default function UserForm() {
                   </FormControl>
                   <SelectContent>
                     {ROLES.map((role) => (
-                      <SelectItem key={role.id} value={role.id.toString()}>
-                        {role.name}
+                      <SelectItem key={role} value={role}>
+                        {role.charAt(0).toUpperCase() + role.slice(1)}
                       </SelectItem>
                     ))}
                   </SelectContent>

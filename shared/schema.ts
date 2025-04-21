@@ -174,7 +174,7 @@ export const createUserSchema = z.object({
   email: z.string().email("Must be a valid email"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   password_confirmation: z.string(),
-  role_id: z.string()
+  role_name: z.enum(["manager", "cs", "sales", "accounting"])
 }).refine(data => data.password === data.password_confirmation, {
   message: "Passwords don't match",
   path: ["password_confirmation"]
