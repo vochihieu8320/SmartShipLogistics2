@@ -420,6 +420,95 @@ export function registerRoutes(app: Express): Server {
     });
   });
   
+  // API endpoint for creating shipments (mock)
+  app.post("/api/v1/shipments", (req, res) => {
+    console.log("[DEBUG] Creating mock shipment");
+    // Return mock response as provided
+    res.status(201).json({
+      "id": 32,
+      "sender_address_id": 33,
+      "receiver_address_id": 34,
+      "tracking_number": null,
+      "status": null,
+      "provider_id": 1,
+      "provider_service_id": 1,
+      "estimated_delivery": null,
+      "actual_delivery": null,
+      "carrier_account": null,
+      "created_at": "2025-04-21T15:22:38.848Z",
+      "updated_at": "2025-04-21T15:22:38.848Z",
+      "total_price": null,
+      "packages": [
+          {
+              "id": 79,
+              "shipment_id": 32,
+              "carriage_value": 1200,
+              "unit_of_weight": "kg_cm",
+              "currency": "USD",
+              "type_shipping": "items",
+              "packaging": "box",
+              "weight_total": 15,
+              "volume_weight": 96,
+              "created_at": "2025-04-21T15:22:39.045Z",
+              "updated_at": "2025-04-21T15:22:39.434Z",
+              "items": [
+                  {
+                      "id": 123,
+                      "package_id": 79,
+                      "weight": 15,
+                      "length": 120,
+                      "width": 80,
+                      "height": 50,
+                      "quantity": 1,
+                      "description": "Furniture",
+                      "value": 1200,
+                      "country_of_origin": "VN",
+                      "hs_code": "940350",
+                      "package_tracking_number": null,
+                      "created_at": "2025-04-21T15:22:39.198Z",
+                      "updated_at": "2025-04-21T15:22:39.334Z",
+                      "volume_weight": "96.0"
+                  }
+              ]
+          }
+      ],
+      "sender_address": {
+          "id": 33,
+          "name": "Le Van C",
+          "company": "Furniture Exports",
+          "country_id": 1,
+          "postal_code": "70000",
+          "city": "Ho Chi Minh City",
+          "state": "",
+          "address1": "789 Cach Mang Thang 8",
+          "address2": "District 3",
+          "address3": "",
+          "phone": "+84918765432",
+          "email": "le@example.com",
+          "address_type": null,
+          "created_at": "2025-04-21T15:22:38.749Z",
+          "updated_at": "2025-04-21T15:22:38.749Z"
+      },
+      "receiver_address": {
+          "id": 34,
+          "name": "Li Wei",
+          "company": "",
+          "country_id": 5,
+          "postal_code": "018956",
+          "city": "Singapore",
+          "state": "",
+          "address1": "10 Marina Boulevard",
+          "address2": "#25-01",
+          "address3": "",
+          "phone": "+6591234567",
+          "email": "li.wei@example.com",
+          "address_type": null,
+          "created_at": "2025-04-21T15:22:38.800Z",
+          "updated_at": "2025-04-21T15:22:38.800Z"
+      }
+    });
+  });
+  
   // Removed duplicate endpoint
 
   // Order endpoints
