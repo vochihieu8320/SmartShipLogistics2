@@ -138,18 +138,20 @@ export default function ShipmentsPage() {
           </div>
           <nav className="hidden md:flex gap-8">
             <Link href="/">
-              <a className="font-medium text-gray-600 hover:text-primary">Home</a>
+              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">Home</span>
             </Link>
             <Link href="/shipping">
-              <a className="font-medium text-gray-600 hover:text-primary">Shipping</a>
+              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">Shipping</span>
             </Link>
             <Link href="/tracking">
-              <a className="font-medium text-gray-600 hover:text-primary">Track</a>
+              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">Track</span>
             </Link>
             <Link href="/shipments">
-              <a className="font-medium text-primary">Shipments</a>
+              <span className="font-medium text-primary cursor-pointer">Shipments</span>
             </Link>
-            <a href="/#contact" className="font-medium text-gray-600 hover:text-primary">Contact</a>
+            <Link href="/#contact">
+              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">Contact</span>
+            </Link>
           </nav>
           <div className="flex items-center gap-2">
             <Link href="/auth">
@@ -319,19 +321,19 @@ export default function ShipmentsPage() {
             <div className="text-sm">
               <h4 className="text-white text-lg font-semibold mb-2">Quick Links</h4>
               <ul className="space-y-1">
-                <li><a href="/" className="hover:text-primary">Home</a></li>
-                <li><a href="/shipping" className="hover:text-primary">Shipping</a></li>
-                <li><a href="/tracking" className="hover:text-primary">Tracking</a></li>
-                <li><a href="/shipments" className="hover:text-primary">Shipments</a></li>
+                <li><Link href="/"><span className="hover:text-primary cursor-pointer">Home</span></Link></li>
+                <li><Link href="/shipping"><span className="hover:text-primary cursor-pointer">Shipping</span></Link></li>
+                <li><Link href="/tracking"><span className="hover:text-primary cursor-pointer">Tracking</span></Link></li>
+                <li><Link href="/shipments"><span className="hover:text-primary cursor-pointer">Shipments</span></Link></li>
               </ul>
             </div>
             
             <div className="text-sm">
               <h4 className="text-white text-lg font-semibold mb-2">Services</h4>
               <ul className="space-y-1">
-                <li><a href="#" className="hover:text-primary">Package Delivery</a></li>
-                <li><a href="#" className="hover:text-primary">Freight Shipping</a></li>
-                <li><a href="#" className="hover:text-primary">International Shipping</a></li>
+                <li><span className="hover:text-primary cursor-pointer">Package Delivery</span></li>
+                <li><span className="hover:text-primary cursor-pointer">Freight Shipping</span></li>
+                <li><span className="hover:text-primary cursor-pointer">International Shipping</span></li>
               </ul>
             </div>
             
