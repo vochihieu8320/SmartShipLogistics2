@@ -15,7 +15,8 @@ export default function HomePage() {
           <nav className="hidden md:flex gap-8">
             <a href="/" className="font-medium text-primary">Home</a>
             <a href="/shipping" className="font-medium text-gray-600 hover:text-primary">Shipping</a>
-            <a href="/track" className="font-medium text-gray-600 hover:text-primary">Track</a>
+            <a href="/tracking" className="font-medium text-gray-600 hover:text-primary">Track</a>
+            <a href="/shipments" className="font-medium text-gray-600 hover:text-primary">Shipments</a>
             <a href="#services" className="font-medium text-gray-600 hover:text-primary">Services</a>
             <a href="#contact" className="font-medium text-gray-600 hover:text-primary">Contact</a>
           </nav>
@@ -48,7 +49,7 @@ export default function HomePage() {
                   Ship Now <ChevronRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/track">
+              <Link href="/tracking">
                 <Button size="lg" variant="outline" className="gap-2">
                   Track Shipment <Search className="h-4 w-4" />
                 </Button>
@@ -231,7 +232,8 @@ export default function HomePage() {
               <ul className="space-y-2">
                 <li><a href="/" className="hover:text-primary">Home</a></li>
                 <li><a href="/shipping" className="hover:text-primary">Shipping</a></li>
-                <li><a href="/track" className="hover:text-primary">Tracking</a></li>
+                <li><a href="/tracking" className="hover:text-primary">Tracking</a></li>
+                <li><a href="/shipments" className="hover:text-primary">Shipments</a></li>
                 <li><a href="#services" className="hover:text-primary">Services</a></li>
                 <li><a href="/auth" className="hover:text-primary">Login / Register</a></li>
               </ul>

@@ -17,6 +17,7 @@ import { queryClient } from "@/lib/queryClient";
 import HomePage from "@/pages/home-page";
 import TrackingPage from "@/pages/tracking-page";
 import ShippingPage from "@/pages/shipping-page";
+import ShipmentsPage from "@/pages/shipments-page";
 import { ThemeProvider } from "@/components/theme-provider";
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
               <Route path="/track" component={TrackingPage} />
               <Route path="/tracking" component={TrackingPage} /> {/* Added alias route for tracking page */}
               <Route path="/shipping" component={ShippingPage} />
+              <Route path="/shipments" component={ShipmentsPage} /> {/* Added shipments list page */}
               <Route path="/auth" component={AuthPage} />
               
               {/* Protected admin dashboard routes */}

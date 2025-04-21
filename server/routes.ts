@@ -258,6 +258,69 @@ export function registerRoutes(app: Express): Server {
     }
   });
   
+  // API endpoint for listing shipments (mock)
+  app.get("/api/v1/shipments", (req, res) => {
+    console.log("[DEBUG] Serving mock shipments data");
+    // Return mock data as requested
+    res.json({
+      "success": true,
+      "count": 30,
+      "shipments": [
+        {
+          "id": 1,
+          "tracking_number": "SHIPS17451448440",
+          "status": null,
+          "created_at": "2025-04-20T10:27:25.530Z",
+          "sender": {
+            "name": "Nguyen Van A",
+            "city": "Ho Chi Minh City",
+            "country": "Việt Nam"
+          },
+          "receiver": {
+            "name": "Li Wei",
+            "city": "Singapore",
+            "country": "Việt Nam"
+          },
+          "total_price": null
+        },
+        {
+          "id": 2,
+          "tracking_number": "SHIPS17451442345",
+          "status": "in_transit",
+          "created_at": "2025-04-19T14:35:25.530Z",
+          "sender": {
+            "name": "Tran Thi B",
+            "city": "Ha Noi",
+            "country": "Việt Nam"
+          },
+          "receiver": {
+            "name": "John Smith",
+            "city": "New York",
+            "country": "USA"
+          },
+          "total_price": 245.50
+        },
+        {
+          "id": 3,
+          "tracking_number": "SHIPS17451435687",
+          "status": "delivered",
+          "created_at": "2025-04-15T08:27:25.530Z",
+          "sender": {
+            "name": "Le Van C",
+            "city": "Da Nang",
+            "country": "Việt Nam"
+          },
+          "receiver": {
+            "name": "Maria Garcia",
+            "city": "Madrid",
+            "country": "Spain"
+          },
+          "total_price": 312.75
+        }
+      ]
+    });
+  });
+  
   // Removed duplicate endpoint
 
   // Order endpoints
