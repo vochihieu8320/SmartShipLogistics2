@@ -321,6 +321,105 @@ export function registerRoutes(app: Express): Server {
     });
   });
   
+  // API endpoint for admin orders (mock)
+  app.get("/api/v1/admin/orders", (req, res) => {
+    console.log("[DEBUG] Serving mock admin orders data");
+    // Return mock data for orders management
+    res.json({
+      "success": true,
+      "count": 25,
+      "orders": [
+        {
+          "id": 1,
+          "orderNumber": "SHP-10001",
+          "awbNumber": "FDX8376541285",
+          "userId": 1,
+          "status": "delivered",
+          "paymentStatus": "paid",
+          "description": "Laptop shipment to Chicago office",
+          "shipmentType": "Domestic",
+          "carrier": "FedEx",
+          "serviceType": "Express",
+          "packageType": "Box",
+          "packageWeight": 5.2,
+          "packageLength": 45,
+          "packageWidth": 35,
+          "packageHeight": 10,
+          "shippingDate": "2025-04-10T00:00:00.000Z",
+          "senderId": 1,
+          "recipientId": 2,
+          "packageQuantity": 1,
+          "basePrice": "45.00",
+          "insurancePrice": "15.00",
+          "additionalFees": "5.00",
+          "tax": "6.50",
+          "totalPrice": "71.50",
+          "additionalServices": null,
+          "createdAt": "2025-04-09T00:00:00.000Z",
+          "updatedAt": "2025-04-11T00:00:00.000Z"
+        },
+        {
+          "id": 2,
+          "orderNumber": "SHP-10002",
+          "awbNumber": "DHL9823754687",
+          "userId": 1,
+          "status": "in_transit",
+          "paymentStatus": "paid",
+          "description": "Marketing materials for conference",
+          "shipmentType": "International",
+          "carrier": "DHL",
+          "serviceType": "Express",
+          "packageType": "Box",
+          "packageWeight": 8.5,
+          "packageLength": 50,
+          "packageWidth": 40,
+          "packageHeight": 30,
+          "shippingDate": "2025-04-15T00:00:00.000Z",
+          "senderId": 1,
+          "recipientId": 3,
+          "packageQuantity": 1,
+          "basePrice": "125.00",
+          "insurancePrice": "25.00",
+          "additionalFees": "15.00",
+          "tax": "16.50",
+          "totalPrice": "181.50",
+          "additionalServices": null,
+          "createdAt": "2025-04-14T00:00:00.000Z",
+          "updatedAt": "2025-04-16T00:00:00.000Z"
+        },
+        {
+          "id": 3,
+          "orderNumber": "SHP-10003",
+          "awbNumber": "SFE1234567890",
+          "userId": 1,
+          "status": "processing",
+          "paymentStatus": "unpaid",
+          "description": "Product samples to distributor",
+          "shipmentType": "International",
+          "carrier": "SF Express",
+          "serviceType": "Standard",
+          "packageType": "Box",
+          "packageWeight": 12.3,
+          "packageLength": 60,
+          "packageWidth": 45,
+          "packageHeight": 30,
+          "shippingDate": "2025-04-20T00:00:00.000Z",
+          "senderId": 1,
+          "recipientId": 4,
+          "packageQuantity": 2,
+          "basePrice": "180.00",
+          "insurancePrice": "50.00",
+          "additionalFees": "20.00",
+          "tax": "25.00",
+          "totalPrice": "275.00",
+          "additionalServices": null,
+          "createdAt": "2025-04-19T00:00:00.000Z",
+          "updatedAt": "2025-04-19T00:00:00.000Z"
+        }
+      ]
+    });
+  });
+  
   // Removed duplicate endpoint
 
   // Order endpoints

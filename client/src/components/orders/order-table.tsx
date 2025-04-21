@@ -100,131 +100,51 @@ export default function OrderTable({ title = "Orders", limit }: OrderTableProps)
   };
   const { toast } = useToast();
   
-  // Mock orders data for development that matches the schema
-  const mockOrders: Order[] = [
-    {
-      id: 1,
-      orderNumber: "SHP-10001",
-      awbNumber: "FDX8376541285",
-      userId: 1,
-      status: OrderStatus.DELIVERED,
-      paymentStatus: PaymentStatus.PAID,
-      description: "Laptop shipment to Chicago office",
-      shipmentType: "Domestic",
-      carrier: "FedEx",
-      serviceType: "Express",
-      packageType: "Box",
-      packageWeight: 5.2,
-      packageLength: 45,
-      packageWidth: 35,
-      packageHeight: 10,
-      shippingDate: new Date("2023-03-15"),
-      senderId: 1,
-      recipientId: 2,
-      packageQuantity: 1,
-      basePrice: "45.00",
-      insurancePrice: "15.00",
-      additionalFees: "5.00",
-      tax: "6.50",
-      totalPrice: "71.50",
-      additionalServices: null,
-      createdAt: new Date("2023-03-14"),
-      updatedAt: new Date("2023-03-18")
-    },
-    {
-      id: 2,
-      orderNumber: "SHP-10002",
-      awbNumber: "DHL9823754687",
-      userId: 1,
-      status: OrderStatus.IN_TRANSIT,
-      paymentStatus: PaymentStatus.PAID,
-      description: "Marketing materials for conference",
-      shipmentType: "International",
-      carrier: "DHL",
-      serviceType: "Express",
-      packageType: "Box",
-      packageWeight: 8.5,
-      packageLength: 50,
-      packageWidth: 40,
-      packageHeight: 30,
-      shippingDate: new Date("2023-03-18"),
-      senderId: 1,
-      recipientId: 3,
-      packageQuantity: 1,
-      basePrice: "125.00",
-      insurancePrice: "25.00",
-      additionalFees: "15.00",
-      tax: "16.50",
-      totalPrice: "181.50",
-      additionalServices: null,
-      createdAt: new Date("2023-03-17"),
-      updatedAt: new Date("2023-03-19")
-    },
-    {
-      id: 3,
-      orderNumber: "SHP-10003",
-      awbNumber: "SFE1234567890",
-      userId: 1,
-      status: OrderStatus.PROCESSING,
-      paymentStatus: PaymentStatus.UNPAID,
-      description: "Product samples to distributor",
-      shipmentType: "International",
-      carrier: "SF Express",
-      serviceType: "Standard",
-      packageType: "Box",
-      packageWeight: 12.3,
-      packageLength: 60,
-      packageWidth: 45,
-      packageHeight: 30,
-      shippingDate: new Date("2023-03-20"),
-      senderId: 1,
-      recipientId: 4,
-      packageQuantity: 2,
-      basePrice: "180.00",
-      insurancePrice: "50.00",
-      additionalFees: "20.00",
-      tax: "25.00",
-      totalPrice: "275.00",
-      additionalServices: null,
-      createdAt: new Date("2023-03-19"),
-      updatedAt: new Date("2023-03-19")
-    }
-  ];
-  
-  const orders = mockOrders;
-  const isLoading = false;
-  
-  // Mock update status mutation
-  const updateOrderStatusMutation = {
-    mutate: ({ id, status }: { id: number; status: string }) => {
-      // Find the order in mock data and update it
-      const orderIndex = mockOrders.findIndex(order => order.id === id);
-      if (orderIndex !== -1) {
-        mockOrders[orderIndex].status = status;
-        
-        // Show success toast
-        toast({
-          title: "Order updated",
-          description: "The order status has been updated successfully.",
-        });
-        
-        setIsUpdateOpen(false);
-      } else {
-        // Show error toast
-        toast({
-          title: "Error updating order",
-          description: "Order not found",
-          variant: "destructive",
-        });
+  // Fetch orders from API
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["/api/v1/admin/orders"],
+    queryFn: async () => {
+      const response = await fetch("/api/v1/admin/orders");
+      if (!response.ok) {
+        throw new Error("Failed to fetch orders");
       }
+      const data = await response.json();
+      return data.orders;
     },
-    isPending: false
-  };
+  });
+  
+  // Update status mutation
+  const updateOrderStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      // In a real app, this would be an API call to update the status
+      // For mock demonstration, we're just returning the input
+      return { id, status };
+    },
+    onSuccess: () => {
+      // Show success toast
+      toast({
+        title: "Order updated",
+        description: "The order status has been updated successfully.",
+      });
+      
+      setIsUpdateOpen(false);
+      // Refetch orders to get updated data
+      queryClient.invalidateQueries({ queryKey: ["/api/v1/admin/orders"] });
+    },
+    onError: (error) => {
+      // Show error toast
+      toast({
+        title: "Error updating order",
+        description: (error as Error).message || "Failed to update order status",
+        variant: "destructive",
+      });
+    }
+  });
   
   const filteredOrders = useMemo(() => {
-    if (!orders) return [];
+    if (!data) return [];
     
-    let filtered = [...orders];
+    let filtered = [...data];
     
     // Apply status filter
     if (selectedStatus && selectedStatus !== 'all') {
@@ -249,7 +169,7 @@ export default function OrderTable({ title = "Orders", limit }: OrderTableProps)
     return filtered.sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-  }, [orders, selectedStatus, searchTerm, limit]);
+  }, [data, selectedStatus, searchTerm, limit]);
   
   const handleViewOrder = (order: Order) => {
     setSelectedOrder(order);
@@ -267,7 +187,7 @@ export default function OrderTable({ title = "Orders", limit }: OrderTableProps)
     }
   };
   
-  if (isLoading) {
+  if (isLoading || !data) {
     return (
       <Card>
         <CardHeader>
