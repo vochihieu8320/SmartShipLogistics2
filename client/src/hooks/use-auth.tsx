@@ -7,6 +7,7 @@ import {
 import { insertUserSchema, User as SelectUser, InsertUser, loginUserSchema, LoginCredentials } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { API_BASE_URL, API_ENDPOINTS } from "@/config/api";
 
 type AuthContextType = {
   user: SelectUser | null;
