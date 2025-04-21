@@ -33,27 +33,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.LOGIN}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: credentials.username,
-          password: credentials.password,
-        }),
-      });
-      if (!res.ok) {
-        throw new Error('Login failed');
+      // Mock API call
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+      
+      // Mock response
+      if (credentials.username === 'admin@example.com' && credentials.password === 'password123') {
+        const mockResponse = {
+          token: "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE3NDUzMzA1MDV9.COT01SSbFDY1HCXCjxhffh5_g5XNObeqi6o42MUCY74",
+          user_id: 3,
+          email: "admin@example.com"
+        };
+        
+        localStorage.setItem('token', mockResponse.token);
+        return {
+          id: mockResponse.user_id,
+          email: mockResponse.email,
+          fullName: mockResponse.email.split('@')[0],
+          role: 'admin'
+        };
       }
-      const data = await res.json();
-      localStorage.setItem('token', data.token);
-      return {
-        id: data.user_id,
-        email: data.email,
-        fullName: data.email.split('@')[0],
-        role: 'staff'
-      };
+      
+      throw new Error('Invalid credentials');
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
