@@ -7,10 +7,14 @@ interface ShippingSummaryProps {
 }
 
 export default function ShippingSummary({ formData }: ShippingSummaryProps) {
-  const { shipment, sender_address_attributes, receiver_address_attributes, packages_attributes } = formData;
+  const { shipment } = formData;
+  
+  // Get addresses from the correct path in the API structure
+  const sender_address_attributes = shipment?.sender_address_attributes || {};
+  const receiver_address_attributes = shipment?.receiver_address_attributes || {};
   
   // Get the first package and item (assuming only one for now)
-  const firstPackage = packages_attributes?.[0] || {};
+  const firstPackage = shipment?.packages_attributes?.[0] || {};
   const firstItem = firstPackage?.items_attributes?.[0] || {};
   
   // Calculate volumetric weight

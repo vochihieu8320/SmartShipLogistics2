@@ -18,7 +18,7 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
         <div className="grid md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name={`${type}_address_attributes.name`}
+            name={`shipment.${type}_address_attributes.name`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Full Name</FormLabel>
@@ -31,7 +31,7 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
           />
           <FormField
             control={form.control}
-            name={`${type}_address_attributes.company`}
+            name={`shipment.${type}_address_attributes.company`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Company (Optional)</FormLabel>
@@ -47,7 +47,7 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
         <div className="grid md:grid-cols-2 gap-4 mt-4">
           <FormField
             control={form.control}
-            name={`${type}_address_attributes.email`}
+            name={`shipment.${type}_address_attributes.email`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email</FormLabel>
@@ -60,7 +60,7 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
           />
           <FormField
             control={form.control}
-            name={`${type}_address_attributes.phone`}
+            name={`shipment.${type}_address_attributes.phone`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Phone</FormLabel>
@@ -76,7 +76,7 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
         <div className="mt-4">
           <FormField
             control={form.control}
-            name={`${type}_address_attributes.address1`}
+            name={`shipment.${type}_address_attributes.address1`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Address Line 1</FormLabel>
@@ -92,7 +92,7 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
         <div className="mt-4">
           <FormField
             control={form.control}
-            name={`${type}_address_attributes.address2`}
+            name={`shipment.${type}_address_attributes.address2`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Address Line 2 (Optional)</FormLabel>
@@ -108,7 +108,7 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
         <div className="grid md:grid-cols-3 gap-4 mt-4">
           <FormField
             control={form.control}
-            name={`${type}_address_attributes.city`}
+            name={`shipment.${type}_address_attributes.city`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>City</FormLabel>
@@ -121,7 +121,7 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
           />
           <FormField
             control={form.control}
-            name={`${type}_address_attributes.state`}
+            name={`shipment.${type}_address_attributes.state`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>State/Province</FormLabel>
@@ -134,7 +134,7 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
           />
           <FormField
             control={form.control}
-            name={`${type}_address_attributes.postal_code`}
+            name={`shipment.${type}_address_attributes.postal_code`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Postal Code</FormLabel>
@@ -150,7 +150,7 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
         <div className="mt-4">
           <FormField
             control={form.control}
-            name={`${type}_address_attributes.country_id`}
+            name={`shipment.${type}_address_attributes.country_id`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Country</FormLabel>
