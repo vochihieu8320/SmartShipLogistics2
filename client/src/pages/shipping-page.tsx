@@ -249,6 +249,12 @@ export default function ShippingPage() {
                 <Calculator className="h-4 w-4" />
                 Compare Shipping Rates
               </Button>
+              <Link href="/shipping/create">
+                <Button className="flex items-center gap-2">
+                  <Package className="h-4 w-4" />
+                  Create New Shipment
+                </Button>
+              </Link>
             </div>
           </div>
 
