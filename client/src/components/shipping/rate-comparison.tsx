@@ -46,7 +46,34 @@ const rateComparisonSchema = z.object({
   shipmentType: z.enum(["domestic", "international"]).default("domestic"),
 });
 
-// Types for the rate quote response
+// Types for the rate quote response from the API
+interface AppliedFee {
+  name: string;
+  display_name: string;
+  amount: string;
+  description: string;
+  note: string | null;
+}
+
+interface PackageFee {
+  package: number;
+  applied_fees: AppliedFee[];
+}
+
+interface ServicePrices {
+  net_price: number;
+  fuel_surcharge: number;
+  peak_season: number;
+  oversize_fee: PackageFee[];
+}
+
+interface ProviderService {
+  id: number;
+  name: string;
+  prices: ServicePrices;
+}
+
+// Legacy RateQuote for compatibility with existing code
 interface RateQuote {
   carrier: string;
   service: string;

@@ -1,0 +1,113 @@
+[
+    {
+        "id": 1,
+        "name": "Worldwide Saver",
+        "prices": {
+            "net_price": 6558288.043478,
+            "fuel_surcharge": 26.75,
+            "peak_season": 9.0,
+            "oversize_fee": [
+                {
+                    "package": 80,
+                    "applied_fees": [
+                        {
+                            "name": "local_ups_freight",
+                            "display_name": "VÙNG DÂN CƯ UPS Worldwide Express Freight",
+                            "amount": "3019515.0",
+                            "description": "Có một kiện hàng nặng hơn 70 kg",
+                            "note": null
+                        },
+                        {
+                            "name": "ahc",
+                            "display_name": "AHC",
+                            "amount": "368715.0",
+                            "description": "Có một kiện hàng năng hơn 25kg",
+                            "note": null
+                        },
+                        {
+                            "name": "lps",
+                            "display_name": "LPS",
+                            "amount": "1602700.0",
+                            "description": "Nếu chu vi nằm trong khoảng từ 300 đến 400cm thì dù kiện hàng có nghẹ hơn hãng vấn tính 40kg",
+                            "note": "Chu vi = (2 × 2 cạnh ngắn nhất) + cạnh dài nhất"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": 2,
+        "name": "Worldwide Expedited",
+        "prices": {
+            "net_price": 0.0,
+            "fuel_surcharge": 26.75,
+            "peak_season": 0.0,
+            "oversize_fee": [
+                {
+                    "package": 80,
+                    "applied_fees": [
+                        {
+                            "name": "local_ups_freight",
+                            "display_name": "VÙNG DÂN CƯ UPS Worldwide Express Freight",
+                            "amount": "3019515.0",
+                            "description": "Có một kiện hàng nặng hơn 70 kg",
+                            "note": null
+                        },
+                        {
+                            "name": "ahc",
+                            "display_name": "AHC",
+                            "amount": "368715.0",
+                            "description": "Có một kiện hàng năng hơn 25kg",
+                            "note": null
+                        },
+                        {
+                            "name": "lps",
+                            "display_name": "LPS",
+                            "amount": "1602700.0",
+                            "description": "Nếu chu vi nằm trong khoảng từ 300 đến 400cm thì dù kiện hàng có nghẹ hơn hãng vấn tính 40kg",
+                            "note": "Chu vi = (2 × 2 cạnh ngắn nhất) + cạnh dài nhất"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": 3,
+        "name": "Worldwide Express Freight",
+        "prices": {
+            "net_price": 0.0,
+            "fuel_surcharge": 26.75,
+            "peak_season": 0.0,
+            "oversize_fee": [
+                {
+                    "package": 80,
+                    "applied_fees": [
+                        {
+                            "name": "local_ups_freight",
+                            "display_name": "VÙNG DÂN CƯ UPS Worldwide Express Freight",
+                            "amount": "3019515.0",
+                            "description": "Có một kiện hàng nặng hơn 70 kg",
+                            "note": null
+                        },
+                        {
+                            "name": "ahc",
+                            "display_name": "AHC",
+                            "amount": "368715.0",
+                            "description": "Có một kiện hàng năng hơn 25kg",
+                            "note": null
+                        },
+                        {
+                            "name": "lps",
+                            "display_name": "LPS",
+                            "amount": "1602700.0",
+                            "description": "Nếu chu vi nằm trong khoảng từ 300 đến 400cm thì dù kiện hàng có nghẹ hơn hãng vấn tính 40kg",
+                            "note": "Chu vi = (2 × 2 cạnh ngắn nhất) + cạnh dài nhất"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+]
