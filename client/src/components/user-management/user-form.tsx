@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createUserSchema, ROLES } from "@shared/schema";
+import { createUserSchema } from "@shared/schema";
 import { API_BASE_URL, API_ENDPOINTS } from "@/config/api";
 import {
   Form,
@@ -19,8 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -29,11 +27,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+const ROLES = [
+  { name: "admin", id: 26 },
+  { name: "manager", id: 27 },
+  { name: "cs", id: 28 },
+  { name: "sales", id: 29 },
+  { name: "accounting", id: 30 }
+];
 
 export default function UserForm() {
   const { toast } = useToast();
   const [permissions, setPermissions] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
   
   const form = useForm({
     resolver: zodResolver(createUserSchema),
@@ -48,6 +58,7 @@ export default function UserForm() {
   const loadPermissions = async (roleName: string) => {
     const token = localStorage.getItem('token');
     try {
+      setIsLoading(true);
       const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.ROLE_PERMISSIONS}?role_name=${roleName}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -63,14 +74,17 @@ export default function UserForm() {
         description: "Failed to load role permissions",
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const onSubmit = async (data: any) => {
     try {
+      setIsLoading(true);
       const token = localStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.USERS}`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -93,6 +107,8 @@ export default function UserForm() {
         description: "Failed to create user",
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -174,7 +190,16 @@ export default function UserForm() {
             )}
           />
           
-          <Button type="submit">Create User</Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating User...
+              </>
+            ) : (
+              "Create User"
+            )}
+          </Button>
         </form>
       </Form>
 
@@ -195,8 +220,12 @@ export default function UserForm() {
                   {Object.entries(moduleData.features).map(([featureName, featureData]: [string, any]) => (
                     <TableRow key={featureName}>
                       <TableCell>{featureName}</TableCell>
-                      <TableCell>
-                        {featureData.permissions.map((p: any) => p.name).join(', ')}
+                      <TableCell className="space-x-1">
+                        {featureData.permissions.map((p: any) => (
+                          <span key={p.id} className="inline-block px-2 py-1 text-xs rounded bg-slate-100">
+                            {p.name}
+                          </span>
+                        ))}
                       </TableCell>
                     </TableRow>
                   ))}
