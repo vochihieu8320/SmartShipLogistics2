@@ -161,9 +161,32 @@ export type Payment = typeof payments.$inferSelect;
 
 // Extended form schemas with additional validation
 export const loginUserSchema = z.object({
-  username: z.string().min(1, "Username is required"),
+  username: z.string().email("Must be a valid email"),
   password: z.string().min(1, "Password is required"),
 });
+
+export const roleSchema = z.object({
+  id: z.number(),
+  name: z.string()
+});
+
+export const createUserSchema = z.object({
+  email: z.string().email("Must be a valid email"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  password_confirmation: z.string(),
+  role_id: z.string()
+}).refine(data => data.password === data.password_confirmation, {
+  message: "Passwords don't match",
+  path: ["password_confirmation"]
+});
+
+export const ROLES = [
+  { name: "admin", id: 26 },
+  { name: "manager", id: 27 },
+  { name: "cs", id: 28 },
+  { name: "sales", id: 29 },
+  { name: "accounting", id: 30 }
+] as const;
 
 export type LoginCredentials = z.infer<typeof loginUserSchema>;
 

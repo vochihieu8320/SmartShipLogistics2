@@ -32,9 +32,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      const validatedCredentials = loginUserSchema.parse(credentials);
-      const res = await apiRequest("POST", "/api/login", validatedCredentials);
-      return await res.json();
+      const res = await fetch(`${API_BASE_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: credentials.username,
+          password: credentials.password,
+        }),
+      });
+      const data = await res.json();
+      localStorage.setItem('token', data.token);
+      return {
+        id: data.user_id,
+        email: data.email,
+        fullName: data.email.split('@')[0],
+        role: 'staff'
+      };
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
