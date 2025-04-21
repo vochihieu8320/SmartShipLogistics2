@@ -199,33 +199,44 @@ export default function UserForm() {
       {permissions && (
         <div className="mt-6">
           <h3 className="text-lg font-semibold mb-4">Role Permissions</h3>
-          {Object.entries(permissions).map(([moduleName, moduleData]: [string, any]) => (
-            <div key={moduleName} className="mb-6">
-              <h4 className="text-md font-medium mb-2">{moduleName}</h4>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Feature</TableHead>
-                    <TableHead>Permissions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {Object.entries(moduleData.features).map(([featureName, featureData]: [string, any]) => (
-                    <TableRow key={featureName}>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Module</TableHead>
+                  <TableHead>Feature</TableHead>
+                  <TableHead>Permissions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Object.entries(permissions).map(([moduleName, moduleData]: [string, any]) =>
+                  Object.entries(moduleData.features).map(([featureName, featureData]: [string, any]) => (
+                    <TableRow key={`${moduleName}-${featureName}`}>
+                      <TableCell className="font-medium">{moduleName}</TableCell>
                       <TableCell>{featureName}</TableCell>
-                      <TableCell className="space-x-1">
-                        {featureData.permissions.map((p: any) => (
-                          <span key={p.id} className="inline-block px-2 py-1 text-xs rounded bg-slate-100">
-                            {p.name}
-                          </span>
-                        ))}
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {featureData.permissions.map((p: any) => (
+                            <span 
+                              key={p.id} 
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                ${p.name === 'read' ? 'bg-blue-100 text-blue-800' :
+                                  p.name === 'create' ? 'bg-green-100 text-green-800' :
+                                  p.name === 'update' ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-slate-100 text-slate-800'}`
+                              }
+                            >
+                              {p.name}
+                            </span>
+                          ))}
+                        </div>
                       </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ))}
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       )}
     </div>

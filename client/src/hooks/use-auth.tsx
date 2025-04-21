@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import {
   useQuery,
   useMutation,
@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: async (credentials: LoginCredentials) => {
       // Mock API call
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-      
+
       // Mock response
       if (credentials.username === 'admin@example.com' && credentials.password === 'password123') {
         const mockResponse = {
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           user_id: 3,
           email: "admin@example.com"
         };
-        
+
         localStorage.setItem('token', mockResponse.token);
         return {
           id: mockResponse.user_id,
@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           role: 'admin'
         };
       }
-      
+
       throw new Error('Invalid credentials');
     },
     onSuccess: (user: SelectUser) => {
@@ -135,3 +135,89 @@ export function useAuth() {
   }
   return context;
 }
+
+function PermissionsTable({ roleName }: { roleName: string }) {
+  const [permissions, setPermissions] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const loadPermissions = async (roleName: string) => {
+    try {
+      setIsLoading(true);
+      // Mock response for development
+      const mockResponse = {
+        "success": true,
+        "role": {
+          "id": 27,
+          "name": roleName
+        },
+        "modules": {
+          "Home & Login": {
+            "module_id": 7,
+            "features": {
+              "User Registration": {
+                "feature_id": 1,
+                "permissions": [
+                  { "id": 26, "name": "create", "action_name": "create" },
+                  { "id": 27, "name": "read", "action_name": "read" },
+                  { "id": 28, "name": "update", "action_name": "update" }
+                ]
+              }
+            }
+          },
+          "Account Management": {
+            "module_id": 10,
+            "features": {
+              "Create Account": {
+                "feature_id": 17,
+                "permissions": [
+                  { "id": 26, "name": "create", "action_name": "create" },
+                  { "id": 27, "name": "read", "action_name": "read" },
+                  { "id": 28, "name": "update", "action_name": "update" }
+                ]
+              }
+            }
+          }
+        }
+      };
+      setPermissions(mockResponse.modules);
+    } catch (error) {
+      console.error("Error loading permissions:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPermissions(roleName);
+  }, [roleName]);
+
+  if (isLoading) return <p>Loading...</p>;
+  if (!permissions) return <p>No permissions found</p>;
+
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Module</th>
+          <th>Feature</th>
+          <th>Permissions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Object.entries(permissions).map(([moduleName, module]) => (
+          Object.entries(module.features).map(([featureName, feature]) => (
+            <React.Fragment key={`${moduleName}-${featureName}`}>
+              <tr>
+                <td>{moduleName}</td>
+                <td>{featureName}</td>
+                <td>{feature.permissions.map(p => p.name).join(', ')}</td>
+              </tr>
+            </React.Fragment>
+          ))
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+export default PermissionsTable;
