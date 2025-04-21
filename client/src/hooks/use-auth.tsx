@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      const res = await fetch(`${API_BASE_URL}/login`, {
+      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.LOGIN}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,6 +42,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           password: credentials.password,
         }),
       });
+      if (!res.ok) {
+        throw new Error('Login failed');
+      }
       const data = await res.json();
       localStorage.setItem('token', data.token);
       return {

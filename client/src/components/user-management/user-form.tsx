@@ -47,21 +47,30 @@ export default function UserForm() {
 
   const loadPermissions = async (roleName: string) => {
     const token = localStorage.getItem('token');
-    const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.ROLE_PERMISSIONS}?role_name=${roleName}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    const data = await res.json();
-    setPermissions(data.modules);
+    try {
+      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.ROLE_PERMISSIONS}?role_name=${roleName}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!res.ok) throw new Error('Failed to load permissions');
+      const data = await res.json();
+      setPermissions(data.modules);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load role permissions",
+        variant: "destructive"
+      });
+    }
   };
 
   const onSubmit = async (data: any) => {
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.USERS}`, {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -77,6 +86,7 @@ export default function UserForm() {
       });
       
       form.reset();
+      setPermissions(null);
     } catch (error) {
       toast({
         title: "Error",
