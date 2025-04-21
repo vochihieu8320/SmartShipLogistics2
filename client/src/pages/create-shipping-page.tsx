@@ -261,9 +261,9 @@ export default function CreateShippingPage() {
                     </TabsList>
                     
                     <TabsContent value="details">
+                      <PackageForm form={form} />
                       <AddressForm form={form} type="sender" title="Sender Information" />
                       <AddressForm form={form} type="receiver" title="Recipient Information" />
-                      <PackageForm form={form} />
                       <div className="flex justify-end mt-6">
                         <Button type="button" onClick={() => setActiveTab("quotes")}>Next</Button>
                       </div>
