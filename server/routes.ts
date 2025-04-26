@@ -12,6 +12,7 @@ import {
   RateQuote,
   TrackingEvent
 } from "./services/carrier-api";
+import { getExternalTracking } from "./services/external-api";
 
 function isAuthenticated(req: Request, res: Response, next: Function) {
   if (req.isAuthenticated()) {
@@ -151,7 +152,28 @@ export function registerRoutes(app: Express): Server {
     try {
       const trackingNumber = req.params.trackingNumber;
       
-      // Try to find by order number or AWB number
+      // Check if we should use the external API
+      if (apiConfig.useExternalApi) {
+        try {
+          console.log('[API] Using external API for tracking:', trackingNumber);
+          
+          // Get tracking info from external API
+          const externalTracking = await getExternalTracking(trackingNumber);
+          if (externalTracking && externalTracking.shipmentDetails) {
+            return res.json({
+              ...externalTracking.shipmentDetails,
+              trackingEvents: externalTracking.trackingEvents
+            });
+          }
+        } catch (error) {
+          console.error('[API] Error getting external tracking, falling back to local storage:', error);
+          // Fall back to local storage if external API fails
+        }
+      }
+      
+      console.log('[API] Using local storage for tracking:', trackingNumber);
+      
+      // Try to find by order number or AWB number from local storage
       const order = await storage.getOrderByNumber(trackingNumber);
       
       if (!order) {
@@ -191,7 +213,7 @@ export function registerRoutes(app: Express): Server {
         estimatedDelivery: estimatedDelivery,
         sender,
         recipient,
-        trackingSteps
+        trackingEvents: trackingSteps
       };
       
       res.json(response);

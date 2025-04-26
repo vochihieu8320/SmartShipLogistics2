@@ -1,7 +1,10 @@
 /**
- * Mock Carrier API Service
- * This file simulates carrier API interactions for demonstration purposes
+ * Carrier API Service
+ * Provides both mock carrier API interactions and integration with external API
  */
+
+import { apiConfig } from '../config';
+import { getExternalRates } from './external-api';
 
 // Types for our carrier rate API
 export interface PackageDimensions {
@@ -242,6 +245,20 @@ export async function getSFExpressRates(request: RateRequest): Promise<RateQuote
 
 // Get rates from all carriers
 export async function getAllCarrierRates(request: RateRequest): Promise<RateQuote[]> {
+  // Check if we should use the external API
+  if (apiConfig.useExternalApi) {
+    try {
+      console.log('[API] Using external API for carrier rates');
+      return await getExternalRates(request);
+    } catch (error) {
+      console.error('[API] Error getting external rates, falling back to mock data:', error);
+      // Fall back to mock data if external API fails
+    }
+  }
+
+  console.log('[API] Using mock data for carrier rates');
+  
+  // Get rates from all carriers in parallel using mock data
   const [upsRates, fedexRates, dhlRates, sfRates] = await Promise.all([
     getUPSRates(request),
     getFedExRates(request),

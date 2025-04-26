@@ -15,7 +15,7 @@ async function apiCall<T>(endpoint: string, method: string = 'GET', body?: any):
   const url = `${apiConfig.externalApiUrl}${endpoint}`;
   
   // Configure request options
-  const options: RequestInit = {
+  const options: any = {
     method,
     headers: {
       'Content-Type': 'application/json',
