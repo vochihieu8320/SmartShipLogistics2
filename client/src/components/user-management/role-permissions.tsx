@@ -63,6 +63,7 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
   
   useEffect(() => {
     if (roleName) {
+      console.log('Role name changed to:', roleName);
       loadPermissions();
     }
   }, [roleName]);
@@ -72,7 +73,9 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
       setIsLoading(true);
       
       // Call the external API to get role permissions
-      const apiUrl = `${API_BASE_URL}/roles/permissions_by_feature?role_name=${roleName}`;
+      // Use our server-side proxy endpoint instead of direct API call
+      const apiUrl = `/api/v1/roles/permissions_by_feature?role_name=${roleName}`;
+      console.log('Calling API URL:', apiUrl);
       
       const response = await fetch(apiUrl, {
         method: 'GET',
@@ -184,8 +187,9 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
         permissions: editedPermissions
       };
       
-      // Call API to update permissions
-      const apiUrl = `${API_BASE_URL}/roles/update_permissions`;
+      // Call API to update permissions through our server proxy
+      const apiUrl = `/api/v1/roles/update_permissions`;
+      console.log('Saving permissions to API URL:', apiUrl);
       
       const response = await fetch(apiUrl, {
         method: 'POST',

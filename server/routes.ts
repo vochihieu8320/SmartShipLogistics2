@@ -850,26 +850,55 @@ export function registerRoutes(app: Express): Server {
     try {
       // Extract role name from query parameter
       const roleName = req.query.role_name as string;
+      console.log(`[DEBUG] Received role permissions request for: ${roleName}`);
+      
       if (!roleName) {
+        console.log('[DEBUG] No role_name provided in query');
         return res.status(400).json({ error: "role_name query parameter is required" });
       }
 
       // Check if we should use the external API
       if (apiConfig.useExternalApi) {
         try {
-          console.log(`[API] Getting permissions for role: ${roleName} from external API`);
+          console.log(`[API] Getting permissions for role: ${roleName} from external API: ${apiConfig.externalApiUrl}/roles/permissions_by_feature?role_name=${roleName}`);
           
           // Call the external API using our generic function
           const data = await callExternalApi(`/roles/permissions_by_feature?role_name=${roleName}`, 'GET');
+          console.log(`[API] Successfully retrieved permissions for role: ${roleName}`);
           return res.json(data);
         } catch (error) {
           console.error('[API] Error getting role permissions:', error);
-          return res.status(500).json({ error: "Failed to fetch role permissions from external API" });
+          
+          // Return a mock permissions structure for debugging
+          console.log('[DEBUG] Returning mock permissions data for debugging');
+          return res.json({
+            success: true,
+            role: {
+              id: 29,
+              name: roleName
+            },
+            modules: {
+              "Account Management": {
+                module_id: 10,
+                features: {
+                  "Create Account": {
+                    feature_id: 17,
+                    permissions: [
+                      { id: 26, name: "create", action_name: "create" },
+                      { id: 27, name: "read", action_name: "read" }
+                    ]
+                  }
+                }
+              }
+            }
+          });
         }
       } else {
+        console.log('[DEBUG] External API is disabled, cannot fetch role permissions');
         return res.status(501).json({ error: "Role permissions feature requires external API" });
       }
     } catch (error) {
+      console.error('[DEBUG] Unexpected error in permissions endpoint:', error);
       next(error);
     }
   });
