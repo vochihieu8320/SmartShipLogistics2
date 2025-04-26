@@ -27,9 +27,8 @@ export function ProtectedRoute({
     );
   }
 
-  console.log("tokn", token);
-
-  if (!token || !user) {
+  // Check if we have both token and user data
+  if (!token || !user?.email) {
     return (
       <Route path={path}>
         <Redirect to="/auth" />
