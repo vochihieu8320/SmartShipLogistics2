@@ -1,8 +1,9 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { API_BASE_URL } from "@/config/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface Quote {
   id: number;
@@ -13,9 +14,14 @@ interface Quote {
     peak_season: number;
     oversize_fee: Array<{
       package: number;
-      applied_fees: Array<any>;
+      applied_fees: Array<{
+        name: string;
+        display_name: string;
+        amount: string;
+        description: string;
+        note: string | null;
+      }>;
     }>;
-    total_price: number;
   };
 }
 
@@ -35,7 +41,6 @@ export default function ServiceQuoteForm({
   shipmentId,
   onQuoteSelect,
 }: ServiceQuoteFormProps) {
-  console.log("Fuck");
   const { data: quoteResponse, isLoading } = useQuery({
     queryKey: ["shipmentQuotes", shipmentId],
     queryFn: async () => {
@@ -62,24 +67,39 @@ export default function ServiceQuoteForm({
     );
   }
 
-  const quotes = quoteResponse?.quote || [];
+  const quotes = quoteResponse || [];
 
   return (
-    <div className="grid gap-4">
+    <div className="space-y-4">
       {quotes.map((quote: Quote) => (
-        <Card key={quote.id} className="overflow-hidden">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
+        <Card 
+          key={quote.id} 
+          className="cursor-pointer hover:bg-accent/5"
+          onClick={() => onQuoteSelect(quote)}
+        >
+          <CardContent className="pt-6">
+            <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className="text-lg font-semibold">{quote.name}</h3>
-                <p className="text-2xl font-bold text-primary mt-1">
-                  {formatCurrency(quote.prices.total_price)}
-                </p>
+                <h3 className="font-medium text-lg">{quote.name}</h3>
               </div>
-              <Button onClick={() => onQuoteSelect(quote)}>
-                <CheckCircle2 className="h-4 w-4 mr-2" />
-                Chọn
-              </Button>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-primary">
+                  {formatCurrency(
+                    quote.prices.net_price +
+                    (quote.prices.net_price * quote.prices.fuel_surcharge) / 100 +
+                    (quote.prices.net_price * quote.prices.peak_season) / 100 +
+                    quote.prices.oversize_fee.reduce(
+                      (sum, fee) =>
+                        sum +
+                        fee.applied_fees.reduce(
+                          (feeSum, applied) => feeSum + parseFloat(applied.amount),
+                          0
+                        ),
+                      0
+                    )
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
@@ -95,8 +115,7 @@ export default function ServiceQuoteForm({
                 </p>
                 <p className="font-medium">
                   {formatCurrency(
-                    (quote.prices.net_price * quote.prices.fuel_surcharge) /
-                      100,
+                    (quote.prices.net_price * quote.prices.fuel_surcharge) / 100
                   )}
                 </p>
               </div>
@@ -107,12 +126,30 @@ export default function ServiceQuoteForm({
                   </p>
                   <p className="font-medium">
                     {formatCurrency(
-                      (quote.prices.net_price * quote.prices.peak_season) / 100,
+                      (quote.prices.net_price * quote.prices.peak_season) / 100
                     )}
                   </p>
                 </div>
               )}
+              {quote.prices.oversize_fee.map((fee, feeIndex) => (
+                <div key={feeIndex}>
+                  <p className="text-muted-foreground">Phụ Phí Quá Khổ</p>
+                  {fee.applied_fees.map((appliedFee, appliedIndex) => (
+                    <div key={appliedIndex}>
+                      <p className="text-muted-foreground text-xs">{appliedFee.display_name}</p>
+                      <p className="font-medium">{formatCurrency(parseFloat(appliedFee.amount))}</p>
+                      {appliedFee.description && (
+                        <p className="text-xs text-muted-foreground mt-1">{appliedFee.description}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ))}
             </div>
+
+            <Button className="w-full mt-4" onClick={() => onQuoteSelect(quote)}>
+              Chọn Dịch Vụ Này
+            </Button>
           </CardContent>
         </Card>
       ))}
