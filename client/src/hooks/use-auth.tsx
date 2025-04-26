@@ -8,7 +8,7 @@ import { insertUserSchema, User as SelectUser, InsertUser, loginUserSchema, Logi
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { API_BASE_URL, API_ENDPOINTS } from "@/config/api";
-import api from '../lib/api'; // Assuming api service is imported here
+import { api } from '../services/api';
 
 
 type AuthContextType = {
