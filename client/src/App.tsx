@@ -30,17 +30,17 @@ function App() {
             <Switch>
               {/* Auth route - always public */}
               <Route path="/auth" component={AuthPage} />
-              
+
               {/* Public landing page */}
               <Route path="/" component={HomePage} />
-              
+
               {/* All other routes require authentication */}
               <ProtectedRoute path="/track" component={TrackingPage} />
               <ProtectedRoute path="/tracking" component={TrackingPage} />
               <ProtectedRoute path="/shipping" component={ShippingPage} />
               <ProtectedRoute path="/shipping/create" component={CreateShippingPage} />
               <ProtectedRoute path="/shipments" component={ShipmentsPage} />
-              
+
               {/* Protected admin dashboard routes */}
               <ProtectedRoute path="/admin" component={DashboardPage} />
               <ProtectedRoute path="/admin/booking" component={BookingPage} />
@@ -49,11 +49,10 @@ function App() {
               <ManagerRoute path="/admin/reports" component={ReportsPage} />
               <AdminRoute path="/admin/users" component={UsersPage} />
               <ProtectedRoute path="/admin/settings" component={SettingsPage} />
-              
+
               <Route component={NotFound} />
             </Switch>
           </TooltipProvider>
-          <Toaster />
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
