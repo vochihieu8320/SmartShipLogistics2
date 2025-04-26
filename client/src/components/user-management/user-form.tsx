@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createUserSchema } from "@shared/schema";
 import { API_BASE_URL, API_ENDPOINTS } from "@/config/api";
+import RolePermissions from "@/components/user-management/role-permissions";
 import {
   Form,
   FormControl,
@@ -19,14 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -40,8 +33,9 @@ interface UserFormProps {
 
 export default function UserForm({ onSuccess }: UserFormProps) {
   const { toast } = useToast();
-  const [permissions, setPermissions] = useState<any>(null);
+  const [selectedRole, setSelectedRole] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [key, setKey] = useState(0); // Key to force re-render
   
   const form = useForm({
     resolver: zodResolver(createUserSchema),
@@ -52,65 +46,6 @@ export default function UserForm({ onSuccess }: UserFormProps) {
       role_name: ""
     }
   });
-
-  const loadPermissions = async (roleName: string) => {
-    try {
-      setIsLoading(true);
-      // Mock response
-      const mockResponse = {
-        "success": true,
-        "role": {
-          "id": 27,
-          "name": roleName
-        },
-        "modules": {
-          "Home & Login": {
-            "module_id": 7,
-            "features": {
-              "User Registration": {
-                "feature_id": 1,
-                "permissions": [
-                  { "id": 26, "name": "create", "action_name": "create" },
-                  { "id": 27, "name": "read", "action_name": "read" },
-                  { "id": 28, "name": "update", "action_name": "update" }
-                ]
-              },
-              "User Login": {
-                "feature_id": 2,
-                "permissions": [
-                  { "id": 26, "name": "create", "action_name": "create" },
-                  { "id": 27, "name": "read", "action_name": "read" },
-                  { "id": 28, "name": "update", "action_name": "update" }
-                ]
-              }
-            }
-          },
-          "Account Management": {
-            "module_id": 10,
-            "features": {
-              "Create Account": {
-                "feature_id": 17,
-                "permissions": [
-                  { "id": 26, "name": "create", "action_name": "create" },
-                  { "id": 27, "name": "read", "action_name": "read" },
-                  { "id": 28, "name": "update", "action_name": "update" }
-                ]
-              }
-            }
-          }
-        }
-      };
-      setPermissions(mockResponse.modules);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to load role permissions",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const onSubmit = async (data: any) => {
     try {
@@ -133,7 +68,7 @@ export default function UserForm({ onSuccess }: UserFormProps) {
       });
       
       form.reset();
-      setPermissions(null);
+      setSelectedRole("");
       
       // Call the onSuccess callback if provided
       if (onSuccess) {
@@ -148,6 +83,14 @@ export default function UserForm({ onSuccess }: UserFormProps) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Handle role selection change
+  const handleRoleChange = (value: string) => {
+    console.log('Role selected in form:', value);
+    setSelectedRole(value);
+    // Force component to re-render with new role
+    setKey(prev => prev + 1);
   };
 
   return (
@@ -204,8 +147,10 @@ export default function UserForm({ onSuccess }: UserFormProps) {
                 <FormLabel>Role</FormLabel>
                 <Select 
                   onValueChange={(value) => {
+                    // Update form value
                     field.onChange(value);
-                    loadPermissions(value);
+                    // Also update our local state for permissions display
+                    handleRoleChange(value);
                   }}
                   value={field.value}
                 >
@@ -240,49 +185,11 @@ export default function UserForm({ onSuccess }: UserFormProps) {
         </form>
       </Form>
 
-      {permissions && (
-        <div className="mt-6">
+      {/* Only show permissions when a role is selected */}
+      {selectedRole && (
+        <div className="mt-8">
           <h3 className="text-lg font-semibold mb-4">Role Permissions</h3>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Module</TableHead>
-                  <TableHead>Feature</TableHead>
-                  <TableHead>Create</TableHead>
-                  <TableHead>Read</TableHead>
-                  <TableHead>Update</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {Object.entries(permissions).map(([moduleName, moduleData]: [string, any]) =>
-                  Object.entries(moduleData.features).map(([featureName, featureData]: [string, any]) => {
-                    const permissionMap = {
-                      create: featureData.permissions.some((p: any) => p.name === 'create'),
-                      read: featureData.permissions.some((p: any) => p.name === 'read'),
-                      update: featureData.permissions.some((p: any) => p.name === 'update')
-                    };
-                    
-                    return (
-                      <TableRow key={`${moduleName}-${featureName}`}>
-                        <TableCell className="font-medium">{moduleName}</TableCell>
-                        <TableCell>{featureName}</TableCell>
-                        <TableCell>
-                          {permissionMap.create ? '✓' : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {permissionMap.read ? '✓' : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {permissionMap.update ? '✓' : '-'}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <RolePermissions key={`${selectedRole}-${key}`} roleName={selectedRole} />
         </div>
       )}
     </div>
