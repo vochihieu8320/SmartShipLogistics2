@@ -282,10 +282,9 @@ export default function CreateShippingPage() {
                           <Button
                             type="button"
                             disabled={createShipmentMutation.isPending}
-                            onClick={() => {
-                              setActiveTab("service");
+                            onClick={async () => {
                               try {
-                                const response = fetch(
+                                const response = await fetch(
                                   `${API_BASE_URL}/shipments`,
                                   {
                                     method: "POST",
@@ -294,24 +293,23 @@ export default function CreateShippingPage() {
                                       Authorization: `Bearer ${localStorage.getItem("token")}`,
                                     },
                                     body: JSON.stringify(form.getValues()),
-                                  },
-                                ).then(async (res) => {
-                                  if (!res.ok) {
-                                    throw new Error(
-                                      "Failed to create shipment",
-                                    );
                                   }
-                                  const data = await res.json();
-                                  if (data.success && data.shipment?.id) {
-                                    setShipmentId(data.shipment.id);
-                                    createShipmentMutation.setData(data);
-                                  }
-                                });
+                                );
+                                
+                                if (!response.ok) {
+                                  throw new Error("Failed to create shipment");
+                                }
+                                
+                                const data = await response.json();
+                                if (data.success && data.shipment?.id) {
+                                  setShipmentId(data.shipment.id);
+                                  createShipmentMutation.setData(data);
+                                  setActiveTab("service"); // Only change tab after successful API call
+                                }
                               } catch (error) {
                                 toast({
                                   title: "Lỗi",
-                                  description:
-                                    "Không thể tạo đơn hàng. Vui lòng thử lại.",
+                                  description: "Không thể tạo đơn hàng. Vui lòng thử lại.",
                                   variant: "destructive",
                                 });
                               }
