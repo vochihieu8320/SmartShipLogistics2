@@ -11,8 +11,8 @@ export default function UsersPage() {
   const [activeTab, setActiveTab] = useState("list");
   const [selectedRole, setSelectedRole] = useState("manager");
   
-  // Available roles
-  const ROLES = ["manager", "cs", "sales", "accounting"];
+  // Available roles from external API
+  const ROLES = ["admin", "manager", "cs", "sales", "accounting"];
   
   return (
     <DashboardLayout title="User Management">
