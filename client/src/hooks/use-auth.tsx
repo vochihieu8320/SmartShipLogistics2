@@ -44,8 +44,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.LOGIN}`, {
           method: 'POST',
           headers: {
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
+          mode: 'cors',
+          credentials: 'include',
           body: JSON.stringify(loginData)
         });
         
