@@ -1,0 +1,71 @@
+[
+    {
+        "id": 1,
+        "name": "Worldwide Saver",
+        "prices": {
+            "net_price": 349690.217391,
+            "fuel_surcharge": 26.75,
+            "peak_season": 9.0,
+            "oversize_fee": [
+                {
+                    "package": 128,
+                    "applied_fees": [
+                        {
+                            "name": "ahc",
+                            "display_name": "AHC",
+                            "amount": "368715.0",
+                            "description": "Có một kiện hàng năng hơn 25kg",
+                            "note": null
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": 2,
+        "name": "Worldwide Expedited",
+        "prices": {
+            "net_price": 0.0,
+            "fuel_surcharge": 26.75,
+            "peak_season": 0.0,
+            "oversize_fee": [
+                {
+                    "package": 128,
+                    "applied_fees": [
+                        {
+                            "name": "ahc",
+                            "display_name": "AHC",
+                            "amount": "368715.0",
+                            "description": "Có một kiện hàng năng hơn 25kg",
+                            "note": null
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": 3,
+        "name": "Worldwide Express Freight",
+        "prices": {
+            "net_price": 0.0,
+            "fuel_surcharge": 26.75,
+            "peak_season": 0.0,
+            "oversize_fee": [
+                {
+                    "package": 128,
+                    "applied_fees": [
+                        {
+                            "name": "ahc",
+                            "display_name": "AHC",
+                            "amount": "368715.0",
+                            "description": "Có một kiện hàng năng hơn 25kg",
+                            "note": null
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+]
