@@ -36,9 +36,9 @@ function App() {
               <Route path="/track" component={TrackingPage} />
               <Route path="/tracking" component={TrackingPage} />
               
-              {/* Protected shipping routes */}
-              <ProtectedRoute path="/shipping" component={ShippingPage} />
-              <ProtectedRoute path="/shipping/create" component={CreateShippingPage} />
+              {/* Public shipping routes */}
+              <Route path="/shipping" component={ShippingPage} />
+              <Route path="/shipping/create" component={CreateShippingPage} />
               <ProtectedRoute path="/shipments" component={ShipmentsPage} />
               
               {/* Protected admin dashboard routes */}

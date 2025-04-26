@@ -86,12 +86,6 @@ export default function CreateShippingPage() {
   const { user, isLoading } = useAuth();
   const [, navigate] = useLocation();
 
-  useEffect(() => {
-    if (!isLoading && !user) {
-      navigate('/auth');
-    }
-  }, [user, isLoading, navigate]);
-
   if (isLoading) {
     return <div>Đang tải...</div>;
   }
