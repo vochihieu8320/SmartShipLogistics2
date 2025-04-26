@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { API_BASE_URL } from "@/config/api";
 import { useLocation, Link } from "wouter";
+import ServiceQuoteForm from "@/components/shipping/service-quote-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -318,9 +319,9 @@ export default function CreateShippingPage() {
                             <CardTitle>Chọn Dịch Vụ Vận Chuyển</CardTitle>
                           </CardHeader>
                           <CardContent>
-                            {createShipmentMutation.data ? (
+                            {createShipmentMutation.data?.shipment?.id ? (
                               <ServiceQuoteForm
-                                shipmentId={createShipmentMutation.data.id}
+                                shipmentId={createShipmentMutation.data.shipment.id}
                                 onQuoteSelect={(quote) => {
                                   form.setValue(
                                     "shipment.provider_service_id",
