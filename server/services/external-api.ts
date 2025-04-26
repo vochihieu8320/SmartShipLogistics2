@@ -9,7 +9,13 @@ import fetch from 'node-fetch';
 import { apiConfig } from '../config';
 import { RateRequest, RateQuote, TrackingEvent } from './carrier-api';
 
-// Helper to handle API responses and errors
+/**
+ * Helper to make API calls to the external API
+ * @param endpoint - The API endpoint path (without the base URL)
+ * @param method - HTTP method (GET, POST, PUT, DELETE, etc.)
+ * @param body - Request body for POST/PUT/PATCH requests
+ * @returns Promise with the API response
+ */
 async function apiCall<T>(endpoint: string, method: string = 'GET', body?: any): Promise<T> {
   // Construct the full URL to the API endpoint
   const url = `${apiConfig.externalApiUrl}${endpoint}`;
@@ -48,6 +54,18 @@ async function apiCall<T>(endpoint: string, method: string = 'GET', body?: any):
     console.error('[API] Error calling external API:', error);
     throw error;
   }
+}
+
+/**
+ * Generic function to call any external API endpoint
+ * Use this when you need to call an endpoint that doesn't have a specific function
+ * @param endpoint - The API endpoint path (without the base URL)
+ * @param method - HTTP method (GET, POST, PUT, DELETE, etc.)
+ * @param body - Request body for POST/PUT/PATCH requests
+ * @returns Promise with the API response
+ */
+export async function callExternalApi<T>(endpoint: string, method: string = 'GET', body?: any): Promise<T> {
+  return apiCall<T>(endpoint, method, body);
 }
 
 /**

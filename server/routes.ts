@@ -12,7 +12,10 @@ import {
   RateQuote,
   TrackingEvent
 } from "./services/carrier-api";
-import { getExternalTracking } from "./services/external-api";
+import { 
+  getExternalTracking, 
+  callExternalApi
+} from "./services/external-api";
 
 function isAuthenticated(req: Request, res: Response, next: Function) {
   if (req.isAuthenticated()) {
@@ -291,255 +294,309 @@ export function registerRoutes(app: Express): Server {
     }
   });
   
-  // API endpoint for listing shipments (mock)
-  app.get("/api/v1/shipments", (req, res) => {
-    console.log("[DEBUG] Serving mock shipments data");
-    // Return mock data as requested
-    res.json({
-      "success": true,
-      "count": 30,
-      "shipments": [
-        {
-          "id": 1,
-          "tracking_number": "SHIPS17451448440",
-          "status": null,
-          "created_at": "2025-04-20T10:27:25.530Z",
-          "sender": {
-            "name": "Nguyen Van A",
-            "city": "Ho Chi Minh City",
-            "country": "Việt Nam"
-          },
-          "receiver": {
-            "name": "Li Wei",
-            "city": "Singapore",
-            "country": "Việt Nam"
-          },
-          "total_price": null
-        },
-        {
-          "id": 2,
-          "tracking_number": "SHIPS17451442345",
-          "status": "in_transit",
-          "created_at": "2025-04-19T14:35:25.530Z",
-          "sender": {
-            "name": "Tran Thi B",
-            "city": "Ha Noi",
-            "country": "Việt Nam"
-          },
-          "receiver": {
-            "name": "John Smith",
-            "city": "New York",
-            "country": "USA"
-          },
-          "total_price": 245.50
-        },
-        {
-          "id": 3,
-          "tracking_number": "SHIPS17451435687",
-          "status": "delivered",
-          "created_at": "2025-04-15T08:27:25.530Z",
-          "sender": {
-            "name": "Le Van C",
-            "city": "Da Nang",
-            "country": "Việt Nam"
-          },
-          "receiver": {
-            "name": "Maria Garcia",
-            "city": "Madrid",
-            "country": "Spain"
-          },
-          "total_price": 312.75
+  // API endpoint for listing shipments
+  app.get("/api/v1/shipments", async (req, res, next) => {
+    try {
+      // Check if we should use the external API
+      if (apiConfig.useExternalApi) {
+        try {
+          console.log('[API] Using external API for shipments list');
+          
+          // Call the external API using our generic function
+          const data = await callExternalApi('/shipments', 'GET');
+          return res.json(data);
+        } catch (error) {
+          console.error('[API] Error getting external shipments, falling back to mock data:', error);
+          // Fall back to mock data if external API fails
         }
-      ]
-    });
-  });
-  
-  // API endpoint for admin orders (mock)
-  app.get("/api/v1/admin/orders", (req, res) => {
-    console.log("[DEBUG] Serving mock admin orders data");
-    // Return mock data for orders management
-    res.json({
-      "success": true,
-      "count": 25,
-      "orders": [
-        {
-          "id": 1,
-          "orderNumber": "SHP-10001",
-          "awbNumber": "FDX8376541285",
-          "userId": 1,
-          "status": "delivered",
-          "paymentStatus": "paid",
-          "description": "Laptop shipment to Chicago office",
-          "shipmentType": "Domestic",
-          "carrier": "FedEx",
-          "serviceType": "Express",
-          "packageType": "Box",
-          "packageWeight": 5.2,
-          "packageLength": 45,
-          "packageWidth": 35,
-          "packageHeight": 10,
-          "shippingDate": "2025-04-10T00:00:00.000Z",
-          "senderId": 1,
-          "recipientId": 2,
-          "packageQuantity": 1,
-          "basePrice": "45.00",
-          "insurancePrice": "15.00",
-          "additionalFees": "5.00",
-          "tax": "6.50",
-          "totalPrice": "71.50",
-          "additionalServices": null,
-          "createdAt": "2025-04-09T00:00:00.000Z",
-          "updatedAt": "2025-04-11T00:00:00.000Z"
-        },
-        {
-          "id": 2,
-          "orderNumber": "SHP-10002",
-          "awbNumber": "DHL9823754687",
-          "userId": 1,
-          "status": "in_transit",
-          "paymentStatus": "paid",
-          "description": "Marketing materials for conference",
-          "shipmentType": "International",
-          "carrier": "DHL",
-          "serviceType": "Express",
-          "packageType": "Box",
-          "packageWeight": 8.5,
-          "packageLength": 50,
-          "packageWidth": 40,
-          "packageHeight": 30,
-          "shippingDate": "2025-04-15T00:00:00.000Z",
-          "senderId": 1,
-          "recipientId": 3,
-          "packageQuantity": 1,
-          "basePrice": "125.00",
-          "insurancePrice": "25.00",
-          "additionalFees": "15.00",
-          "tax": "16.50",
-          "totalPrice": "181.50",
-          "additionalServices": null,
-          "createdAt": "2025-04-14T00:00:00.000Z",
-          "updatedAt": "2025-04-16T00:00:00.000Z"
-        },
-        {
-          "id": 3,
-          "orderNumber": "SHP-10003",
-          "awbNumber": "SFE1234567890",
-          "userId": 1,
-          "status": "processing",
-          "paymentStatus": "unpaid",
-          "description": "Product samples to distributor",
-          "shipmentType": "International",
-          "carrier": "SF Express",
-          "serviceType": "Standard",
-          "packageType": "Box",
-          "packageWeight": 12.3,
-          "packageLength": 60,
-          "packageWidth": 45,
-          "packageHeight": 30,
-          "shippingDate": "2025-04-20T00:00:00.000Z",
-          "senderId": 1,
-          "recipientId": 4,
-          "packageQuantity": 2,
-          "basePrice": "180.00",
-          "insurancePrice": "50.00",
-          "additionalFees": "20.00",
-          "tax": "25.00",
-          "totalPrice": "275.00",
-          "additionalServices": null,
-          "createdAt": "2025-04-19T00:00:00.000Z",
-          "updatedAt": "2025-04-19T00:00:00.000Z"
-        }
-      ]
-    });
-  });
-  
-  // API endpoint for creating shipments (mock)
-  app.post("/api/v1/shipments", (req, res) => {
-    console.log("[DEBUG] Creating mock shipment");
-    // Return mock response as provided
-    res.status(201).json({
-      "id": 32,
-      "sender_address_id": 33,
-      "receiver_address_id": 34,
-      "tracking_number": null,
-      "status": null,
-      "provider_id": 1,
-      "provider_service_id": 1,
-      "estimated_delivery": null,
-      "actual_delivery": null,
-      "carrier_account": null,
-      "created_at": "2025-04-21T15:22:38.848Z",
-      "updated_at": "2025-04-21T15:22:38.848Z",
-      "total_price": null,
-      "packages": [
-          {
-              "id": 79,
-              "shipment_id": 32,
-              "carriage_value": 1200,
-              "unit_of_weight": "kg_cm",
-              "currency": "USD",
-              "type_shipping": "items",
-              "packaging": "box",
-              "weight_total": 15,
-              "volume_weight": 96,
-              "created_at": "2025-04-21T15:22:39.045Z",
-              "updated_at": "2025-04-21T15:22:39.434Z",
-              "items": [
-                  {
-                      "id": 123,
-                      "package_id": 79,
-                      "weight": 15,
-                      "length": 120,
-                      "width": 80,
-                      "height": 50,
-                      "quantity": 1,
-                      "description": "Furniture",
-                      "value": 1200,
-                      "country_of_origin": "VN",
-                      "hs_code": "940350",
-                      "package_tracking_number": null,
-                      "created_at": "2025-04-21T15:22:39.198Z",
-                      "updated_at": "2025-04-21T15:22:39.334Z",
-                      "volume_weight": "96.0"
-                  }
-              ]
-          }
-      ],
-      "sender_address": {
-          "id": 33,
-          "name": "Le Van C",
-          "company": "Furniture Exports",
-          "country_id": 1,
-          "postal_code": "70000",
-          "city": "Ho Chi Minh City",
-          "state": "",
-          "address1": "789 Cach Mang Thang 8",
-          "address2": "District 3",
-          "address3": "",
-          "phone": "+84918765432",
-          "email": "le@example.com",
-          "address_type": null,
-          "created_at": "2025-04-21T15:22:38.749Z",
-          "updated_at": "2025-04-21T15:22:38.749Z"
-      },
-      "receiver_address": {
-          "id": 34,
-          "name": "Li Wei",
-          "company": "",
-          "country_id": 5,
-          "postal_code": "018956",
-          "city": "Singapore",
-          "state": "",
-          "address1": "10 Marina Boulevard",
-          "address2": "#25-01",
-          "address3": "",
-          "phone": "+6591234567",
-          "email": "li.wei@example.com",
-          "address_type": null,
-          "created_at": "2025-04-21T15:22:38.800Z",
-          "updated_at": "2025-04-21T15:22:38.800Z"
       }
-    });
+    
+      console.log("[DEBUG] Serving mock shipments data");
+      // Return mock data as requested
+      res.json({
+        "success": true,
+        "count": 30,
+        "shipments": [
+          {
+            "id": 1,
+            "tracking_number": "SHIPS17451448440",
+            "status": null,
+            "created_at": "2025-04-20T10:27:25.530Z",
+            "sender": {
+              "name": "Nguyen Van A",
+              "city": "Ho Chi Minh City",
+              "country": "Việt Nam"
+            },
+            "receiver": {
+              "name": "Li Wei",
+              "city": "Singapore",
+              "country": "Việt Nam"
+            },
+            "total_price": null
+          },
+          {
+            "id": 2,
+            "tracking_number": "SHIPS17451442345",
+            "status": "in_transit",
+            "created_at": "2025-04-19T14:35:25.530Z",
+            "sender": {
+              "name": "Tran Thi B",
+              "city": "Ha Noi",
+              "country": "Việt Nam"
+            },
+            "receiver": {
+              "name": "John Smith",
+              "city": "New York",
+              "country": "USA"
+            },
+            "total_price": 245.50
+          },
+          {
+            "id": 3,
+            "tracking_number": "SHIPS17451435687",
+            "status": "delivered",
+            "created_at": "2025-04-15T08:27:25.530Z",
+            "sender": {
+              "name": "Le Van C",
+              "city": "Da Nang",
+              "country": "Việt Nam"
+            },
+            "receiver": {
+              "name": "Maria Garcia",
+              "city": "Madrid",
+              "country": "Spain"
+            },
+            "total_price": 312.75
+          }
+        ]
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // API endpoint for admin orders
+  app.get("/api/v1/admin/orders", async (req, res, next) => {
+    try {
+      // Check if we should use the external API
+      if (apiConfig.useExternalApi) {
+        try {
+          console.log('[API] Using external API for admin orders');
+          
+          // Call the external API using our generic function
+          const data = await callExternalApi('/admin/orders', 'GET');
+          return res.json(data);
+        } catch (error) {
+          console.error('[API] Error getting external admin orders, falling back to mock data:', error);
+          // Fall back to mock data if external API fails
+        }
+      }
+      
+      console.log("[DEBUG] Serving mock admin orders data");
+      // Return mock data for orders management
+      res.json({
+        "success": true,
+        "count": 25,
+        "orders": [
+          {
+            "id": 1,
+            "orderNumber": "SHP-10001",
+            "awbNumber": "FDX8376541285",
+            "userId": 1,
+            "status": "delivered",
+            "paymentStatus": "paid",
+            "description": "Laptop shipment to Chicago office",
+            "shipmentType": "Domestic",
+            "carrier": "FedEx",
+            "serviceType": "Express",
+            "packageType": "Box",
+            "packageWeight": 5.2,
+            "packageLength": 45,
+            "packageWidth": 35,
+            "packageHeight": 10,
+            "shippingDate": "2025-04-10T00:00:00.000Z",
+            "senderId": 1,
+            "recipientId": 2,
+            "packageQuantity": 1,
+            "basePrice": "45.00",
+            "insurancePrice": "15.00",
+            "additionalFees": "5.00",
+            "tax": "6.50",
+            "totalPrice": "71.50",
+            "additionalServices": null,
+            "createdAt": "2025-04-09T00:00:00.000Z",
+            "updatedAt": "2025-04-11T00:00:00.000Z"
+          },
+          {
+            "id": 2,
+            "orderNumber": "SHP-10002",
+            "awbNumber": "DHL9823754687",
+            "userId": 1,
+            "status": "in_transit",
+            "paymentStatus": "paid",
+            "description": "Marketing materials for conference",
+            "shipmentType": "International",
+            "carrier": "DHL",
+            "serviceType": "Express",
+            "packageType": "Box",
+            "packageWeight": 8.5,
+            "packageLength": 50,
+            "packageWidth": 40,
+            "packageHeight": 30,
+            "shippingDate": "2025-04-15T00:00:00.000Z",
+            "senderId": 1,
+            "recipientId": 3,
+            "packageQuantity": 1,
+            "basePrice": "125.00",
+            "insurancePrice": "25.00",
+            "additionalFees": "15.00",
+            "tax": "16.50",
+            "totalPrice": "181.50",
+            "additionalServices": null,
+            "createdAt": "2025-04-14T00:00:00.000Z",
+            "updatedAt": "2025-04-16T00:00:00.000Z"
+          },
+          {
+            "id": 3,
+            "orderNumber": "SHP-10003",
+            "awbNumber": "SFE1234567890",
+            "userId": 1,
+            "status": "processing",
+            "paymentStatus": "unpaid",
+            "description": "Product samples to distributor",
+            "shipmentType": "International",
+            "carrier": "SF Express",
+            "serviceType": "Standard",
+            "packageType": "Box",
+            "packageWeight": 12.3,
+            "packageLength": 60,
+            "packageWidth": 45,
+            "packageHeight": 30,
+            "shippingDate": "2025-04-20T00:00:00.000Z",
+            "senderId": 1,
+            "recipientId": 4,
+            "packageQuantity": 2,
+            "basePrice": "180.00",
+            "insurancePrice": "50.00",
+            "additionalFees": "20.00",
+            "tax": "25.00",
+            "totalPrice": "275.00",
+            "additionalServices": null,
+            "createdAt": "2025-04-19T00:00:00.000Z",
+            "updatedAt": "2025-04-19T00:00:00.000Z"
+          }
+        ]
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // API endpoint for creating shipments
+  app.post("/api/v1/shipments", async (req, res, next) => {
+    try {
+      // Check if we should use the external API
+      if (apiConfig.useExternalApi) {
+        try {
+          console.log('[API] Using external API to create shipment');
+          
+          // Call the external API using our generic function
+          const data = await callExternalApi('/shipments', 'POST', req.body);
+          return res.status(201).json(data);
+        } catch (error) {
+          console.error('[API] Error creating shipment in external API, falling back to mock data:', error);
+          // Fall back to mock data if external API fails
+        }
+      }
+      
+      console.log("[DEBUG] Creating mock shipment");
+      // Return mock response as provided
+      res.status(201).json({
+        "id": 32,
+        "sender_address_id": 33,
+        "receiver_address_id": 34,
+        "tracking_number": null,
+        "status": null,
+        "provider_id": 1,
+        "provider_service_id": 1,
+        "estimated_delivery": null,
+        "actual_delivery": null,
+        "carrier_account": null,
+        "created_at": "2025-04-21T15:22:38.848Z",
+        "updated_at": "2025-04-21T15:22:38.848Z",
+        "total_price": null,
+        "packages": [
+            {
+                "id": 79,
+                "shipment_id": 32,
+                "carriage_value": 1200,
+                "unit_of_weight": "kg_cm",
+                "currency": "USD",
+                "type_shipping": "items",
+                "packaging": "box",
+                "weight_total": 15,
+                "volume_weight": 96,
+                "created_at": "2025-04-21T15:22:39.045Z",
+                "updated_at": "2025-04-21T15:22:39.434Z",
+                "items": [
+                    {
+                        "id": 123,
+                        "package_id": 79,
+                        "weight": 15,
+                        "length": 120,
+                        "width": 80,
+                        "height": 50,
+                        "quantity": 1,
+                        "description": "Furniture",
+                        "value": 1200,
+                        "country_of_origin": "VN",
+                        "hs_code": "940350",
+                        "package_tracking_number": null,
+                        "created_at": "2025-04-21T15:22:39.198Z",
+                        "updated_at": "2025-04-21T15:22:39.334Z",
+                        "volume_weight": "96.0"
+                    }
+                ]
+            }
+        ],
+        "sender_address": {
+            "id": 33,
+            "name": "Le Van C",
+            "company": "Furniture Exports",
+            "country_id": 1,
+            "postal_code": "70000",
+            "city": "Ho Chi Minh City",
+            "state": "",
+            "address1": "789 Cach Mang Thang 8",
+            "address2": "District 3",
+            "address3": "",
+            "phone": "+84918765432",
+            "email": "le@example.com",
+            "address_type": null,
+            "created_at": "2025-04-21T15:22:38.749Z",
+            "updated_at": "2025-04-21T15:22:38.749Z"
+        },
+        "receiver_address": {
+            "id": 34,
+            "name": "Li Wei",
+            "company": "",
+            "country_id": 5,
+            "postal_code": "018956",
+            "city": "Singapore",
+            "state": "",
+            "address1": "10 Marina Boulevard",
+            "address2": "#25-01",
+            "address3": "",
+            "phone": "+6591234567",
+            "email": "li.wei@example.com",
+            "address_type": null,
+            "created_at": "2025-04-21T15:22:38.800Z",
+            "updated_at": "2025-04-21T15:22:38.800Z"
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
   });
   
   // Removed duplicate endpoint
