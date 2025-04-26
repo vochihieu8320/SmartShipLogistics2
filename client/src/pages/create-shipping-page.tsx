@@ -54,20 +54,23 @@ const createShipmentSchema = z.object({
         currency: z.string(),
         type_shipping: z.string(),
         packaging: z.string(),
-        items_attributes: z.array(
-          z.object({
-            weight: z.number(),
-            length: z.number(),
-            width: z.number(),
-            height: z.number(),
-            quantity: z.number(),
-            description: z.string(),
-            value: z.number(),
-            country_of_origin: z.string(),
-            hs_code: z.string().optional(),
-          })
-        ).optional().default([]),
-      })
+        items_attributes: z
+          .array(
+            z.object({
+              weight: z.number(),
+              length: z.number(),
+              width: z.number(),
+              height: z.number(),
+              quantity: z.number(),
+              description: z.string(),
+              value: z.number(),
+              country_of_origin: z.string(),
+              hs_code: z.string().optional(),
+            }),
+          )
+          .optional()
+          .default([]),
+      }),
     ),
   }),
 });
@@ -88,7 +91,7 @@ export default function CreateShippingPage() {
         provider_service_id: 1,
         status: "created",
         sender_address_attributes: {
-          name: user?.fullName || "",
+          name: user?.fullName || "Ebay",
           company: "Furniture Exports",
           country_id: 1,
           postal_code: "70000",
@@ -133,6 +136,7 @@ export default function CreateShippingPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(data),
       });
@@ -230,11 +234,18 @@ export default function CreateShippingPage() {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
                   <Tabs value={activeTab} onValueChange={setActiveTab}>
                     <TabsList className="grid w-full grid-cols-4">
-                      <TabsTrigger value="address">Thông Tin Địa Chỉ</TabsTrigger>
-                      <TabsTrigger value="package">Thông Tin Hàng Hóa</TabsTrigger>
+                      <TabsTrigger value="address">
+                        Thông Tin Địa Chỉ
+                      </TabsTrigger>
+                      <TabsTrigger value="package">
+                        Thông Tin Hàng Hóa
+                      </TabsTrigger>
                       <TabsTrigger value="service">Chọn Dịch Vụ</TabsTrigger>
                       <TabsTrigger value="review">Xác Nhận</TabsTrigger>
                     </TabsList>
@@ -278,12 +289,15 @@ export default function CreateShippingPage() {
                             disabled={createShipmentMutation.isPending}
                             onClick={async () => {
                               try {
-                                await createShipmentMutation.mutateAsync(form.getValues());
+                                await createShipmentMutation.mutateAsync(
+                                  form.getValues(),
+                                );
                                 setActiveTab("service");
                               } catch (error) {
                                 toast({
                                   title: "Lỗi",
-                                  description: "Không thể tạo đơn hàng. Vui lòng thử lại.",
+                                  description:
+                                    "Không thể tạo đơn hàng. Vui lòng thử lại.",
                                   variant: "destructive",
                                 });
                               }
@@ -310,11 +324,14 @@ export default function CreateShippingPage() {
                           </CardHeader>
                           <CardContent>
                             {createShipmentMutation.data ? (
-                              <ServiceQuoteForm 
-                                shipmentId={createShipmentMutation.data.id} 
+                              <ServiceQuoteForm
+                                shipmentId={createShipmentMutation.data.id}
                                 onServiceSelect={(service) => {
                                   // Handle service selection
-                                  form.setValue("shipment.service_id", service.id);
+                                  form.setValue(
+                                    "shipment.service_id",
+                                    service.id,
+                                  );
                                   setActiveTab("review");
                                 }}
                               />
