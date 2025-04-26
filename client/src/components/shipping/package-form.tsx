@@ -253,7 +253,6 @@ export default function PackageForm({ form }: PackageFormProps) {
                   <TableHead className="text-center">Kích Thước (D×R×C)</TableHead>
                   <TableHead className="text-center">Cân Nặng</TableHead>
                   <TableHead className="text-center">Số Lượng</TableHead>
-                  <TableHead className="text-center">Giá Trị</TableHead>
                   <TableHead className="text-center">Xuất Xứ</TableHead>
                   <TableHead className="text-center">Thao Tác</TableHead>
                 </TableRow>
@@ -268,33 +267,69 @@ export default function PackageForm({ form }: PackageFormProps) {
                 ) : (
                   fields.map((field, index) => (
                     <TableRow key={field.id}>
-                      <TableCell>{field.description || "—"}</TableCell>
-                      <TableCell className="text-center">
-                        {field.length || 0}×{field.width || 0}×{field.height || 0} cm
+                      <TableCell>
+                        <Input
+                          value={field.description || ""}
+                          onChange={(e) => update(index, { ...field, description: e.target.value })}
+                          className="max-w-[200px]"
+                        />
                       </TableCell>
-                      <TableCell className="text-center">{field.weight || 0} kg</TableCell>
-                      <TableCell className="text-center">{field.quantity || 1}</TableCell>
-                      <TableCell className="text-center">{field.value || 0}</TableCell>
-                      <TableCell className="text-center">{field.country_of_origin || "VN"}</TableCell>
                       <TableCell className="text-center">
-                        <div className="flex justify-center gap-2">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => startEditItem(index)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => remove(index)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
+                        <div className="flex items-center gap-1 justify-center">
+                          <Input
+                            type="number"
+                            value={field.length || 0}
+                            onChange={(e) => update(index, { ...field, length: Number(e.target.value) })}
+                            className="w-[60px]"
+                          />
+                          ×
+                          <Input
+                            type="number"
+                            value={field.width || 0}
+                            onChange={(e) => update(index, { ...field, width: Number(e.target.value) })}
+                            className="w-[60px]"
+                          />
+                          ×
+                          <Input
+                            type="number"
+                            value={field.height || 0}
+                            onChange={(e) => update(index, { ...field, height: Number(e.target.value) })}
+                            className="w-[60px]"
+                          />
                         </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Input
+                          type="number"
+                          value={field.weight || 0}
+                          onChange={(e) => update(index, { ...field, weight: Number(e.target.value) })}
+                          className="w-[80px] mx-auto"
+                        />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Input
+                          type="number"
+                          value={field.quantity || 1}
+                          onChange={(e) => update(index, { ...field, quantity: Number(e.target.value) })}
+                          className="w-[80px] mx-auto"
+                        />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Input
+                          value={field.country_of_origin || "VN"}
+                          onChange={(e) => update(index, { ...field, country_of_origin: e.target.value })}
+                          className="w-[80px] mx-auto"
+                        />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => remove(index)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))
