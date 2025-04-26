@@ -32,9 +32,21 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 
+// Define a type for the external API user structure
+interface ExternalUser {
+  id: number;
+  email: string;
+  name?: string;
+  username?: string;  // Add this for backward compatibility
+  role_name?: string;
+  role?: string;      // Add this for backward compatibility
+  created_at?: string;
+  updated_at?: string;
+}
+
 export default function UserTable() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<ExternalUser | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
   
@@ -43,6 +55,11 @@ export default function UserTable() {
   // Custom fetch function to use correct API endpoint
   const fetchUsers = async () => {
     const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authentication token not found');
+    }
+    
+    console.log('[DEBUG] Fetching users with token');
     const response = await fetch(`${API_BASE_URL}/users`, {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -51,14 +68,17 @@ export default function UserTable() {
     });
     
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[ERROR] Failed to fetch users: ${response.status}`, errorText);
       throw new Error(`Failed to fetch users: ${response.status}`);
     }
     
     const data = await response.json();
+    console.log('[DEBUG] Fetched users:', data);
     return data.users || []; // Ensure we return an array of users
   };
   
-  const { data: users, isLoading, refetch } = useQuery<any[]>({
+  const { data: users, isLoading, refetch } = useQuery<ExternalUser[]>({
     queryKey: ["/api/v1/users"],
     queryFn: fetchUsers,
     staleTime: 10000, // 10 seconds
@@ -104,9 +124,11 @@ export default function UserTable() {
   const handleDeleteUser = () => {
     toast({
       title: "User deleted",
-      description: `${selectedUser?.fullName} has been deleted.`,
+      description: `${selectedUser?.name || selectedUser?.email} has been deleted.`,
     });
     setIsDeleteDialogOpen(false);
+    // Refresh the user list after deletion
+    setTimeout(() => refetch(), 500);
   };
   
   const handleResetPassword = () => {
@@ -168,7 +190,7 @@ export default function UserTable() {
                     </Avatar>
                     <span className="font-medium">{user.name || 'N/A'}</span>
                   </TableCell>
-                  <TableCell>{user.username || user.email}</TableCell>
+                  <TableCell>{user.email}</TableCell>
                   <TableCell>
                     <Badge variant="default" className="capitalize">
                       {user.role_name || 'User'}

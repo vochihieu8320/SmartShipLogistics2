@@ -382,6 +382,123 @@ export function registerRoutes(app: Express): Server {
     }
   });
   
+  // User Management API endpoints
+  app.get("/api/v1/users", async (req, res, next) => {
+    try {
+      // Get auth token from request header and make it available to the external API call
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        console.log('[DEBUG] Using authorization token from request for users list');
+        (global as any).authToken = token;
+      } else {
+        console.log('[DEBUG] No authorization token in request headers');
+        delete (global as any).authToken;
+        return res.status(401).json({ error: "Authorization required" });
+      }
+
+      // Check if we should use the external API
+      if (apiConfig.useExternalApi) {
+        try {
+          console.log('[API] Getting users from external API');
+          
+          // Call the external API using our generic function
+          const data = await callExternalApi('/users', 'GET');
+          return res.json(data);
+        } catch (error) {
+          console.error('[API] Error getting users from external API:', error);
+          return res.status(500).json({ 
+            success: false, 
+            message: "Failed to get users from external API" 
+          });
+        }
+      } else {
+        // For testing without external API
+        console.log('[DEBUG] External API is disabled, returning mock users');
+        return res.json({
+          success: true,
+          users: [
+            {
+              id: 1,
+              email: "admin@example.com",
+              name: "Admin User",
+              role_name: "admin",
+              created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+            },
+            {
+              id: 2,
+              email: "manager@example.com",
+              name: "Manager User",
+              role_name: "manager",
+              created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString()
+            }
+          ]
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Create user API endpoint
+  app.post("/api/v1/users", async (req, res, next) => {
+    try {
+      // Validate request body
+      const { email, password, password_confirmation, role_name } = req.body;
+      
+      if (!email || !password || !password_confirmation || !role_name) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Email, password, password confirmation, and role name are required" 
+        });
+      }
+      
+      // Get auth token from request header and make it available to the external API call
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        console.log('[DEBUG] Using authorization token to create user');
+        (global as any).authToken = token;
+      } else {
+        console.log('[DEBUG] No authorization token in request headers');
+        delete (global as any).authToken;
+        return res.status(401).json({ error: "Authorization required" });
+      }
+
+      // Check if we should use the external API
+      if (apiConfig.useExternalApi) {
+        try {
+          console.log(`[API] Creating user with email: ${email} and role: ${role_name}`);
+          
+          // Call the external API to create the user
+          const data = await callExternalApi('/users', 'POST', req.body);
+          return res.status(201).json(data);
+        } catch (error) {
+          console.error('[API] Error creating user:', error);
+          return res.status(500).json({ 
+            success: false, 
+            message: "Failed to create user via external API" 
+          });
+        }
+      } else {
+        // For testing without external API
+        console.log('[DEBUG] External API is disabled, returning mock success');
+        return res.status(201).json({
+          success: true,
+          user: {
+            id: Date.now(),
+            email,
+            name: email.split('@')[0],
+            role_name,
+            created_at: new Date().toISOString()
+          }
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
+  
   // External API login endpoint
   app.post("/api/v1/login", async (req, res, next) => {
     try {
