@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -11,7 +12,6 @@ import { Plus, Trash2, Edit, Save, X } from "lucide-react";
 
 // Define the interface for an item
 interface ShipmentItem {
-  id?: string;
   weight: number;
   length: number;
   width: number;
@@ -47,26 +47,24 @@ export default function PackageForm({ form }: PackageFormProps) {
       quantity: 1,
       description: "",
       value: 0,
-      country_of_origin: "",
+      country_of_origin: "VN",
       hs_code: ""
     };
   };
   
   // Start editing an item
   const startEditItem = (index: number) => {
-    const item = fields[index] as unknown as ShipmentItem;
     setTempItem({
-      ...item,
-      // Ensure all required fields are present
-      weight: item.weight || 0,
-      length: item.length || 0,
-      width: item.width || 0,
-      height: item.height || 0,
-      quantity: item.quantity || 1,
-      description: item.description || "",
-      value: item.value || 0,
-      country_of_origin: item.country_of_origin || "",
-      hs_code: item.hs_code || ""
+      ...fields[index],
+      weight: fields[index].weight || 0,
+      length: fields[index].length || 0,
+      width: fields[index].width || 0,
+      height: fields[index].height || 0,
+      quantity: fields[index].quantity || 1,
+      description: fields[index].description || "",
+      value: fields[index].value || 0,
+      country_of_origin: fields[index].country_of_origin || "VN",
+      hs_code: fields[index].hs_code || ""
     });
     setEditingItemIndex(index);
   };
@@ -102,17 +100,12 @@ export default function PackageForm({ form }: PackageFormProps) {
     startEditItem(fields.length);
   };
   
-  // Calculate volume weight (L*W*H/5000)
-  const calculateVolumeWeight = (length: number, width: number, height: number) => {
-    return (length * width * height / 5000).toFixed(1);
-  };
-  
   return (
     <Card className="mb-6">
       <CardContent className="pt-6">
-        <h3 className="text-lg font-semibold mb-4">Package Information</h3>
+        <h3 className="text-lg font-semibold mb-4">Thông Tin Gói Hàng</h3>
         
-        {/* Package-level attributes first */}
+        {/* Package-level attributes */}
         <div className="space-y-4 mb-6">
           <div className="grid md:grid-cols-2 gap-4">
             <FormField
@@ -120,7 +113,7 @@ export default function PackageForm({ form }: PackageFormProps) {
               name="shipment.packages_attributes.0.carriage_value"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Carriage Value</FormLabel>
+                  <FormLabel>Giá Trị Vận Chuyển</FormLabel>
                   <FormControl>
                     <Input type="number" min="1" {...field} />
                   </FormControl>
@@ -134,22 +127,18 @@ export default function PackageForm({ form }: PackageFormProps) {
               name="shipment.packages_attributes.0.currency"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Currency</FormLabel>
+                  <FormLabel>Tiền Tệ</FormLabel>
                   <Select 
                     onValueChange={field.onChange} 
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select currency" />
+                        <SelectValue placeholder="Chọn tiền tệ" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="USD">USD</SelectItem>
-                      <SelectItem value="EUR">EUR</SelectItem>
-                      <SelectItem value="GBP">GBP</SelectItem>
-                      <SelectItem value="JPY">JPY</SelectItem>
-                      <SelectItem value="CNY">CNY</SelectItem>
                       <SelectItem value="VND">VND</SelectItem>
                     </SelectContent>
                   </Select>
@@ -165,14 +154,14 @@ export default function PackageForm({ form }: PackageFormProps) {
               name="shipment.packages_attributes.0.unit_of_weight"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Unit of Weight</FormLabel>
+                  <FormLabel>Đơn Vị</FormLabel>
                   <Select 
                     onValueChange={field.onChange} 
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select unit" />
+                        <SelectValue placeholder="Chọn đơn vị" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -190,20 +179,19 @@ export default function PackageForm({ form }: PackageFormProps) {
               name="shipment.packages_attributes.0.type_shipping"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Shipping Type</FormLabel>
+                  <FormLabel>Loại Vận Chuyển</FormLabel>
                   <Select 
                     onValueChange={field.onChange} 
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select shipping type" />
+                        <SelectValue placeholder="Chọn loại" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="items">Items</SelectItem>
-                      <SelectItem value="documents">Documents</SelectItem>
-                      <SelectItem value="merchandise">Merchandise</SelectItem>
+                      <SelectItem value="items">Hàng Hoá</SelectItem>
+                      <SelectItem value="documents">Tài Liệu</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -216,22 +204,21 @@ export default function PackageForm({ form }: PackageFormProps) {
               name="shipment.packages_attributes.0.packaging"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Packaging Type</FormLabel>
+                  <FormLabel>Đóng Gói</FormLabel>
                   <Select 
                     onValueChange={field.onChange} 
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select packaging type" />
+                        <SelectValue placeholder="Chọn loại đóng gói" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="box">Box</SelectItem>
-                      <SelectItem value="envelope">Envelope</SelectItem>
+                      <SelectItem value="box">Hộp</SelectItem>
+                      <SelectItem value="envelope">Phong Bì</SelectItem>
                       <SelectItem value="pallet">Pallet</SelectItem>
-                      <SelectItem value="tube">Tube</SelectItem>
-                      <SelectItem value="custom">Custom Packaging</SelectItem>
+                      <SelectItem value="tube">Ống</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -246,7 +233,7 @@ export default function PackageForm({ form }: PackageFormProps) {
         {/* Items Table */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h4 className="text-md font-medium">Items in Package</h4>
+            <h4 className="text-md font-medium">Danh Sách Hàng Hoá</h4>
             <Button 
               type="button" 
               variant="outline" 
@@ -254,7 +241,7 @@ export default function PackageForm({ form }: PackageFormProps) {
               onClick={addNewItem}
               className="flex items-center gap-1"
             >
-              <Plus className="h-4 w-4" /> Add Item
+              <Plus className="h-4 w-4" /> Thêm Hàng Hoá
             </Button>
           </div>
           
@@ -262,60 +249,55 @@ export default function PackageForm({ form }: PackageFormProps) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Description</TableHead>
-                  <TableHead className="text-center">Dimensions (L×W×H)</TableHead>
-                  <TableHead className="text-center">Weight</TableHead>
-                  <TableHead className="text-center">Qty</TableHead>
-                  <TableHead className="text-center">Value</TableHead>
-                  <TableHead className="text-center">Vol. Weight</TableHead>
-                  <TableHead className="text-center">Actions</TableHead>
+                  <TableHead>Mô Tả</TableHead>
+                  <TableHead className="text-center">Kích Thước (D×R×C)</TableHead>
+                  <TableHead className="text-center">Cân Nặng</TableHead>
+                  <TableHead className="text-center">Số Lượng</TableHead>
+                  <TableHead className="text-center">Giá Trị</TableHead>
+                  <TableHead className="text-center">Xuất Xứ</TableHead>
+                  <TableHead className="text-center">Thao Tác</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {fields.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-6 text-muted-foreground">
-                      No items added yet. Click "Add Item" to begin.
+                      Chưa có hàng hoá. Nhấn "Thêm Hàng Hoá" để bắt đầu.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  fields.map((field, index) => {
-                    const item = field as unknown as ShipmentItem;
-                    return (
-                      <TableRow key={field.id}>
-                        <TableCell>{item.description || "—"}</TableCell>
-                        <TableCell className="text-center">
-                          {item.length || 0}×{item.width || 0}×{item.height || 0} cm
-                        </TableCell>
-                        <TableCell className="text-center">{item.weight || 0} kg</TableCell>
-                        <TableCell className="text-center">{item.quantity || 1}</TableCell>
-                        <TableCell className="text-center">{item.value || 0}</TableCell>
-                        <TableCell className="text-center">
-                          {calculateVolumeWeight(item.length || 0, item.width || 0, item.height || 0)} kg
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <div className="flex justify-center gap-2">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => startEditItem(index)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => remove(index)}
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
+                  fields.map((field, index) => (
+                    <TableRow key={field.id}>
+                      <TableCell>{field.description || "—"}</TableCell>
+                      <TableCell className="text-center">
+                        {field.length || 0}×{field.width || 0}×{field.height || 0} cm
+                      </TableCell>
+                      <TableCell className="text-center">{field.weight || 0} kg</TableCell>
+                      <TableCell className="text-center">{field.quantity || 1}</TableCell>
+                      <TableCell className="text-center">{field.value || 0}</TableCell>
+                      <TableCell className="text-center">{field.country_of_origin || "VN"}</TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex justify-center gap-2">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => startEditItem(index)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => remove(index)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
                 )}
               </TableBody>
             </Table>
@@ -329,7 +311,7 @@ export default function PackageForm({ form }: PackageFormProps) {
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-semibold">
-                    {editingItemIndex < fields.length ? "Edit Item" : "Add New Item"}
+                    {editingItemIndex < fields.length ? "Sửa Hàng Hoá" : "Thêm Hàng Hoá"}
                   </h3>
                   <Button
                     type="button"
@@ -344,7 +326,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 gap-4">
                     <div className="form-item">
-                      <label className="text-sm font-medium">Description</label>
+                      <label className="text-sm font-medium">Mô Tả Hàng Hoá</label>
                       <Input 
                         value={tempItem.description || ""} 
                         onChange={(e) => handleTempItemChange("description", e.target.value)}
@@ -354,7 +336,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                   
                   <div className="grid grid-cols-4 gap-4">
                     <div className="form-item">
-                      <label className="text-sm font-medium">Length (cm)</label>
+                      <label className="text-sm font-medium">Dài (cm)</label>
                       <Input 
                         type="number"
                         min="0"
@@ -363,7 +345,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                       />
                     </div>
                     <div className="form-item">
-                      <label className="text-sm font-medium">Width (cm)</label>
+                      <label className="text-sm font-medium">Rộng (cm)</label>
                       <Input 
                         type="number"
                         min="0"
@@ -372,7 +354,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                       />
                     </div>
                     <div className="form-item">
-                      <label className="text-sm font-medium">Height (cm)</label>
+                      <label className="text-sm font-medium">Cao (cm)</label>
                       <Input 
                         type="number"
                         min="0"
@@ -381,7 +363,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                       />
                     </div>
                     <div className="form-item">
-                      <label className="text-sm font-medium">Weight (kg)</label>
+                      <label className="text-sm font-medium">Cân Nặng (kg)</label>
                       <Input 
                         type="number"
                         min="0"
@@ -394,7 +376,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                   
                   <div className="grid grid-cols-3 gap-4">
                     <div className="form-item">
-                      <label className="text-sm font-medium">Quantity</label>
+                      <label className="text-sm font-medium">Số Lượng</label>
                       <Input 
                         type="number"
                         min="1"
@@ -403,7 +385,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                       />
                     </div>
                     <div className="form-item">
-                      <label className="text-sm font-medium">Value</label>
+                      <label className="text-sm font-medium">Giá Trị</label>
                       <Input 
                         type="number"
                         min="0"
@@ -412,9 +394,9 @@ export default function PackageForm({ form }: PackageFormProps) {
                       />
                     </div>
                     <div className="form-item">
-                      <label className="text-sm font-medium">Country of Origin</label>
+                      <label className="text-sm font-medium">Xuất Xứ</label>
                       <Input 
-                        placeholder="e.g., VN, US"
+                        placeholder="VN"
                         value={tempItem.country_of_origin || ""}
                         onChange={(e) => handleTempItemChange("country_of_origin", e.target.value)}
                       />
@@ -423,9 +405,9 @@ export default function PackageForm({ form }: PackageFormProps) {
                   
                   <div className="grid grid-cols-1 gap-4">
                     <div className="form-item">
-                      <label className="text-sm font-medium">HS Code (Optional)</label>
+                      <label className="text-sm font-medium">Mã HS (Không bắt buộc)</label>
                       <Input 
-                        placeholder="Harmonized System Code"
+                        placeholder="Mã HS Code"
                         value={tempItem.hs_code || ""}
                         onChange={(e) => handleTempItemChange("hs_code", e.target.value)}
                       />
@@ -438,14 +420,14 @@ export default function PackageForm({ form }: PackageFormProps) {
                       variant="outline"
                       onClick={cancelEditItem}
                     >
-                      Cancel
+                      Huỷ Bỏ
                     </Button>
                     <Button
                       type="button"
                       onClick={saveItemChanges}
                       className="flex items-center gap-1"
                     >
-                      <Save className="h-4 w-4" /> Save Item
+                      <Save className="h-4 w-4" /> Lưu Lại
                     </Button>
                   </div>
                 </div>
