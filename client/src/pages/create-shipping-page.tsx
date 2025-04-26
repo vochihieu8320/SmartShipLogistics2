@@ -286,7 +286,7 @@ export default function CreateShippingPage() {
                               setActiveTab("service");
                               try {
                                 const response = fetch(
-                                  `${API_BASE_URL}/api/v1/shipments`,
+                                  `${API_BASE_URL}/shipments`,
                                   {
                                     method: "POST",
                                     headers: {
@@ -297,7 +297,9 @@ export default function CreateShippingPage() {
                                   },
                                 ).then(async (res) => {
                                   if (!res.ok) {
-                                    throw new Error("Failed to create shipment");
+                                    throw new Error(
+                                      "Failed to create shipment",
+                                    );
                                   }
                                   const data = await res.json();
                                   if (data.success && data.shipment?.id) {
