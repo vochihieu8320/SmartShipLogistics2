@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { API_BASE_URL } from "@/config/api";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,23 +25,30 @@ interface ServiceQuoteFormProps {
 }
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND'
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
   }).format(amount);
 }
 
-export default function ServiceQuoteForm({ shipmentId, onQuoteSelect }: ServiceQuoteFormProps) {
+export default function ServiceQuoteForm({
+  shipmentId,
+  onQuoteSelect,
+}: ServiceQuoteFormProps) {
+  console.log("Fuck");
   const { data: quoteResponse, isLoading } = useQuery({
-    queryKey: ['shipmentQuotes', shipmentId],
+    queryKey: ["shipmentQuotes", shipmentId],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/api/v1/shipments/${shipmentId}/quote`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/shipments/${shipmentId}/quote`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
       if (!response.ok) {
-        throw new Error('Failed to fetch quotes');
+        throw new Error("Failed to fetch quotes");
       }
       return response.json();
     },
@@ -75,20 +81,35 @@ export default function ServiceQuoteForm({ shipmentId, onQuoteSelect }: ServiceQ
                 Chọn
               </Button>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">Giá Gốc</p>
-                <p className="font-medium">{formatCurrency(quote.prices.net_price)}</p>
+                <p className="font-medium">
+                  {formatCurrency(quote.prices.net_price)}
+                </p>
               </div>
               <div>
-                <p className="text-muted-foreground">Phụ Phí Nhiên Liệu ({quote.prices.fuel_surcharge}%)</p>
-                <p className="font-medium">{formatCurrency((quote.prices.net_price * quote.prices.fuel_surcharge) / 100)}</p>
+                <p className="text-muted-foreground">
+                  Phụ Phí Nhiên Liệu ({quote.prices.fuel_surcharge}%)
+                </p>
+                <p className="font-medium">
+                  {formatCurrency(
+                    (quote.prices.net_price * quote.prices.fuel_surcharge) /
+                      100,
+                  )}
+                </p>
               </div>
               {quote.prices.peak_season > 0 && (
                 <div>
-                  <p className="text-muted-foreground">Phụ Phí Mùa Cao Điểm ({quote.prices.peak_season}%)</p>
-                  <p className="font-medium">{formatCurrency((quote.prices.net_price * quote.prices.peak_season) / 100)}</p>
+                  <p className="text-muted-foreground">
+                    Phụ Phí Mùa Cao Điểm ({quote.prices.peak_season}%)
+                  </p>
+                  <p className="font-medium">
+                    {formatCurrency(
+                      (quote.prices.net_price * quote.prices.peak_season) / 100,
+                    )}
+                  </p>
                 </div>
               )}
             </div>
