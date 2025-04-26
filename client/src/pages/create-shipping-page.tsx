@@ -251,7 +251,29 @@ export default function CreateShippingPage() {
                         <div className="flex justify-end">
                           <Button
                             type="button"
-                            onClick={() => setActiveTab("package")}
+                            onClick={async () => {
+                              try {
+                                const response = await fetch("/api/v1/shipments", {
+                                  method: "POST",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                  },
+                                  body: JSON.stringify(form.getValues()),
+                                });
+
+                                if (!response.ok) {
+                                  throw new Error("Lỗi khi gửi thông tin");
+                                }
+
+                                setActiveTab("package");
+                              } catch (error) {
+                                toast({
+                                  title: "Lỗi",
+                                  description: "Không thể gửi thông tin. Vui lòng thử lại.",
+                                  variant: "destructive",
+                                });
+                              }
+                            }}
                           >
                             Tiếp Theo
                           </Button>

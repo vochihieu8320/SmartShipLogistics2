@@ -21,9 +21,9 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
             name={`shipment.${type}_address_attributes.name`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel>Họ và tên</FormLabel> {/* Changed to Vietnamese */}
                 <FormControl>
-                  <Input placeholder="Full Name" {...field} />
+                  <Input placeholder="Họ và tên" {...field} /> {/* Changed to Vietnamese */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -34,9 +34,9 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
             name={`shipment.${type}_address_attributes.company`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Company (Optional)</FormLabel>
+                <FormLabel>Công ty (Tùy chọn)</FormLabel> {/* Changed to Vietnamese */}
                 <FormControl>
-                  <Input placeholder="Company Name" {...field} />
+                  <Input placeholder="Tên công ty" {...field} /> {/* Changed to Vietnamese */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -52,7 +52,7 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="Email Address" {...field} />
+                  <Input type="email" placeholder="Địa chỉ Email" {...field} /> {/* Changed to Vietnamese */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -63,9 +63,9 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
             name={`shipment.${type}_address_attributes.phone`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone</FormLabel>
+                <FormLabel>Điện thoại</FormLabel> {/* Changed to Vietnamese */}
                 <FormControl>
-                  <Input placeholder="Phone Number" {...field} />
+                  <Input placeholder="Số điện thoại" {...field} /> {/* Changed to Vietnamese */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -79,9 +79,9 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
             name={`shipment.${type}_address_attributes.address1`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Address Line 1</FormLabel>
+                <FormLabel>Địa Chỉ</FormLabel> {/* Changed to Vietnamese */}
                 <FormControl>
-                  <Input placeholder="Street Address" {...field} />
+                  <Input placeholder="Nhập địa chỉ" {...field} /> {/* Changed to Vietnamese */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -95,9 +95,9 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
             name={`shipment.${type}_address_attributes.address2`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Address Line 2 (Optional)</FormLabel>
+                <FormLabel>Địa chỉ dòng 2 (Tùy chọn)</FormLabel> {/* Changed to Vietnamese */}
                 <FormControl>
-                  <Input placeholder="Apartment, Suite, Unit, etc." {...field} />
+                  <Input placeholder="Căn hộ, Suite, Unit, v.v." {...field} /> {/* Changed to Vietnamese */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -111,9 +111,9 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
             name={`shipment.${type}_address_attributes.city`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>City</FormLabel>
+                <FormLabel>Thành phố</FormLabel> {/* Changed to Vietnamese */}
                 <FormControl>
-                  <Input placeholder="City" {...field} />
+                  <Input placeholder="Thành phố" {...field} /> {/* Changed to Vietnamese */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -124,9 +124,9 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
             name={`shipment.${type}_address_attributes.state`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>State/Province</FormLabel>
+                <FormLabel>Tỉnh/Thành phố</FormLabel> {/* Changed to Vietnamese */}
                 <FormControl>
-                  <Input placeholder="State or Province" {...field} />
+                  <Input placeholder="Tỉnh/Thành phố" {...field} /> {/* Changed to Vietnamese */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -137,9 +137,9 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
             name={`shipment.${type}_address_attributes.postal_code`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Postal Code</FormLabel>
+                <FormLabel>Mã bưu chính</FormLabel> {/* Changed to Vietnamese */}
                 <FormControl>
-                  <Input placeholder="ZIP or Postal Code" {...field} />
+                  <Input placeholder="Mã bưu chính" {...field} /> {/* Changed to Vietnamese */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -153,9 +153,9 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
             name={`shipment.${type}_address_attributes.country_id`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Country</FormLabel>
+                <FormLabel>Quốc gia</FormLabel> {/* Changed to Vietnamese */}
                 <FormControl>
-                  <Input placeholder="Country" type="number" {...field} />
+                  <Input placeholder="Quốc gia" type="number" {...field} /> {/* Changed to Vietnamese */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
