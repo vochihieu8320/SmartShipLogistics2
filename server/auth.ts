@@ -6,6 +6,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
+import { sessionConfig, serverConfig, authConfig } from './config';
 
 declare global {
   namespace Express {
@@ -29,11 +30,18 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
+  // Configure session settings from centralized config
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET || 'dev-secret',
+    secret: sessionConfig.secret,
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
+    cookie: {
+      secure: sessionConfig.secureCookies || sessionConfig.forceSecureCookies,
+      maxAge: sessionConfig.maxAge,
+      httpOnly: true,
+      sameSite: 'lax'
+    }
   };
 
   app.set("trust proxy", 1);

@@ -4,6 +4,7 @@ import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import { eq, desc } from "drizzle-orm";
+import { sessionConfig } from './config';
 
 const PostgresSessionStore = connectPg(session);
 
@@ -45,12 +46,13 @@ export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
 
   constructor() {
-    // Initialize session store with PostgreSQL
-    this.sessionStore = new PostgresSessionStore({ 
-      pool, 
+    // Initialize session store with PostgreSQL using centralized config
+    this.sessionStore = new PostgresSessionStore({
+      pool,
       createTableIfMissing: true,
-      // Use tableName from env var if available, otherwise use default
-      tableName: process.env.SESSION_TABLE_NAME || 'session'
+      tableName: sessionConfig.tableName,
+      // PostgreSQL prune configuration
+      pruneSessionInterval: 60 * 15 // Prune expired sessions every 15 minutes
     });
   }
 
