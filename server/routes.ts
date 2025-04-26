@@ -887,28 +887,61 @@ export function registerRoutes(app: Express): Server {
         } catch (error) {
           console.error('[API] Error getting role permissions:', error);
           
-          // Return a mock permissions structure for debugging
+          // Return a more comprehensive mock permissions structure for debugging
           console.log('[DEBUG] Returning mock permissions data for debugging');
-          return res.json({
-            success: true,
-            role: {
-              id: 29,
-              name: roleName
+          
+          // Create a more complete mock data structure with multiple modules and features
+          const mockModules = {
+            "Account Management": {
+              module_id: 10,
+              features: {
+                "Create Account": {
+                  feature_id: 17,
+                  permissions: [
+                    { id: 26, name: "create", action_name: "create" },
+                    { id: 27, name: "read", action_name: "read" }
+                  ]
+                },
+                "Admin Settings": {
+                  feature_id: 18,
+                  permissions: [
+                    { id: 28, name: "read", action_name: "read" },
+                    { id: 29, name: "update", action_name: "update" }
+                  ]
+                }
+              }
             },
-            modules: {
-              "Account Management": {
-                module_id: 10,
-                features: {
-                  "Create Account": {
-                    feature_id: 17,
-                    permissions: [
-                      { id: 26, name: "create", action_name: "create" },
-                      { id: 27, name: "read", action_name: "read" }
-                    ]
-                  }
+            "Shipment Management": {
+              module_id: 11,
+              features: {
+                "Create Shipment": {
+                  feature_id: 19,
+                  permissions: [
+                    { id: 30, name: "create", action_name: "create" },
+                    { id: 31, name: "read", action_name: "read" }
+                  ]
+                },
+                "Update Tracking": {
+                  feature_id: 20,
+                  permissions: [
+                    { id: 32, name: "read", action_name: "read" },
+                    { id: 33, name: "update", action_name: "update" }
+                  ]
                 }
               }
             }
+          };
+          
+          return res.json({
+            success: true,
+            role: {
+              id: roleName === "admin" ? 1 : 
+                   roleName === "manager" ? 2 : 
+                   roleName === "sales" ? 3 : 
+                   roleName === "accounting" ? 4 : 5,
+              name: roleName
+            },
+            modules: mockModules
           });
         }
       } else {

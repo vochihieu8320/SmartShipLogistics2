@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { API_BASE_URL } from "@/config/api";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Types for the permissions data structure
 interface Permission {
@@ -235,11 +236,49 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
     );
   }
   
-  if (!permissionsData) {
+  if (!permissionsData || Object.keys(permissionsData).length === 0) {
     return (
-      <div className="p-4 text-center text-muted-foreground">
-        No permissions data available for this role.
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Permissions for {roleName.charAt(0).toUpperCase() + roleName.slice(1)} Role</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="default" className="mb-4">
+            <AlertTitle>No permissions data available</AlertTitle>
+            <AlertDescription>
+              There was an issue retrieving permissions data for this role. Please try again or contact support.
+              <Button 
+                variant="outline" 
+                className="mt-2" 
+                onClick={loadPermissions}
+              >
+                Try Again
+              </Button>
+            </AlertDescription>
+          </Alert>
+          
+          {/* Show mock data structure for debugging */}
+          <div className="mt-4 p-4 border rounded-md bg-muted/30">
+            <p className="text-sm font-medium mb-2">Expected Data Structure:</p>
+            <pre className="text-xs overflow-auto p-2 bg-muted rounded">
+              {JSON.stringify({
+                "Account Management": {
+                  module_id: 1,
+                  features: {
+                    "Create Account": {
+                      feature_id: 1,
+                      permissions: [
+                        { id: 1, name: "create", action_name: "create" },
+                        { id: 2, name: "read", action_name: "read" }
+                      ]
+                    }
+                  }
+                }
+              }, null, 2)}
+            </pre>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
   
@@ -249,62 +288,73 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
         <CardTitle>Permissions for {roleName.charAt(0).toUpperCase() + roleName.slice(1)} Role</CardTitle>
       </CardHeader>
       <CardContent>
-        <Accordion type="multiple" value={expandedModules} className="mb-6">
-          {Object.entries(permissionsData).map(([moduleName, moduleData]) => (
-            <AccordionItem 
-              key={moduleName} 
-              value={moduleName}
-              onClick={() => toggleExpandModule(moduleName)}
-            >
-              <AccordionTrigger className="hover:no-underline">
-                <span className="font-medium">{moduleName}</span>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="rounded-md border">
-                  <div className="py-2 px-4 bg-muted text-sm font-medium grid grid-cols-5">
-                    <div>Feature</div>
-                    {permissionActions.map(action => (
-                      <div key={action.name} className="text-center">{action.display}</div>
-                    ))}
-                  </div>
-                  {Object.entries(moduleData.features).map(([featureName, featureData]) => (
-                    <div 
-                      key={featureName} 
-                      className="py-3 px-4 border-t grid grid-cols-5 items-center"
-                    >
-                      <div className="text-sm">{featureName}</div>
-                      {permissionActions.map(action => (
-                        <div key={action.name} className="flex justify-center">
-                          <Checkbox 
-                            id={`${moduleName}-${featureName}-${action.name}`}
-                            checked={hasPermission(moduleName, featureName, action.name)}
-                            onCheckedChange={() => togglePermission(moduleName, featureName, action.name)}
-                          />
+        {Object.keys(permissionsData).length > 0 ? (
+          <>
+            <Accordion type="multiple" value={expandedModules} className="mb-6">
+              {Object.entries(permissionsData).map(([moduleName, moduleData]) => (
+                <AccordionItem 
+                  key={moduleName} 
+                  value={moduleName}
+                  onClick={() => toggleExpandModule(moduleName)}
+                >
+                  <AccordionTrigger className="hover:no-underline">
+                    <span className="font-medium">{moduleName}</span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="rounded-md border">
+                      <div className="py-2 px-4 bg-muted text-sm font-medium grid grid-cols-5">
+                        <div>Feature</div>
+                        {permissionActions.map(action => (
+                          <div key={action.name} className="text-center">{action.display}</div>
+                        ))}
+                      </div>
+                      {Object.entries(moduleData.features).map(([featureName, featureData]) => (
+                        <div 
+                          key={featureName} 
+                          className="py-3 px-4 border-t grid grid-cols-5 items-center"
+                        >
+                          <div className="text-sm">{featureName}</div>
+                          {permissionActions.map(action => (
+                            <div key={action.name} className="flex justify-center">
+                              <Checkbox 
+                                id={`${moduleName}-${featureName}-${action.name}`}
+                                checked={hasPermission(moduleName, featureName, action.name)}
+                                onCheckedChange={() => togglePermission(moduleName, featureName, action.name)}
+                              />
+                            </div>
+                          ))}
                         </div>
                       ))}
                     </div>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-        
-        <div className="flex justify-end">
-          <Button onClick={savePermissions} disabled={isSaving}>
-            {isSaving ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2 h-4 w-4" />
-                Save Permissions
-              </>
-            )}
-          </Button>
-        </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+            
+            <div className="flex justify-end">
+              <Button onClick={savePermissions} disabled={isSaving}>
+                {isSaving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Permissions
+                  </>
+                )}
+              </Button>
+            </div>
+          </>
+        ) : (
+          <Alert variant="destructive">
+            <AlertTitle>No permissions found</AlertTitle>
+            <AlertDescription>
+              No permissions data available for this role. Please try selecting a different role or contact support.
+            </AlertDescription>
+          </Alert>
+        )}
       </CardContent>
     </Card>
   );
