@@ -36,7 +36,7 @@ export default function ServiceQuoteForm({ shipmentId, onQuoteSelect }: ServiceQ
   const { data: quoteResponse, isLoading } = useQuery({
     queryKey: ['shipmentQuotes', shipmentId],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/shipments/${shipmentId}/quote`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/shipments/${shipmentId}/quote`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
