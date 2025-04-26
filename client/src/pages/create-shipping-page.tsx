@@ -283,10 +283,22 @@ export default function CreateShippingPage() {
                             disabled={createShipmentMutation.isPending}
                             onClick={async () => {
                               try {
-                                const response = await createShipmentMutation.mutateAsync(
-                                  form.getValues(),
-                                );
-                                if (response) {
+                                const response = await fetch(`${API_BASE_URL}/api/v1/shipments`, {
+                                  method: "POST",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                  },
+                                  body: JSON.stringify(form.getValues()),
+                                });
+
+                                if (!response.ok) {
+                                  throw new Error("Failed to create shipment");
+                                }
+
+                                const data = await response.json();
+                                if (data.success && data.shipment?.id) {
+                                  createShipmentMutation.setData(data);
                                   setActiveTab("service");
                                 }
                               } catch (error) {
