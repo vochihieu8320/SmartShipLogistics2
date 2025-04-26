@@ -160,7 +160,7 @@ function LoginForm() {
         />
 
         <div className="text-sm text-right">
-          <span className="text-muted-foreground">Demo credentials: </span>
+          <span className="text-muted-foreground">Tài khoản demo: </span>
           <span className="font-medium">admin@example.com / password123</span>
         </div>
 
@@ -168,10 +168,10 @@ function LoginForm() {
           {loginMutation.isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Logging in...
+              Đang đăng nhập...
             </>
           ) : (
-            "Login"
+            "Đăng Nhập"
           )}
         </Button>
       </form>

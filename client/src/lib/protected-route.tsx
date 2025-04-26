@@ -34,6 +34,15 @@ export function ProtectedRoute({
     );
   }
 
+  // Redirect admin users to admin dashboard
+  if (user.role === 'admin' && !path.startsWith('/admin')) {
+    return (
+      <Route path={path}>
+        <Redirect to="/admin" />
+      </Route>
+    );
+  }
+
   // Check if the user has the required role
   if (requiredRoles && !requiredRoles.includes(user.role)) {
     return (

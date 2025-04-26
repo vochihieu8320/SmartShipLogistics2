@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: data.email,
           fullName: data.email.split('@')[0],
           username: data.email,
-          role: 'admin', // Assuming the user is an admin for now
+          role: data.roles.includes('admin') ? 'admin' : 'user',
           password: '', // We don't store the password
           createdAt: new Date()
         };
