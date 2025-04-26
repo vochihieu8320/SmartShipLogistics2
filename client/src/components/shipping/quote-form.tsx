@@ -1,15 +1,44 @@
 import React, { useState, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { InfoIcon, Calculator, HelpCircle } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -34,6 +63,7 @@ interface ServicePrices {
   fuel_surcharge: number;
   peak_season: number;
   oversize_fee: PackageFee[];
+  total_price: number;
 }
 
 interface ProviderService {
@@ -47,43 +77,57 @@ interface QuoteFormProps {
   onShowRateComparison: () => void;
 }
 
-export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps) {
+export default function QuoteForm({
+  form,
+  onShowRateComparison,
+}: QuoteFormProps) {
   const { toast } = useToast();
-  const [providerServices, setProviderServices] = useState<ProviderService[]>([]);
-  const [selectedService, setSelectedService] = useState<ProviderService | null>(null);
+  const [providerServices, setProviderServices] = useState<ProviderService[]>(
+    [],
+  );
+  const [selectedService, setSelectedService] =
+    useState<ProviderService | null>(null);
   const [customFee, setCustomFee] = useState<number>(0);
   const [vatRate] = useState<number>(0.08); // 8% VAT
-  
+
   // Calculate total price based on the selected service
   const calculateTotalPriceBeforeVAT = () => {
     if (!selectedService) return 0;
-    
-    const { net_price, fuel_surcharge, peak_season, oversize_fee } = selectedService.prices;
-    
+
+    const {
+      net_price,
+      fuel_surcharge,
+      peak_season,
+      oversize_fee,
+      total_price,
+    } = selectedService.prices;
+
     // Calculate the sum of all oversize fees
     let oversizeFeeTotal = 0;
-    oversize_fee.forEach(packageFee => {
-      packageFee.applied_fees.forEach(fee => {
+    oversize_fee.forEach((packageFee) => {
+      packageFee.applied_fees.forEach((fee) => {
         oversizeFeeTotal += parseFloat(fee.amount);
       });
     });
-    
+
     // Calculate percentages
     const fuelSurchargeAmount = (net_price * fuel_surcharge) / 100;
-    const peakSeasonAmount = (net_price * peak_season) / 100;
-    
-    return net_price + fuelSurchargeAmount + peakSeasonAmount + oversizeFeeTotal;
+    const peakSeasonAmount = peak_season;
+
+    return (
+      net_price + fuelSurchargeAmount + peakSeasonAmount + oversizeFeeTotal
+    );
   };
-  
+
   const priceBeforeVAT = calculateTotalPriceBeforeVAT();
   const vatAmount = priceBeforeVAT * vatRate;
   const totalPrice = priceBeforeVAT + vatAmount + customFee;
-  
+
   // Fetch service quotes
   const quotesMutation = useMutation({
     mutationFn: async (shipmentId: number) => {
-      const res = await apiRequest('GET', `/api/shipments/${shipmentId}/quote`);
-      return await res.json() as ProviderService[];
+      const res = await apiRequest("GET", `/api/shipments/${shipmentId}/quote`);
+      return (await res.json()) as ProviderService[];
     },
     onSuccess: (data) => {
       setProviderServices(data);
@@ -98,11 +142,11 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
       toast({
         title: "Failed to load service quotes",
         description: error.message,
-        variant: "destructive"
+        variant: "destructive",
       });
-    }
+    },
   });
-  
+
   // Mock fetch quotes on component mount
   useEffect(() => {
     // This would typically fetch based on the shipment ID
@@ -124,26 +168,27 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
                   display_name: "VÙNG DÂN CƯ UPS Worldwide Express Freight",
                   amount: "3019515.0",
                   description: "Có một kiện hàng nặng hơn 70 kg",
-                  note: null
+                  note: null,
                 },
                 {
                   name: "ahc",
                   display_name: "AHC",
                   amount: "368715.0",
                   description: "Có một kiện hàng năng hơn 25kg",
-                  note: null
+                  note: null,
                 },
                 {
                   name: "lps",
                   display_name: "LPS",
                   amount: "1602700.0",
-                  description: "Nếu chu vi nằm trong khoảng từ 300 đến 400cm thì dù kiện hàng có nghẹ hơn hãng vấn tính 40kg",
-                  note: "Chu vi = (2 × 2 cạnh ngắn nhất) + cạnh dài nhất"
-                }
-              ]
-            }
-          ]
-        }
+                  description:
+                    "Nếu chu vi nằm trong khoảng từ 300 đến 400cm thì dù kiện hàng có nghẹ hơn hãng vấn tính 40kg",
+                  note: "Chu vi = (2 × 2 cạnh ngắn nhất) + cạnh dài nhất",
+                },
+              ],
+            },
+          ],
+        },
       },
       {
         id: 2,
@@ -161,22 +206,22 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
                   display_name: "VÙNG DÂN CƯ UPS Worldwide Express Freight",
                   amount: "3019515.0",
                   description: "Có một kiện hàng nặng hơn 70 kg",
-                  note: null
+                  note: null,
                 },
                 {
                   name: "ahc",
                   display_name: "AHC",
                   amount: "368715.0",
                   description: "Có một kiện hàng năng hơn 25kg",
-                  note: null
-                }
-              ]
-            }
-          ]
-        }
-      }
+                  note: null,
+                },
+              ],
+            },
+          ],
+        },
+      },
     ];
-    
+
     setProviderServices(mockQuotes);
   }, []);
 
@@ -184,18 +229,20 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
   useEffect(() => {
     const serviceId = form.getValues("shipment.provider_service_id");
     if (serviceId && providerServices.length > 0) {
-      const service = providerServices.find(s => s.id === parseInt(serviceId));
+      const service = providerServices.find(
+        (s) => s.id === parseInt(serviceId),
+      );
       setSelectedService(service || null);
     }
   }, [form, providerServices]);
 
   // Format currency helper
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -205,7 +252,7 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
       form.setValue("shipment.total_price", totalPrice);
     }
   }, [totalPrice, selectedService, form]);
-  
+
   // Handle custom fee change
   const handleCustomFeeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value) || 0;
@@ -216,11 +263,13 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
   return (
     <Card className="mb-6">
       <CardContent className="pt-6">
-        <h3 className="text-lg font-semibold mb-4">Carrier and Service Selection</h3>
+        <h3 className="text-lg font-semibold mb-4">
+          Carrier and Service Selection
+        </h3>
 
         <div className="mb-6">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             type="button"
             onClick={onShowRateComparison}
             className="flex items-center gap-2"
@@ -229,7 +278,7 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
             Compare Shipping Rates
           </Button>
         </div>
-        
+
         <div className="grid md:grid-cols-2 gap-4 mb-6">
           <FormField
             control={form.control}
@@ -237,8 +286,8 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Carrier</FormLabel>
-                <Select 
-                  onValueChange={field.onChange} 
+                <Select
+                  onValueChange={field.onChange}
                   defaultValue={field.value?.toString()}
                 >
                   <FormControl>
@@ -257,17 +306,19 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="shipment.provider_service_id"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Service Type</FormLabel>
-                <Select 
+                <Select
                   onValueChange={(value) => {
                     field.onChange(value);
-                    const service = providerServices.find(s => s.id === parseInt(value));
+                    const service = providerServices.find(
+                      (s) => s.id === parseInt(value),
+                    );
                     setSelectedService(service || null);
                   }}
                   defaultValue={field.value?.toString()}
@@ -278,8 +329,11 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {providerServices.map(service => (
-                      <SelectItem key={service.id} value={service.id.toString()}>
+                    {providerServices.map((service) => (
+                      <SelectItem
+                        key={service.id}
+                        value={service.id.toString()}
+                      >
                         {service.name}
                       </SelectItem>
                     ))}
@@ -290,95 +344,135 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
             )}
           />
         </div>
-        
+
         {selectedService && (
           <div className="mt-6 border rounded-lg p-4">
             <h4 className="font-medium text-lg mb-4">Price Details</h4>
-            
+
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                 <div className="text-sm text-muted-foreground">Base Price:</div>
                 <div className="text-sm font-medium">
                   {formatCurrency(selectedService.prices.net_price)}
                 </div>
-                
+
                 <div className="text-sm text-muted-foreground flex items-center">
                   Fuel Surcharge ({selectedService.prices.fuel_surcharge}%):
                 </div>
                 <div className="text-sm font-medium">
-                  {formatCurrency((selectedService.prices.net_price * selectedService.prices.fuel_surcharge) / 100)}
+                  {formatCurrency(
+                    (selectedService.prices.net_price *
+                      selectedService.prices.fuel_surcharge) /
+                      100,
+                  )}
                 </div>
-                
+
                 {selectedService.prices.peak_season > 0 && (
                   <>
                     <div className="text-sm text-muted-foreground">
                       Peak Season ({selectedService.prices.peak_season}%):
                     </div>
                     <div className="text-sm font-medium">
-                      {formatCurrency((selectedService.prices.net_price * selectedService.prices.peak_season) / 100)}
+                      {formatCurrency(
+                        (selectedService.prices.net_price *
+                          selectedService.prices.peak_season) /
+                          100,
+                      )}
                     </div>
                   </>
                 )}
               </div>
-              
+
               <div className="space-y-4">
-                {selectedService.prices.oversize_fee.map((packageFee, packageIndex) => {
-                  // Calculate total for this package's fees
-                  const totalFees = packageFee.applied_fees.reduce((sum, fee) => 
-                    sum + parseFloat(fee.amount), 0
-                  );
-                  
-                  return (
-                    <div key={packageIndex} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-center mb-4">
-                        <h4 className="font-medium">Phụ phí quá khổ - Kiện #{packageFee.package}</h4>
-                        <div className="text-right">
-                          <div className="text-sm text-muted-foreground">Tổng phụ phí:</div>
-                          <div className="font-bold text-primary">{formatCurrency(totalFees)}</div>
+                {selectedService.prices.oversize_fee.map(
+                  (packageFee, packageIndex) => {
+                    // Calculate total for this package's fees
+                    const totalFees = packageFee.applied_fees.reduce(
+                      (sum, fee) => sum + parseFloat(fee.amount),
+                      0,
+                    );
+
+                    return (
+                      <div key={packageIndex} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-center mb-4">
+                          <h4 className="font-medium">
+                            Phụ phí quá khổ - Kiện #{packageFee.package}
+                          </h4>
+                          <div className="text-right">
+                            <div className="text-sm text-muted-foreground">
+                              Tổng phụ phí:
+                            </div>
+                            <div className="font-bold text-primary">
+                              {formatCurrency(totalFees)}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          {packageFee.applied_fees.map((fee, feeIndex) => (
+                            <div
+                              key={feeIndex}
+                              className="bg-muted/50 rounded-lg p-3"
+                            >
+                              <div className="flex justify-between items-start mb-2">
+                                <div className="font-medium">
+                                  {fee.display_name}
+                                </div>
+                                <div className="font-medium">
+                                  {formatCurrency(parseFloat(fee.amount))}
+                                </div>
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                {fee.description}
+                              </p>
+                              {fee.note && (
+                                <div className="mt-2 text-xs flex items-center text-muted-foreground">
+                                  <InfoIcon className="h-3 w-3 mr-1" />
+                                  {fee.note}
+                                </div>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       </div>
-                      
-                      <div className="space-y-3">
-                        {packageFee.applied_fees.map((fee, feeIndex) => (
-                          <div key={feeIndex} className="bg-muted/50 rounded-lg p-3">
-                            <div className="flex justify-between items-start mb-2">
-                              <div className="font-medium">{fee.display_name}</div>
-                              <div className="font-medium">{formatCurrency(parseFloat(fee.amount))}</div>
-                            </div>
-                            <p className="text-sm text-muted-foreground">{fee.description}</p>
-                            {fee.note && (
-                              <div className="mt-2 text-xs flex items-center text-muted-foreground">
-                                <InfoIcon className="h-3 w-3 mr-1" />
-                                {fee.note}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  },
+                )}
               </div>
-              
+
               <Separator />
-              
+
               <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                 <div className="text-sm text-muted-foreground">Subtotal:</div>
-                <div className="text-sm font-medium">{formatCurrency(priceBeforeVAT)}</div>
-                
-                <div className="text-sm text-muted-foreground">VAT ({(vatRate * 100).toFixed(0)}%):</div>
-                <div className="text-sm font-medium">{formatCurrency(vatAmount)}</div>
-                
+                <div className="text-sm font-medium">
+                  {formatCurrency(priceBeforeVAT)}
+                </div>
+
+                <div className="text-sm text-muted-foreground">
+                  VAT ({(vatRate * 100).toFixed(0)}%):
+                </div>
+                <div className="text-sm font-medium">
+                  {formatCurrency(vatAmount)}
+                </div>
+
                 <div className="text-sm">
                   <div className="flex items-center">
-                    <FormLabel htmlFor="custom-fee" className="text-muted-foreground mr-2">Additional Fees:</FormLabel>
+                    <FormLabel
+                      htmlFor="custom-fee"
+                      className="text-muted-foreground mr-2"
+                    >
+                      Additional Fees:
+                    </FormLabel>
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
                           <HelpCircle className="h-3 w-3 text-muted-foreground" />
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Add any custom or additional fees not included in the carrier quote</p>
+                          <p>
+                            Add any custom or additional fees not included in
+                            the carrier quote
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -390,19 +484,19 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
                     type="number"
                     placeholder="0"
                     className="h-8"
-                    value={customFee || ''}
+                    value={customFee || ""}
                     onChange={handleCustomFeeChange}
                   />
                 </div>
-                
+
                 <Separator className="col-span-2 my-1" />
-                
+
                 <div className="text-base font-bold">Total:</div>
                 <div className="text-base font-bold text-primary">
                   {formatCurrency(totalPrice)}
                 </div>
               </div>
-              
+
               <FormField
                 control={form.control}
                 name="shipment.total_price"
@@ -410,7 +504,7 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
                   <input type="hidden" {...field} value={totalPrice} />
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="shipment.custom_fee"
@@ -419,7 +513,7 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
                 )}
               />
             </div>
-            
+
             <div className="mt-4">
               <Badge variant="outline" className="text-xs">
                 Service: {selectedService.name}
