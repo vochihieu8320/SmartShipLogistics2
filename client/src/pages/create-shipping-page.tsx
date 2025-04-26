@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_BASE_URL } from "@/config/api";
 import { useLocation, Link } from "wouter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -128,7 +129,7 @@ export default function CreateShippingPage() {
 
   const createShipmentMutation = useMutation({
     mutationFn: async (data: CreateShipmentFormValues) => {
-      const response = await fetch("/api/v1/shipments", {
+      const response = await fetch(`${API_BASE_URL}/shipments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
