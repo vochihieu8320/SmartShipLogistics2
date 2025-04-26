@@ -845,6 +845,64 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Role permissions endpoints
+  app.get("/api/v1/roles/permissions_by_feature", async (req, res, next) => {
+    try {
+      // Extract role name from query parameter
+      const roleName = req.query.role_name as string;
+      if (!roleName) {
+        return res.status(400).json({ error: "role_name query parameter is required" });
+      }
+
+      // Check if we should use the external API
+      if (apiConfig.useExternalApi) {
+        try {
+          console.log(`[API] Getting permissions for role: ${roleName} from external API`);
+          
+          // Call the external API using our generic function
+          const data = await callExternalApi(`/roles/permissions_by_feature?role_name=${roleName}`, 'GET');
+          return res.json(data);
+        } catch (error) {
+          console.error('[API] Error getting role permissions:', error);
+          return res.status(500).json({ error: "Failed to fetch role permissions from external API" });
+        }
+      } else {
+        return res.status(501).json({ error: "Role permissions feature requires external API" });
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Role permissions update endpoint
+  app.post("/api/v1/roles/update_permissions", async (req, res, next) => {
+    try {
+      // Extract role name and permissions from request body
+      const { role_name, permissions } = req.body;
+      if (!role_name || !permissions) {
+        return res.status(400).json({ error: "role_name and permissions are required" });
+      }
+
+      // Check if we should use the external API
+      if (apiConfig.useExternalApi) {
+        try {
+          console.log(`[API] Updating permissions for role: ${role_name}`);
+          
+          // Call the external API using our generic function
+          const data = await callExternalApi('/roles/update_permissions', 'POST', req.body);
+          return res.json(data);
+        } catch (error) {
+          console.error('[API] Error updating role permissions:', error);
+          return res.status(500).json({ error: "Failed to update role permissions in external API" });
+        }
+      } else {
+        return res.status(501).json({ error: "Role permissions feature requires external API" });
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
