@@ -83,7 +83,18 @@ export default function CreateShippingPage() {
   const [isComplete, setIsComplete] = useState(false);
   const [displayRateComparison, setDisplayRateComparison] = useState(false);
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const [, navigate] = useLocation();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      navigate('/auth');
+    }
+  }, [user, isLoading, navigate]);
+
+  if (isLoading) {
+    return <div>Đang tải...</div>;
+  }
   
   // Default values for the form
   const defaultValues: Partial<CreateShipmentFormValues> = {

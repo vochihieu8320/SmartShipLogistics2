@@ -31,10 +31,12 @@ function App() {
               {/* Auth route */}
               <Route path="/auth" component={AuthPage} />
               
-              {/* Protected client-facing routes */}
-              <ProtectedRoute path="/" component={HomePage} />
-              <ProtectedRoute path="/track" component={TrackingPage} />
-              <ProtectedRoute path="/tracking" component={TrackingPage} />
+              {/* Public routes */}
+              <Route path="/" component={HomePage} />
+              <Route path="/track" component={TrackingPage} />
+              <Route path="/tracking" component={TrackingPage} />
+              
+              {/* Protected shipping routes */}
               <ProtectedRoute path="/shipping" component={ShippingPage} />
               <ProtectedRoute path="/shipping/create" component={CreateShippingPage} />
               <ProtectedRoute path="/shipments" component={ShipmentsPage} />
