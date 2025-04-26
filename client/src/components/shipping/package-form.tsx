@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -9,6 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Trash2, Edit, Save, X } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog"; // Import Dialog and DialogContent
+
 
 // Define the interface for an item
 interface ShipmentItem {
@@ -30,13 +31,13 @@ interface PackageFormProps {
 export default function PackageForm({ form }: PackageFormProps) {
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
   const [tempItem, setTempItem] = useState<ShipmentItem | null>(null);
-  
+
   // Use field array to handle dynamic item list
   const { fields, append, remove, update } = useFieldArray({
     control: form.control,
     name: "shipment.packages_attributes.0.items_attributes"
   });
-  
+
   // Function to create a new blank item
   const createNewItem = (): ShipmentItem => {
     return {
@@ -51,7 +52,7 @@ export default function PackageForm({ form }: PackageFormProps) {
       hs_code: ""
     };
   };
-  
+
   // Start editing an item
   const startEditItem = (index: number) => {
     setTempItem({
@@ -68,7 +69,7 @@ export default function PackageForm({ form }: PackageFormProps) {
     });
     setEditingItemIndex(index);
   };
-  
+
   // Save item changes
   const saveItemChanges = () => {
     if (editingItemIndex !== null && tempItem) {
@@ -77,13 +78,13 @@ export default function PackageForm({ form }: PackageFormProps) {
       setTempItem(null);
     }
   };
-  
+
   // Cancel editing
   const cancelEditItem = () => {
     setEditingItemIndex(null);
     setTempItem(null);
   };
-  
+
   // Handle temp item field changes
   const handleTempItemChange = (field: keyof ShipmentItem, value: any) => {
     if (tempItem) {
@@ -93,18 +94,18 @@ export default function PackageForm({ form }: PackageFormProps) {
       });
     }
   };
-  
+
   // Add a new item
   const addNewItem = () => {
     append(createNewItem());
     startEditItem(fields.length);
   };
-  
+
   return (
     <Card className="mb-6">
       <CardContent className="pt-6">
         <h3 className="text-lg font-semibold mb-4">Thông Tin Gói Hàng</h3>
-        
+
         {/* Package-level attributes */}
         <div className="space-y-4 mb-6">
           <div className="grid md:grid-cols-2 gap-4">
@@ -121,7 +122,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="shipment.packages_attributes.0.currency"
@@ -147,7 +148,7 @@ export default function PackageForm({ form }: PackageFormProps) {
               )}
             />
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-4">
             <FormField
               control={form.control}
@@ -173,7 +174,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="shipment.packages_attributes.0.type_shipping"
@@ -198,7 +199,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="shipment.packages_attributes.0.packaging"
@@ -227,9 +228,9 @@ export default function PackageForm({ form }: PackageFormProps) {
             />
           </div>
         </div>
-        
+
         <Separator className="my-6" />
-          
+
         {/* Items Table */}
         <div>
           <div className="flex items-center justify-between mb-3">
@@ -244,7 +245,7 @@ export default function PackageForm({ form }: PackageFormProps) {
               <Plus className="h-4 w-4" /> Thêm Hàng Hoá
             </Button>
           </div>
-          
+
           <div className="border rounded-md">
             <Table>
               <TableHeader>
@@ -338,7 +339,7 @@ export default function PackageForm({ form }: PackageFormProps) {
             </Table>
           </div>
         </div>
-        
+
         {/* Edit Item Dialog */}
         {editingItemIndex !== null && tempItem && (
           <Dialog open={editingItemIndex !== null} onOpenChange={() => cancelEditItem()}>
@@ -357,7 +358,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                     <X className="h-5 w-5" />
                   </Button>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 gap-4">
                     <div className="form-item">
@@ -368,7 +369,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-4 gap-4">
                     <div className="form-item">
                       <label className="text-sm font-medium">Dài (cm)</label>
@@ -408,7 +409,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-3 gap-4">
                     <div className="form-item">
                       <label className="text-sm font-medium">Số Lượng</label>
@@ -437,7 +438,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 gap-4">
                     <div className="form-item">
                       <label className="text-sm font-medium">Mã HS (Không bắt buộc)</label>
@@ -448,7 +449,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-end gap-2">
                     <Button
                       type="button"
