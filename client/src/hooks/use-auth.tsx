@@ -40,23 +40,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           password: credentials.password
         };
         
-        // Call the external API endpoint using configured URL
-        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.LOGIN}`, {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          mode: 'cors',
-          credentials: 'include',
-          body: JSON.stringify(loginData)
-        });
-        
-        if (!response.ok) {
-          throw new Error('Invalid credentials');
-        }
-        
-        const data = await response.json();
+        // Call login endpoint using centralized API service
+        const data = await api.post(API_ENDPOINTS.LOGIN, loginData);
         
         // Store token in localStorage
         localStorage.setItem('token', data.token);
