@@ -231,9 +231,10 @@ export default function CreateShippingPage() {
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <Tabs value={activeTab} onValueChange={setActiveTab}>
-                    <TabsList className="grid w-full grid-cols-3">
+                    <TabsList className="grid w-full grid-cols-4">
                       <TabsTrigger value="address">Thông Tin Địa Chỉ</TabsTrigger>
                       <TabsTrigger value="package">Thông Tin Hàng Hóa</TabsTrigger>
+                      <TabsTrigger value="service">Chọn Dịch Vụ</TabsTrigger>
                       <TabsTrigger value="review">Xác Nhận</TabsTrigger>
                     </TabsList>
 
@@ -287,6 +288,47 @@ export default function CreateShippingPage() {
                             type="button"
                             variant="outline"
                             onClick={() => setActiveTab("address")}
+                          >
+                            Quay Lại
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={() => setActiveTab("service")}
+                          >
+                            Tiếp Theo
+                          </Button>
+                        </div>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="service">
+                      <div className="space-y-6">
+                        <Card>
+                          <CardHeader>
+                            <CardTitle>Chọn Dịch Vụ Vận Chuyển</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            {createShipmentMutation.data ? (
+                              <ServiceQuoteForm 
+                                shipmentId={createShipmentMutation.data.id} 
+                                onServiceSelect={(service) => {
+                                  // Handle service selection
+                                  form.setValue("shipment.service_id", service.id);
+                                  setActiveTab("review");
+                                }}
+                              />
+                            ) : (
+                              <div className="text-center py-4">
+                                <p>Vui lòng hoàn thành các bước trước</p>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                        <div className="flex justify-between">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setActiveTab("package")}
                           >
                             Quay Lại
                           </Button>
