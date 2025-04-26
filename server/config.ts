@@ -23,11 +23,11 @@ export const storageConfig = {
 
 // API Configuration
 export const apiConfig = {
-  // Whether to use the external API endpoint
-  useExternalApi: process.env.USE_EXTERNAL_API === 'true',
+  // Whether to use the external API endpoint (default to true as requested)
+  useExternalApi: process.env.USE_EXTERNAL_API !== 'false',
   
-  // External API endpoint base URL
-  externalApiUrl: 'http://128.199.198.8/api/v1',
+  // External API endpoint base URL (using the ngrok URL from the frontend config)
+  externalApiUrl: process.env.EXTERNAL_API_URL || 'https://f155-103-249-22-81.ngrok-free.app/api/v1',
   
   // API key for external authentication if needed
   apiKey: process.env.EXTERNAL_API_KEY,
