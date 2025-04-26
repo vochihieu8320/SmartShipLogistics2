@@ -252,9 +252,28 @@ export default function CreateShippingPage() {
                         <div className="flex justify-end">
                           <Button
                             type="button"
-                            onClick={() => setActiveTab("package")}
+                            disabled={createShipmentMutation.isPending}
+                            onClick={async () => {
+                              try {
+                                await createShipmentMutation.mutateAsync(form.getValues());
+                                setActiveTab("package");
+                              } catch (error) {
+                                toast({
+                                  title: "Lỗi",
+                                  description: "Không thể tạo đơn hàng. Vui lòng thử lại.",
+                                  variant: "destructive",
+                                });
+                              }
+                            }}
                           >
-                            Tiếp Theo
+                            {createShipmentMutation.isPending ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Đang xử lý...
+                              </>
+                            ) : (
+                              "Tiếp Theo"
+                            )}
                           </Button>
                         </div>
                       </div>
