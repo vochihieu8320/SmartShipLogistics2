@@ -856,11 +856,23 @@ export function registerRoutes(app: Express): Server {
         console.log('[DEBUG] No role_name provided in query');
         return res.status(400).json({ error: "role_name query parameter is required" });
       }
+      
+      // Get auth token from request header and make it available to the external API call
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        console.log(`[DEBUG] Using authorization token from request: ${token.substring(0, 10)}...`);
+        // Store in global/thread-local variable to be used by apiCall
+        (global as any).authToken = token;
+      } else {
+        console.log('[DEBUG] No authorization token in request headers');
+        delete (global as any).authToken;
+      }
 
       // Check if we should use the external API
       if (apiConfig.useExternalApi) {
         try {
-          console.log(`[API] Getting permissions for role: ${roleName} from external API: ${apiConfig.externalApiUrl}/roles/permissions_by_feature?role_name=${roleName}`);
+          console.log(`[API] Getting permissions for role: ${roleName} from external API`);
           
           // Call the external API using our generic function
           const data = await callExternalApi(`/roles/permissions_by_feature?role_name=${roleName}`, 'GET');

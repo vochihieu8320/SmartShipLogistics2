@@ -20,24 +20,34 @@ async function apiCall<T>(endpoint: string, method: string = 'GET', body?: any):
   // Construct the full URL to the API endpoint
   const url = `${apiConfig.externalApiUrl}${endpoint}`;
   
+  // Check if we have a token in the request (thread-local storage)
+  const token = global.authToken || apiConfig.apiKey;
+  
+  console.log(`[API] Calling external API: ${method} ${url}`);
+  console.log(`[API] Auth token available: ${!!token}`);
+  
   // Configure request options
   const options: any = {
     method,
     headers: {
       'Content-Type': 'application/json',
-      // Add the API key if available
-      ...(apiConfig.apiKey ? { 'Authorization': `Bearer ${apiConfig.apiKey}` } : {})
     }
   };
+  
+  // Add authorization if we have a token
+  if (token) {
+    options.headers['Authorization'] = `Bearer ${token}`;
+    console.log(`[API] Using token for authorization: ${token.substring(0, 10)}...`);
+  }
   
   // Add the request body for POST/PUT/PATCH requests
   if (body && ['POST', 'PUT', 'PATCH'].includes(method)) {
     options.body = JSON.stringify(body);
+    console.log(`[API] Request body:`, JSON.stringify(body).substring(0, 200));
   }
   
-  console.log(`[API] Calling external API: ${method} ${url}`);
-  
   try {
+    console.log(`[API] Sending request to ${url} with headers:`, options.headers);
     const response = await fetch(url, options);
     
     // Check if the response is successful
@@ -49,6 +59,8 @@ async function apiCall<T>(endpoint: string, method: string = 'GET', body?: any):
     
     // Parse and return the response data
     const data = await response.json();
+    console.log(`[API] Successful response from ${endpoint}:`, 
+      JSON.stringify(data).substring(0, 200) + (JSON.stringify(data).length > 200 ? '...' : ''));
     return data as T;
   } catch (error) {
     console.error('[API] Error calling external API:', error);

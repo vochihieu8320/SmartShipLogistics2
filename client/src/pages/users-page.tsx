@@ -10,9 +10,20 @@ import { useState } from "react";
 export default function UsersPage() {
   const [activeTab, setActiveTab] = useState("list");
   const [selectedRole, setSelectedRole] = useState("manager");
+  const [key, setKey] = useState(0); // Key to force re-render
   
   // Available roles from external API
   const ROLES = ["admin", "manager", "cs", "sales", "accounting"];
+  
+  // When changing tabs, force reload if permissions tab is selected
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    if (value === "permissions") {
+      console.log("Permissions tab selected, triggering reload of permissions for role:", selectedRole);
+      // Force re-render the RolePermissions component
+      setKey(prev => prev + 1);
+    }
+  };
   
   return (
     <DashboardLayout title="User Management">
@@ -27,7 +38,7 @@ export default function UsersPage() {
           <Tabs 
             defaultValue="list" 
             value={activeTab} 
-            onValueChange={setActiveTab}
+            onValueChange={handleTabChange}
             className="space-y-4"
           >
             <TabsList>
@@ -49,7 +60,10 @@ export default function UsersPage() {
                 <label className="block text-sm font-medium mb-2">Select Role to Manage</label>
                 <Select 
                   value={selectedRole}
-                  onValueChange={setSelectedRole}
+                  onValueChange={(value) => {
+                    console.log('Role selected:', value);
+                    setSelectedRole(value);
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a role" />
@@ -64,7 +78,8 @@ export default function UsersPage() {
                 </Select>
               </div>
               
-              <RolePermissions roleName={selectedRole} />
+              {/* Force re-render of RolePermissions when role changes by using key prop */}
+              <RolePermissions key={`${selectedRole}-${key}`} roleName={selectedRole} />
             </TabsContent>
           </Tabs>
         </CardContent>
