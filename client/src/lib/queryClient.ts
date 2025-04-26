@@ -34,14 +34,22 @@ export async function apiRequest(
   // Resolve the URL based on API configuration
   const resolvedUrl = resolveApiUrl(url);
   
-  // Set appropriate headers for external API requests
-  const headers: HeadersInit = data ? { "Content-Type": "application/json" } : {};
+  // Set up headers with content type if needed
+  const headers: HeadersInit = {
+    ...(data ? { "Content-Type": "application/json" } : {})
+  };
+  
+  // Add authorization token if available in localStorage
+  const token = localStorage.getItem('token');
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
   
   const res = await fetch(resolvedUrl, {
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
+    credentials: "include", // Keep for session-based auth
   });
 
   await throwIfResNotOk(res);
@@ -58,8 +66,16 @@ export const getQueryFn: <T>(options: {
     const url = queryKey[0] as string;
     const resolvedUrl = resolveApiUrl(url);
     
+    // Set up headers and add auth token if available
+    const headers: HeadersInit = {};
+    const token = localStorage.getItem('token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
     const res = await fetch(resolvedUrl, {
-      credentials: "include",
+      headers,
+      credentials: "include", // Keep for session-based auth
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {

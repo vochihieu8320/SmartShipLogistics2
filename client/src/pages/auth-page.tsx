@@ -100,7 +100,7 @@ function LoginForm() {
   const form = useForm<LoginCredentials>({
     resolver: zodResolver(loginUserSchema),
     defaultValues: {
-      username: "",
+      username: "", // username field will contain email for API compatibility
       password: ""
     }
   });
@@ -108,11 +108,6 @@ function LoginForm() {
   function onSubmit(data: LoginCredentials) {
     loginMutation.mutate(data, {
       onSuccess: (user) => {
-        toast({
-          title: "Login successful",
-          description: `Welcome back, ${user.fullName}!`,
-        });
-        
         // Navigate based on user role
         if (user.role === "admin" || user.role === "manager") {
           navigate("/admin");
@@ -131,9 +126,14 @@ function LoginForm() {
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your username" {...field} />
+                <Input 
+                  type="email"
+                  placeholder="Enter your email" 
+                  {...field} 
+                  autoComplete="email"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -147,14 +147,24 @@ function LoginForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Enter your password" {...field} />
+                <Input 
+                  type="password" 
+                  placeholder="Enter your password" 
+                  {...field}
+                  autoComplete="current-password"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         
-        <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+        <div className="text-sm text-right">
+          <span className="text-muted-foreground">Demo credentials: </span>
+          <span className="font-medium">admin@example.com / password123</span>
+        </div>
+        
+        <Button type="submit" className="w-full mt-6" disabled={loginMutation.isPending}>
           {loginMutation.isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
