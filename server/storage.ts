@@ -2,7 +2,7 @@ import { users, type User, type InsertUser, address, orders, payments, type Addr
 import { db, pool } from "./db";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import { sessionConfig, storageConfig } from './config';
 import createMemoryStore from "memorystore";
 
@@ -132,10 +132,16 @@ export class DatabaseStorage implements IStorage {
     
     if (orderIds.length === 0) return [];
     
-    return db.select()
-      .from(payments)
-      .where(payments.orderId.in(orderIds))
-      .orderBy(desc(payments.createdAt));
+    // For Postgres storage - use Drizzle's query builder
+    if (storageConfig.type === 'postgres' && db) {
+      return db.select()
+        .from(payments)
+        .where(sql`${payments.orderId} IN (${sql.join(orderIds, sql`, `)})`)
+        .orderBy(desc(payments.createdAt));
+    }
+    
+    // Otherwise return empty array (will be populated in MemStorage implementation)
+    return [];
   }
 
   async getRecentOrders(limit: number): Promise<Order[]> {
@@ -216,14 +222,36 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = ++this.lastUserId;
     const createdAt = new Date();
-    const user: User = { id, createdAt, ...insertUser };
+    // Ensure role is always a string (default to 'user' if not provided)
+    const role = insertUser.role || 'user';
+    const user: User = { 
+      id, 
+      createdAt, 
+      username: insertUser.username,
+      password: insertUser.password,
+      email: insertUser.email,
+      fullName: insertUser.fullName,
+      role: role
+    };
     this.users.push(user);
     return user;
   }
 
   async createAddress(insertAddress: InsertAddress): Promise<Address> {
     const id = ++this.lastAddressId;
-    const address: Address = { id, ...insertAddress };
+    // Ensure company is always string | null (default to null if not provided)
+    const company = insertAddress.company || null;
+    const address: Address = { 
+      id, 
+      email: insertAddress.email,
+      name: insertAddress.name,
+      company,
+      phone: insertAddress.phone,
+      streetAddress: insertAddress.streetAddress,
+      city: insertAddress.city,
+      postalCode: insertAddress.postalCode,
+      country: insertAddress.country
+    };
     this.addresses.push(address);
     return address;
   }
@@ -236,7 +264,24 @@ export class MemStorage implements IStorage {
     const id = ++this.lastOrderId;
     const createdAt = new Date();
     const updatedAt = createdAt;
-    const order: Order = { id, createdAt, updatedAt, ...insertOrder };
+    
+    // Generate orderNumber and awbNumber if not provided
+    const orderNumber = insertOrder.orderNumber || `ORD-${Date.now()}-${id}`;
+    const awbNumber = insertOrder.awbNumber || `AWB-${Date.now()}-${id}`;
+    const status = insertOrder.status || 'pending';
+    const paymentStatus = insertOrder.paymentStatus || 'unpaid';
+    
+    const order: Order = { 
+      id, 
+      createdAt, 
+      updatedAt,
+      orderNumber,
+      awbNumber,
+      status,
+      paymentStatus,
+      ...insertOrder
+    };
+    
     this.orderList.push(order);
     return order;
   }
