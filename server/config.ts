@@ -21,6 +21,21 @@ export const storageConfig = {
     parseInt(process.env.DB_IDLE_TIMEOUT) : 30000
 };
 
+// API Configuration
+export const apiConfig = {
+  // Whether to use the external API endpoint
+  useExternalApi: process.env.USE_EXTERNAL_API === 'true',
+  
+  // External API endpoint base URL
+  externalApiUrl: 'http://128.199.198.8/api/v1',
+  
+  // API key for external authentication if needed
+  apiKey: process.env.EXTERNAL_API_KEY,
+  
+  // Local API base path for internal routing
+  localApiPath: '/api'
+};
+
 // Session Configuration
 export const sessionConfig = {
   // Secret key for signing session cookies (required in production)
