@@ -301,23 +301,11 @@ export default function CreateShippingPage() {
                                 }
 
                                 const data = await response.json();
-                                if (data.success && data.shipment?.id) {
-                                  setShipmentId(data.shipment.id);
-                                  setActiveTab("service");
-                                  console.log(
-                                    "Shipment created with ID:",
-                                    data.shipment.id,
-                                  );
-                                  setTimeout(() => setActiveTab("service"), 0);
+                                if (data) {
+                                  setShipmentId(data.id); // Set the shipment ID
+                                  setActiveTab("service"); // Move to the "service" tab
                                 }
-                              } catch (error) {
-                                toast({
-                                  title: "Lỗi",
-                                  description:
-                                    "Không thể tạo đơn hàng. Vui lòng thử lại.",
-                                  variant: "destructive",
-                                });
-                              }
+                              } catch (error) {}
                             }}
                           >
                             {createShipmentMutation.isPending ? (
