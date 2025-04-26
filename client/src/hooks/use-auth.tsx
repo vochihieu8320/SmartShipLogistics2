@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
         
         // Call the external API endpoint using configured URL
-        const response = await fetch(`${ACTIVE_API_URL}${API_ENDPOINTS.LOGIN}`, {
+        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.LOGIN}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
