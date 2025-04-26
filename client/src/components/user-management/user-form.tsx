@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,60 +35,61 @@ export default function UserForm({ onSuccess }: UserFormProps) {
   const [selectedRole, setSelectedRole] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [key, setKey] = useState(0); // Key to force re-render
-  
+
   const form = useForm({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
       email: "",
       password: "",
       password_confirmation: "",
-      role_name: ""
-    }
+      role_name: "",
+    },
   });
 
   const onSubmit = async (data: any) => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
 
       // Use configured API URL and endpoints
-      const res = await fetch(`${ACTIVE_API_URL}${API_ENDPOINTS.USERS}`, {
-        method: 'POST',
+      const res = await fetch(`${API_BASE_URL}/users`, {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: data.email,
           password: data.password,
           password_confirmation: data.password_confirmation,
-          role_name: data.role_name
-        })
+          role_name: data.role_name,
+        }),
       });
-      
+
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to create user');
+        throw new Error(errorData.message || "Failed to create user");
       }
-      
+
       toast({
         title: "Success",
         description: "User created successfully",
       });
-      
+
       form.reset();
       setSelectedRole("");
-      
+
       // Call the onSuccess callback if provided
       if (onSuccess) {
         onSuccess();
       }
     } catch (error) {
-      console.error('Error creating user:', error);
+      console.error("Error creating user:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create user",
-        variant: "destructive"
+        description:
+          error instanceof Error ? error.message : "Failed to create user",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -98,10 +98,10 @@ export default function UserForm({ onSuccess }: UserFormProps) {
 
   // Handle role selection change
   const handleRoleChange = (value: string) => {
-    console.log('Role selected in form:', value);
+    console.log("Role selected in form:", value);
     setSelectedRole(value);
     // Force component to re-render with new role
-    setKey(prev => prev + 1);
+    setKey((prev) => prev + 1);
   };
 
   return (
@@ -121,7 +121,7 @@ export default function UserForm({ onSuccess }: UserFormProps) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="password"
@@ -135,7 +135,7 @@ export default function UserForm({ onSuccess }: UserFormProps) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="password_confirmation"
@@ -149,14 +149,14 @@ export default function UserForm({ onSuccess }: UserFormProps) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="role_name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Role</FormLabel>
-                <Select 
+                <Select
                   onValueChange={(value) => {
                     // Update form value
                     field.onChange(value);
@@ -182,7 +182,7 @@ export default function UserForm({ onSuccess }: UserFormProps) {
               </FormItem>
             )}
           />
-          
+
           <Button type="submit" disabled={isLoading}>
             {isLoading ? (
               <>
@@ -200,7 +200,10 @@ export default function UserForm({ onSuccess }: UserFormProps) {
       {selectedRole && (
         <div className="mt-8">
           <h3 className="text-lg font-semibold mb-4">Role Permissions</h3>
-          <RolePermissions key={`${selectedRole}-${key}`} roleName={selectedRole} />
+          <RolePermissions
+            key={`${selectedRole}-${key}`}
+            roleName={selectedRole}
+          />
         </div>
       )}
     </div>
