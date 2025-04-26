@@ -51,16 +51,26 @@ export default function UserForm({ onSuccess }: UserFormProps) {
     try {
       setIsLoading(true);
       const token = localStorage.getItem('token');
-      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.USERS}`, {
+
+      // Using the exact API endpoint specified
+      const res = await fetch(`${API_BASE_URL}/users`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          password_confirmation: data.password_confirmation,
+          role_name: data.role_name
+        })
       });
       
-      if (!res.ok) throw new Error('Failed to create user');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to create user');
+      }
       
       toast({
         title: "Success",
@@ -75,9 +85,10 @@ export default function UserForm({ onSuccess }: UserFormProps) {
         onSuccess();
       }
     } catch (error) {
+      console.error('Error creating user:', error);
       toast({
         title: "Error",
-        description: "Failed to create user",
+        description: error instanceof Error ? error.message : "Failed to create user",
         variant: "destructive"
       });
     } finally {

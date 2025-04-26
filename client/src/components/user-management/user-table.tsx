@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { User, UserRole } from "@shared/schema";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { API_BASE_URL } from "@/config/api";
 import {
   Table,
   TableBody,
@@ -26,9 +27,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Loader2, MoreHorizontal, UserX, Key, Edit } from "lucide-react";
+import { Loader2, MoreHorizontal, UserX, Key, Edit, RefreshCw } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 
 export default function UserTable() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,10 +40,35 @@ export default function UserTable() {
   
   const { toast } = useToast();
   
-  const { data: users, isLoading } = useQuery<User[]>({
-    queryKey: ["/api/users"],
-    staleTime: 60000, // 1 minute
+  // Custom fetch function to use correct API endpoint
+  const fetchUsers = async () => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/users`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch users: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.users || []; // Ensure we return an array of users
+  };
+  
+  const { data: users, isLoading, refetch } = useQuery<any[]>({
+    queryKey: ["/api/v1/users"],
+    queryFn: fetchUsers,
+    staleTime: 10000, // 10 seconds
+    retry: 1
   });
+  
+  // Refresh user list when component mounts or when redirected back to list
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
   
   const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleDateString('en-US', {
@@ -90,12 +117,16 @@ export default function UserTable() {
     setIsResetPasswordDialogOpen(false);
   };
   
+  // Filter users based on search term
   const filteredUsers = users
-    ? users.filter(user => 
-        user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    ? users.filter(user => {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+          (user.name && user.name.toLowerCase().includes(searchLower)) ||
+          (user.email && user.email.toLowerCase().includes(searchLower)) ||
+          (user.role_name && user.role_name.toLowerCase().includes(searchLower))
+        );
+      })
     : [];
   
   if (isLoading) {
@@ -133,18 +164,18 @@ export default function UserTable() {
                 <TableRow key={user.id}>
                   <TableCell className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarFallback>{getInitials(user.fullName)}</AvatarFallback>
+                      <AvatarFallback>{getInitials(user.name || 'User')}</AvatarFallback>
                     </Avatar>
-                    <span className="font-medium">{user.fullName}</span>
+                    <span className="font-medium">{user.name || 'N/A'}</span>
                   </TableCell>
-                  <TableCell>{user.username}</TableCell>
+                  <TableCell>{user.username || user.email}</TableCell>
                   <TableCell>
-                    <Badge variant={getUserRoleBadgeVariant(user.role) as any} className="capitalize">
-                      {user.role}
+                    <Badge variant="default" className="capitalize">
+                      {user.role_name || 'User'}
                     </Badge>
                   </TableCell>
                   <TableCell>{user.email}</TableCell>
-                  <TableCell>{formatDate(user.createdAt)}</TableCell>
+                  <TableCell>{user.created_at ? formatDate(user.created_at) : 'N/A'}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -195,7 +226,7 @@ export default function UserTable() {
           <DialogHeader>
             <DialogTitle>Delete User</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete {selectedUser?.fullName}? This action cannot be undone.
+              Are you sure you want to delete {selectedUser?.name || selectedUser?.email || 'this user'}? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
