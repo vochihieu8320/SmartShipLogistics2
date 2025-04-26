@@ -93,60 +93,15 @@ export default function CreateShippingPage() {
   const { user, isLoading } = useAuth();
   const [, navigate] = useLocation();
 
+  if (isLoading) {
+    return <div>Đang tải...</div>;
+  }
+
   // Form setup with default values
   const form = useForm<CreateShipmentFormValues>({
     resolver: zodResolver(createShipmentSchema),
     defaultValues: {
       shipment: {
-        provider_id: 1,
-        provider_service_id: 1,
-        status: "created",
-        sender_address_attributes: {
-          name: user?.fullName || "",
-          company: "Furniture Exports",
-          country_id: 1,
-          postal_code: "70000",
-          city: "Ho Chi Minh City",
-          state: "",
-          address1: "789 Cach Mang Thang 8",
-          address2: "District 3",
-          address3: "",
-          phone: "+84918765432",
-          email: user?.email || "le@example.com",
-        },
-        receiver_address_attributes: {
-          name: "Li Wei",
-          company: "",
-          country_id: 5,
-          postal_code: "018956",
-          city: "Singapore",
-          state: "",
-          address1: "10 Marina Boulevard",
-          address2: "#25-01",
-          address3: "",
-          phone: "+6591234567",
-          email: "li.wei@example.com",
-        },
-        packages_attributes: [
-          {
-            carriage_value: 1200,
-            unit_of_weight: "kg_cm",
-            currency: "USD",
-            type_shipping: "items",
-            packaging: "box",
-            items_attributes: [],
-          },
-        ],
-      },
-    },
-    mode: "onChange",
-  });
-
-  if (isLoading) {
-    return <div>Đang tải...</div>;
-  }
-  const defaultValues: Partial<CreateShipmentFormValues> = {
-    shipment: {
       provider_id: 1,
       provider_service_id: 1,
       status: "created",
