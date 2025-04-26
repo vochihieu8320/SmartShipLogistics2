@@ -1,16 +1,34 @@
 
-// External API endpoint for production
+// Default API endpoints
 export const API_BASE_URL = 'http://128.199.198.8/api/v1';
-
-// Use the local API for development
 export const LOCAL_API_URL = '/api';
 
-// Determine which API to use based on environment variable
-// This variable is set in the server configuration and passed down via import.meta.env
-export const USE_EXTERNAL_API = import.meta.env.VITE_USE_EXTERNAL_API === 'true';
+// Default to local API until config is loaded
+export let USE_EXTERNAL_API = false;
+export let ACTIVE_API_URL = LOCAL_API_URL;
 
-// Use external or local API based on configuration
-export const ACTIVE_API_URL = USE_EXTERNAL_API ? API_BASE_URL : LOCAL_API_URL;
+// Load configuration from server
+async function loadApiConfig() {
+  try {
+    const response = await fetch('/api/config');
+    if (response.ok) {
+      const config = await response.json();
+      USE_EXTERNAL_API = config.useExternalApi || false;
+      
+      // Update active API URL based on server configuration
+      ACTIVE_API_URL = USE_EXTERNAL_API ? (config.externalApiUrl || API_BASE_URL) : LOCAL_API_URL;
+      
+      console.log(`[API] Using ${USE_EXTERNAL_API ? 'external' : 'local'} API: ${ACTIVE_API_URL}`);
+    } else {
+      console.warn("[API] Failed to load API configuration, using defaults");
+    }
+  } catch (error) {
+    console.error("[API] Error loading API configuration:", error);
+  }
+}
+
+// Load configuration immediately
+loadApiConfig();
 
 export const API_ENDPOINTS = {
   // External API endpoints

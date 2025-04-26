@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { ACTIVE_API_URL, USE_EXTERNAL_API, LOCAL_API_URL } from "../config/api";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -7,14 +8,38 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+// This function handles URL resolution based on whether we're using external or local API
+function resolveApiUrl(url: string): string {
+  // If it's an absolute URL, return it as is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // If it's already prefixed with the local API path, and we're using the local API
+  if (url.startsWith(LOCAL_API_URL) && !USE_EXTERNAL_API) {
+    return url;
+  }
+  
+  // Otherwise, prepend the active API URL, but make sure not to double-prefix
+  const baseUrl = ACTIVE_API_URL.endsWith('/') ? ACTIVE_API_URL.slice(0, -1) : ACTIVE_API_URL;
+  const apiPath = url.startsWith('/') ? url : `/${url}`;
+  return `${baseUrl}${apiPath}`;
+}
+
 export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(url, {
+  // Resolve the URL based on API configuration
+  const resolvedUrl = resolveApiUrl(url);
+  
+  // Set appropriate headers for external API requests
+  const headers: HeadersInit = data ? { "Content-Type": "application/json" } : {};
+  
+  const res = await fetch(resolvedUrl, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -29,7 +54,11 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    // Resolve the URL based on API configuration
+    const url = queryKey[0] as string;
+    const resolvedUrl = resolveApiUrl(url);
+    
+    const res = await fetch(resolvedUrl, {
       credentials: "include",
     });
 

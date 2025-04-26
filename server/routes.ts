@@ -4,6 +4,7 @@ import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertOrderSchema, insertPaymentSchema, insertAddressSchema } from "@shared/schema";
 import { z } from "zod";
+import { apiConfig } from "./config";
 import {
   getAllCarrierRates,
   generateMockTrackingInfo,
@@ -34,6 +35,16 @@ export function registerRoutes(app: Express): Server {
   app.use((req, res, next) => {
     console.log(`[DEBUG] ${req.method} ${req.path}`);
     next();
+  });
+  
+  // API Configuration endpoint - expose configuration to the client
+  app.get("/api/config", (req, res) => {
+    // Only expose what the client needs to know
+    res.json({
+      useExternalApi: apiConfig.useExternalApi,
+      externalApiUrl: apiConfig.externalApiUrl,
+      // Don't expose sensitive information like API keys
+    });
   });
   
   // Public API endpoints for client-facing interface
