@@ -159,7 +159,7 @@ export default function CreateShippingPage() {
   });
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (!localStorage.getItem("token")) {
       navigate("/auth");
     }
   }, [user, isLoading, navigate]);
