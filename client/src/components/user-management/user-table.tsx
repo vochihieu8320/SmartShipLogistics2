@@ -60,7 +60,12 @@ export default function UserTable() {
     }
     
     console.log('[DEBUG] Fetching users with token');
-    const response = await fetch(`${API_BASE_URL}/users`, {
+    // Make sure we're using the correct API endpoint and method
+    const apiUrl = `${API_BASE_URL}/users`;
+    console.log('[DEBUG] API URL:', apiUrl);
+    
+    const response = await fetch(apiUrl, {
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'

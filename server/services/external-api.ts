@@ -28,6 +28,10 @@ async function apiCall<T>(endpoint: string, method: string = 'GET', body?: any):
   // Check if we have a token in the request (thread-local storage)
   const token = global.authToken || apiConfig.apiKey;
   
+  if (!token && endpoint === '/users') {
+    console.log(`[API] WARNING: No authentication token available for users endpoint`);
+  }
+  
   console.log(`[API] Calling external API: ${method} ${url}`);
   console.log(`[API] Auth token available: ${!!token}`);
   
@@ -82,7 +86,22 @@ async function apiCall<T>(endpoint: string, method: string = 'GET', body?: any):
  * @returns Promise with the API response
  */
 export async function callExternalApi<T>(endpoint: string, method: string = 'GET', body?: any): Promise<T> {
-  return apiCall<T>(endpoint, method, body);
+  // Log the specific API call for debugging
+  console.log(`[API] Calling external API: ${method} ${endpoint}`);
+  
+  // Special handling for users endpoint
+  if (endpoint === '/users' && method === 'GET') {
+    console.log('[API] Getting users list from external API');
+  }
+  
+  try {
+    const result = await apiCall<T>(endpoint, method, body);
+    console.log(`[API] Successfully called ${endpoint}`);
+    return result;
+  } catch (error) {
+    console.error(`[API] Error calling ${endpoint}:`, error);
+    throw error;
+  }
 }
 
 /**

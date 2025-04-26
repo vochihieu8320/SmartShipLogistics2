@@ -403,6 +403,7 @@ export function registerRoutes(app: Express): Server {
           console.log('[API] Getting users from external API');
           
           // Call the external API using our generic function
+          console.log('[API] Calling external API for users list');
           const data = await callExternalApi('/users', 'GET');
           return res.json(data);
         } catch (error) {
