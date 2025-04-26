@@ -161,21 +161,31 @@ export default function UserTable() {
   
   return (
     <div className="space-y-4">
-      <Input
-        placeholder="Search users..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="max-w-[300px]"
-      />
+      <div className="flex justify-between items-center">
+        <Input
+          placeholder="Search users..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="max-w-[300px]"
+        />
+        <Button 
+          variant="outline" 
+          onClick={() => refetch()} 
+          className="flex items-center gap-1"
+          disabled={isLoading}
+        >
+          <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
+      </div>
       
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>User</TableHead>
-              <TableHead>Username</TableHead>
-              <TableHead>Role</TableHead>
               <TableHead>Email</TableHead>
+              <TableHead>Role</TableHead>
               <TableHead>Created</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -196,7 +206,6 @@ export default function UserTable() {
                       {user.role_name || 'User'}
                     </Badge>
                   </TableCell>
-                  <TableCell>{user.email}</TableCell>
                   <TableCell>{user.created_at ? formatDate(user.created_at) : 'N/A'}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -233,7 +242,7 @@ export default function UserTable() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                   No users found
                 </TableCell>
               </TableRow>
