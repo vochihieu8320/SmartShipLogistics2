@@ -265,21 +265,51 @@ export class MemStorage implements IStorage {
     const createdAt = new Date();
     const updatedAt = createdAt;
     
-    // Generate orderNumber and awbNumber if not provided
-    const orderNumber = insertOrder.orderNumber || `ORD-${Date.now()}-${id}`;
-    const awbNumber = insertOrder.awbNumber || `AWB-${Date.now()}-${id}`;
-    const status = insertOrder.status || 'pending';
-    const paymentStatus = insertOrder.paymentStatus || 'unpaid';
+    // Generate orderNumber and awbNumber
+    const orderNumber = `ORD-${Date.now()}-${id}`;
+    const awbNumber = `AWB-${Date.now()}-${id}`;
     
-    const order: Order = { 
-      id, 
-      createdAt, 
+    // Use defaults for optional fields
+    const status = insertOrder.status || 'processing';
+    const paymentStatus = insertOrder.paymentStatus || 'unpaid';
+    const packageQuantity = insertOrder.packageQuantity || 1;
+    const declaredValue = insertOrder.declaredValue || "0";
+    const insurancePrice = insertOrder.insurancePrice || "0";
+    const additionalFees = insertOrder.additionalFees || "0";
+    const tax = insertOrder.tax || "0";
+    const description = insertOrder.description || "";
+    const additionalServices = insertOrder.additionalServices || null;
+    
+    // Create complete order object with all required fields
+    const order: Order = {
+      id,
+      createdAt,
       updatedAt,
       orderNumber,
       awbNumber,
+      userId: insertOrder.userId,
+      shipmentType: insertOrder.shipmentType,
+      carrier: insertOrder.carrier,
+      serviceType: insertOrder.serviceType,
+      shippingDate: insertOrder.shippingDate,
       status,
       paymentStatus,
-      ...insertOrder
+      senderId: insertOrder.senderId,
+      recipientId: insertOrder.recipientId,
+      packageWeight: insertOrder.packageWeight,
+      packageLength: insertOrder.packageLength,
+      packageWidth: insertOrder.packageWidth,
+      packageHeight: insertOrder.packageHeight,
+      packageType: insertOrder.packageType,
+      packageQuantity,
+      description,
+      declaredValue,
+      basePrice: insertOrder.basePrice,
+      insurancePrice,
+      additionalFees,
+      tax,
+      totalPrice: insertOrder.totalPrice,
+      additionalServices
     };
     
     this.orderList.push(order);
@@ -316,7 +346,21 @@ export class MemStorage implements IStorage {
   async createPayment(insertPayment: InsertPayment): Promise<Payment> {
     const id = ++this.lastPaymentId;
     const createdAt = new Date();
-    const payment: Payment = { id, createdAt, ...insertPayment };
+    
+    // Ensure required fields are always present
+    const paymentDate = insertPayment.paymentDate || new Date();
+    const reference = insertPayment.reference || null;
+    
+    const payment: Payment = { 
+      id, 
+      createdAt,
+      orderId: insertPayment.orderId,
+      amount: insertPayment.amount,
+      paymentDate,
+      paymentMethod: insertPayment.paymentMethod,
+      reference
+    };
+    
     this.paymentList.push(payment);
     return payment;
   }
