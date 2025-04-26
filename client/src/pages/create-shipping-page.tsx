@@ -285,7 +285,7 @@ export default function CreateShippingPage() {
                             onClick={async () => {
                               try {
                                 const response = await fetch(
-                                  `${API_BASE_URL}/api/v1/shipments`,
+                                  `${API_BASE_URL}/shipments`,
                                   {
                                     method: "POST",
                                     headers: {
