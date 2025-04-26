@@ -15,6 +15,7 @@ export function ProtectedRoute({
   requiredRoles,
 }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
+  const token = localStorage.getItem('token');
 
   if (isLoading) {
     return (
@@ -26,7 +27,7 @@ export function ProtectedRoute({
     );
   }
 
-  if (!user) {
+  if (!token || !user) {
     return (
       <Route path={path}>
         <Redirect to="/auth" />
