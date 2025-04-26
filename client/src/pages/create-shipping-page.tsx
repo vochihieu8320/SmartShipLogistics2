@@ -337,8 +337,9 @@ export default function CreateShippingPage() {
                             <CardTitle>Chọn Dịch Vụ Vận Chuyển</CardTitle>
                           </CardHeader>
                           <CardContent>
-                            {shipmentId ? (
+                            {shipmentId && activeTab === "service" ? (
                               <ServiceQuoteForm
+                                key={`quote-form-${shipmentId}`}
                                 shipmentId={shipmentId}
                                 onQuoteSelect={(quote) => {
                                   form.setValue(
