@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
 import AddressForm from "@/components/shipping/address-form";
+import PackageForm from "@/components/shipping/package-form";
 
 const createShipmentSchema = z.object({
   shipment: z.object({
@@ -282,21 +283,23 @@ export default function CreateShippingPage() {
                     </TabsContent>
 
                     <TabsContent value="package">
-                      {/* Package details form will be implemented here */}
-                      <div className="flex justify-between">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => setActiveTab("address")}
-                        >
-                          Quay Lại
-                        </Button>
-                        <Button
-                          type="button"
-                          onClick={() => setActiveTab("review")}
-                        >
-                          Tiếp Theo
-                        </Button>
+                      <div className="space-y-6">
+                        <PackageForm form={form} />
+                        <div className="flex justify-between">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setActiveTab("address")}
+                          >
+                            Quay Lại
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={() => setActiveTab("review")}
+                          >
+                            Tiếp Theo
+                          </Button>
+                        </div>
                       </div>
                     </TabsContent>
 
