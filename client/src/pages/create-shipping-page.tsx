@@ -80,6 +80,7 @@ type CreateShipmentFormValues = z.infer<typeof createShipmentSchema>;
 
 export default function CreateShippingPage() {
   const [activeTab, setActiveTab] = useState("address");
+  const [shipmentId, setShipmentId] = useState<number | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
   const [, navigate] = useLocation();
@@ -284,7 +285,7 @@ export default function CreateShippingPage() {
                             onClick={async () => {
                               try {
                                 const response = await fetch(
-                                  `${API_BASE_URL}/shipments`,
+                                  `${API_BASE_URL}/api/v1/shipments`,
                                   {
                                     method: "POST",
                                     headers: {
@@ -301,6 +302,7 @@ export default function CreateShippingPage() {
 
                                 const data = await response.json();
                                 if (data.success && data.shipment?.id) {
+                                  setShipmentId(data.shipment.id);
                                   createShipmentMutation.setData(data);
                                   setActiveTab("service");
                                 }
@@ -334,11 +336,9 @@ export default function CreateShippingPage() {
                             <CardTitle>Chọn Dịch Vụ Vận Chuyển</CardTitle>
                           </CardHeader>
                           <CardContent>
-                            {createShipmentMutation.data?.shipment?.id ? (
+                            {shipmentId ? (
                               <ServiceQuoteForm
-                                shipmentId={
-                                  createShipmentMutation.data.shipment.id
-                                }
+                                shipmentId={shipmentId}
                                 onQuoteSelect={(quote) => {
                                   form.setValue(
                                     "shipment.provider_service_id",
