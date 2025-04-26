@@ -282,10 +282,11 @@ export default function CreateShippingPage() {
                           <Button
                             type="button"
                             disabled={createShipmentMutation.isPending}
-                            onClick={async () => {
+                            onClick={() => {
+                              setActiveTab("service");
                               try {
-                                const response = await fetch(
-                                  `${API_BASE_URL}/shipments`,
+                                const response = fetch(
+                                  `${API_BASE_URL}/api/v1/shipments`,
                                   {
                                     method: "POST",
                                     headers: {
@@ -294,18 +295,16 @@ export default function CreateShippingPage() {
                                     },
                                     body: JSON.stringify(form.getValues()),
                                   },
-                                );
-
-                                if (!response.ok) {
-                                  throw new Error("Failed to create shipment");
-                                }
-
-                                const data = await response.json();
-                                if (data.success && data.shipment?.id) {
-                                  setShipmentId(data.shipment.id);
-                                  createShipmentMutation.setData(data);
-                                  setActiveTab("service");
-                                }
+                                ).then(async (res) => {
+                                  if (!res.ok) {
+                                    throw new Error("Failed to create shipment");
+                                  }
+                                  const data = await res.json();
+                                  if (data.success && data.shipment?.id) {
+                                    setShipmentId(data.shipment.id);
+                                    createShipmentMutation.setData(data);
+                                  }
+                                });
                               } catch (error) {
                                 toast({
                                   title: "Lỗi",
