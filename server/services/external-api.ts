@@ -9,6 +9,11 @@ import fetch from 'node-fetch';
 import { apiConfig } from '../config';
 import { RateRequest, RateQuote, TrackingEvent } from './carrier-api';
 
+// Extend global interface to include our authToken
+declare global {
+  var authToken: string | undefined;
+}
+
 /**
  * Helper to make API calls to the external API
  * @param endpoint - The API endpoint path (without the base URL)

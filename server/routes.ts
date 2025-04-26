@@ -5,6 +5,12 @@ import { storage } from "./storage";
 import { insertOrderSchema, insertPaymentSchema, insertAddressSchema } from "@shared/schema";
 import { z } from "zod";
 import { apiConfig } from "./config";
+
+// Extend global interface to include our authToken for TypeScript
+declare global {
+  var authToken: string | undefined;
+}
+
 import {
   getAllCarrierRates,
   generateMockTrackingInfo,
@@ -922,6 +928,18 @@ export function registerRoutes(app: Express): Server {
       const { role_name, permissions } = req.body;
       if (!role_name || !permissions) {
         return res.status(400).json({ error: "role_name and permissions are required" });
+      }
+      
+      // Get auth token from request header and make it available to the external API call
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        console.log(`[DEBUG] Using authorization token from request: ${token.substring(0, 10)}...`);
+        // Store in global/thread-local variable to be used by apiCall
+        (global as any).authToken = token;
+      } else {
+        console.log('[DEBUG] No authorization token in request headers');
+        delete (global as any).authToken;
       }
 
       // Check if we should use the external API
