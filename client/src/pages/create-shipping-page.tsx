@@ -283,14 +283,17 @@ export default function CreateShippingPage() {
                             disabled={createShipmentMutation.isPending}
                             onClick={async () => {
                               try {
-                                const response = await fetch(`${API_BASE_URL}/api/v1/shipments`, {
-                                  method: "POST",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                const response = await fetch(
+                                  `${API_BASE_URL}/shipments`,
+                                  {
+                                    method: "POST",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                    },
+                                    body: JSON.stringify(form.getValues()),
                                   },
-                                  body: JSON.stringify(form.getValues()),
-                                });
+                                );
 
                                 if (!response.ok) {
                                   throw new Error("Failed to create shipment");
@@ -333,7 +336,9 @@ export default function CreateShippingPage() {
                           <CardContent>
                             {createShipmentMutation.data?.shipment?.id ? (
                               <ServiceQuoteForm
-                                shipmentId={createShipmentMutation.data.shipment.id}
+                                shipmentId={
+                                  createShipmentMutation.data.shipment.id
+                                }
                                 onQuoteSelect={(quote) => {
                                   form.setValue(
                                     "shipment.provider_service_id",
