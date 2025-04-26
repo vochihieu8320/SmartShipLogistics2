@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { API_BASE_URL } from "@/config/api";
 import { Card, CardContent } from "@/components/ui/card";
@@ -147,9 +146,37 @@ export default function ServiceQuoteForm({
               ))}
             </div>
 
-            <Button className="w-full mt-4" onClick={() => onQuoteSelect(quote)}>
-              Chọn Dịch Vụ Này
-            </Button>
+            <Button 
+                  className="w-full mt-4" 
+                  onClick={async () => {
+                    try {
+                      const response = await fetch(
+                        `${API_BASE_URL}/shipments/${shipmentId}/select_service`,
+                        {
+                          method: 'PATCH',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                          },
+                          body: JSON.stringify({
+                            provider_id: 1,
+                            provider_service_id: quote.id
+                          })
+                        }
+                      );
+
+                      if (!response.ok) {
+                        throw new Error('Failed to select service');
+                      }
+
+                      onQuoteSelect(quote);
+                    } catch (error) {
+                      console.error('Error selecting service:', error);
+                    }
+                  }}
+                >
+                  Chọn Dịch Vụ Này
+                </Button>
           </CardContent>
         </Card>
       ))}
