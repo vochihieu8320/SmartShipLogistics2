@@ -321,58 +321,44 @@ export default function QuoteForm({ form, onShowRateComparison }: QuoteFormProps
                 )}
               </div>
               
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="oversize-fees">
-                  <AccordionTrigger className="text-sm py-2">
-                    Additional Fees
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="text-xs">
-                      {selectedService.prices.oversize_fee.map((packageFee, packageIndex) => (
-                        <div key={packageIndex} className="mb-4">
-                          <div className="mb-2 font-medium">
-                            Package #{packageFee.package}
-                          </div>
-                          <Table>
-                            <TableHeader>
-                              <TableRow>
-                                <TableHead className="w-[200px]">Fee</TableHead>
-                                <TableHead>Description</TableHead>
-                                <TableHead className="text-right">Amount</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {packageFee.applied_fees.map((fee, feeIndex) => (
-                                <TableRow key={feeIndex}>
-                                  <TableCell className="font-medium">
-                                    <div className="flex items-center">
-                                      {fee.display_name}
-                                      {fee.note && (
-                                        <TooltipProvider>
-                                          <Tooltip>
-                                            <TooltipTrigger>
-                                              <InfoIcon className="h-3 w-3 ml-1 text-muted-foreground" />
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                              <p>{fee.note}</p>
-                                            </TooltipContent>
-                                          </Tooltip>
-                                        </TooltipProvider>
-                                      )}
-                                    </div>
-                                  </TableCell>
-                                  <TableCell>{fee.description}</TableCell>
-                                  <TableCell className="text-right">{formatCurrency(parseFloat(fee.amount))}</TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
+              <div className="space-y-4">
+                {selectedService.prices.oversize_fee.map((packageFee, packageIndex) => {
+                  // Calculate total for this package's fees
+                  const totalFees = packageFee.applied_fees.reduce((sum, fee) => 
+                    sum + parseFloat(fee.amount), 0
+                  );
+                  
+                  return (
+                    <div key={packageIndex} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="font-medium">Phụ phí quá khổ - Kiện #{packageFee.package}</h4>
+                        <div className="text-right">
+                          <div className="text-sm text-muted-foreground">Tổng phụ phí:</div>
+                          <div className="font-bold text-primary">{formatCurrency(totalFees)}</div>
                         </div>
-                      ))}
+                      </div>
+                      
+                      <div className="space-y-3">
+                        {packageFee.applied_fees.map((fee, feeIndex) => (
+                          <div key={feeIndex} className="bg-muted/50 rounded-lg p-3">
+                            <div className="flex justify-between items-start mb-2">
+                              <div className="font-medium">{fee.display_name}</div>
+                              <div className="font-medium">{formatCurrency(parseFloat(fee.amount))}</div>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{fee.description}</p>
+                            {fee.note && (
+                              <div className="mt-2 text-xs flex items-center text-muted-foreground">
+                                <InfoIcon className="h-3 w-3 mr-1" />
+                                {fee.note}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+                  );
+                })}
+              </div>
               
               <Separator />
               
