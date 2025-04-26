@@ -163,3 +163,22 @@ export async function getExternalTracking(trackingNumber: string): Promise<{
     throw error;
   }
 }
+
+/**
+ * Login to the external API
+ * @param email User email
+ * @param password User password
+ * @returns Auth token and user info
+ */
+export async function loginToExternalApi(email: string, password: string): Promise<{
+  token: string,
+  user_id: number,
+  email: string
+}> {
+  try {
+    return await apiCall<any>('/login', 'POST', { email, password });
+  } catch (error) {
+    console.error('[API] Error logging in to external API:', error);
+    throw error;
+  }
+}

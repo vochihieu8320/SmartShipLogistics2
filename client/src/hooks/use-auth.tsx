@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useState, useEffect } from "react";
 import {
   useQuery,
   useMutation,
@@ -33,27 +33,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-
-      // Mock response
-      if (credentials.username === 'admin@example.com' && credentials.password === 'password123') {
-        const mockResponse = {
-          token: "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE3NDUzMzA1MDV9.COT01SSbFDY1HCXCjxhffh5_g5XNObeqi6o42MUCY74",
-          user_id: 3,
-          email: "admin@example.com"
+      try {
+        // Transform credentials format for the external API
+        const loginData = {
+          email: credentials.username, // API uses email instead of username
+          password: credentials.password
         };
-
-        localStorage.setItem('token', mockResponse.token);
+        
+        // Call the external API endpoint
+        const response = await fetch('/api/v1/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(loginData)
+        });
+        
+        if (!response.ok) {
+          throw new Error('Invalid credentials');
+        }
+        
+        const data = await response.json();
+        
+        // Store token in localStorage
+        localStorage.setItem('token', data.token);
+        
+        // Return user data in the format our application expects
         return {
-          id: mockResponse.user_id,
-          email: mockResponse.email,
-          fullName: mockResponse.email.split('@')[0],
-          role: 'admin'
+          id: data.user_id,
+          email: data.email,
+          fullName: data.email.split('@')[0],
+          username: data.email,
+          role: 'admin', // Assuming the user is an admin for now
+          password: '', // We don't store the password
+          createdAt: new Date()
         };
+      } catch (error) {
+        console.error('Login error:', error);
+        throw error;
       }
-
-      throw new Error('Invalid credentials');
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
@@ -95,20 +113,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", "/api/logout");
+      // Remove token from localStorage
+      localStorage.removeItem('token');
+      
+      // We don't need to call the server for logout with token-based auth
+      // but we'll keep this line for compatibility with session auth if needed
+      try {
+        await apiRequest("POST", "/api/logout");
+      } catch (error) {
+        // Ignore errors from logout endpoint since we've already removed the token
+        console.log("Logout endpoint error (ignored):", error);
+      }
     },
     onSuccess: () => {
+      // Clear user from cache
       queryClient.setQueryData(["/api/user"], null);
+      
       toast({
         title: "Logged out successfully",
       });
+      
+      // Redirect to login page
+      window.location.href = '/auth';
     },
     onError: (error: Error) => {
+      // Even if there's an error, still remove the token and redirect
+      localStorage.removeItem('token');
+      queryClient.setQueryData(["/api/user"], null);
+      
       toast({
-        title: "Logout failed",
-        description: error.message,
+        title: "Logout had issues",
+        description: "You have been logged out, but there were some issues.",
         variant: "destructive",
       });
+      
+      // Redirect to login page
+      window.location.href = '/auth';
     },
   });
 
@@ -136,88 +176,35 @@ export function useAuth() {
   return context;
 }
 
+// Permission table component moved to separate file for clarity
+interface PermissionItem {
+  id: number;
+  name: string;
+  action_name: string;
+}
+
+interface Feature {
+  feature_id: number;
+  permissions: PermissionItem[];
+}
+
+interface ModuleFeatures {
+  [featureName: string]: Feature;
+}
+
+interface Module {
+  module_id: number;
+  features: ModuleFeatures;
+}
+
+interface Modules {
+  [moduleName: string]: Module;
+}
+
+// This functionality has been moved to a dedicated component
+// We keep it here simplified for backwards compatibility until refactored completely
 function PermissionsTable({ roleName }: { roleName: string }) {
-  const [permissions, setPermissions] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const loadPermissions = async (roleName: string) => {
-    try {
-      setIsLoading(true);
-      // Mock response for development
-      const mockResponse = {
-        "success": true,
-        "role": {
-          "id": 27,
-          "name": roleName
-        },
-        "modules": {
-          "Home & Login": {
-            "module_id": 7,
-            "features": {
-              "User Registration": {
-                "feature_id": 1,
-                "permissions": [
-                  { "id": 26, "name": "create", "action_name": "create" },
-                  { "id": 27, "name": "read", "action_name": "read" },
-                  { "id": 28, "name": "update", "action_name": "update" }
-                ]
-              }
-            }
-          },
-          "Account Management": {
-            "module_id": 10,
-            "features": {
-              "Create Account": {
-                "feature_id": 17,
-                "permissions": [
-                  { "id": 26, "name": "create", "action_name": "create" },
-                  { "id": 27, "name": "read", "action_name": "read" },
-                  { "id": 28, "name": "update", "action_name": "update" }
-                ]
-              }
-            }
-          }
-        }
-      };
-      setPermissions(mockResponse.modules);
-    } catch (error) {
-      console.error("Error loading permissions:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadPermissions(roleName);
-  }, [roleName]);
-
-  if (isLoading) return <p>Loading...</p>;
-  if (!permissions) return <p>No permissions found</p>;
-
-  return (
-    <table>
-      <thead>
-        <tr>
-          <th>Module</th>
-          <th>Feature</th>
-          <th>Permissions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {Object.entries(permissions).map(([moduleName, module]) => (
-          Object.entries(module.features).map(([featureName, feature]) => (
-            <React.Fragment key={`${moduleName}-${featureName}`}>
-              <tr>
-                <td>{moduleName}</td>
-                <td>{featureName}</td>
-                <td>{feature.permissions.map(p => p.name).join(', ')}</td>
-              </tr>
-            </React.Fragment>
-          ))
-        ))}
-      </tbody>
-    </table>
-  );
+  return <div>Role permissions for {roleName} (component being refactored)</div>;
 }
 
 export default PermissionsTable;

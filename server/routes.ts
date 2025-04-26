@@ -14,7 +14,8 @@ import {
 } from "./services/carrier-api";
 import { 
   getExternalTracking, 
-  callExternalApi
+  callExternalApi,
+  loginToExternalApi
 } from "./services/external-api";
 
 function isAuthenticated(req: Request, res: Response, next: Function) {
@@ -370,6 +371,38 @@ export function registerRoutes(app: Express): Server {
           }
         ]
       });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // External API login endpoint
+  app.post("/api/v1/login", async (req, res, next) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+      
+      // Check if we should use the external API
+      if (apiConfig.useExternalApi) {
+        try {
+          console.log('[API] Using external API for login');
+          
+          // Call the external API login endpoint
+          const loginData = await loginToExternalApi(email, password);
+          
+          return res.status(200).json(loginData);
+        } catch (error) {
+          console.error('[API] Error logging in through external API:', error);
+          return res.status(401).json({ error: "Invalid credentials" });
+        }
+      } else {
+        console.log('[API] Using local authentication');
+        // For local authentication, pass to the next route handler
+        next();
+      }
     } catch (error) {
       next(error);
     }
