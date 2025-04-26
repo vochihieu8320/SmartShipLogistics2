@@ -10,7 +10,14 @@ import { useAuth } from "@/hooks/use-auth";
 
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckCircle2, Loader2, Package, Truck, X } from "lucide-react";
 import AddressForm from "@/components/shipping/address-form";
@@ -69,11 +76,11 @@ const createShipmentSchema = z.object({
             value: z.coerce.number(),
             country_of_origin: z.string(),
             hs_code: z.string().optional(),
-          })
+          }),
         ),
-      })
+      }),
     ),
-  })
+  }),
 });
 
 type CreateShipmentFormValues = z.infer<typeof createShipmentSchema>;
@@ -130,7 +137,7 @@ export default function CreateShippingPage() {
             items_attributes: [],
           },
         ],
-      }
+      },
     },
     mode: "onChange",
   });
@@ -179,16 +186,9 @@ export default function CreateShippingPage() {
           items_attributes: [], // Empty array - items will be added via the table interface
         },
       ],
-    }
+    },
   };
-  
-  // Form setup
-  const form = useForm<CreateShipmentFormValues>({
-    resolver: zodResolver(createShipmentSchema),
-    defaultValues,
-    mode: "onChange",
-  });
-  
+
   // Submit mutation
   const createShipmentMutation = useMutation({
     mutationFn: async (data: CreateShipmentFormValues) => {
@@ -196,16 +196,16 @@ export default function CreateShippingPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(data),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to create shipment");
       }
-      
+
       return await response.json();
     },
     onSuccess: () => {
@@ -223,15 +223,15 @@ export default function CreateShippingPage() {
       });
     },
   });
-  
+
   function onSubmit(data: CreateShipmentFormValues) {
     createShipmentMutation.mutate(data);
   }
-  
+
   function handleTabChange(value: string) {
     setActiveTab(value);
   }
-  
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
@@ -243,16 +243,22 @@ export default function CreateShippingPage() {
           </div>
           <nav className="hidden md:flex gap-8">
             <Link href="/">
-              <a className="font-medium text-gray-600 hover:text-primary">Home</a>
+              <a className="font-medium text-gray-600 hover:text-primary">
+                Home
+              </a>
             </Link>
             <Link href="/shipping">
               <a className="font-medium text-primary">Shipping</a>
             </Link>
             <Link href="/track">
-              <a className="font-medium text-gray-600 hover:text-primary">Track</a>
+              <a className="font-medium text-gray-600 hover:text-primary">
+                Track
+              </a>
             </Link>
             <Link href="/shipments">
-              <a className="font-medium text-gray-600 hover:text-primary">Shipments</a>
+              <a className="font-medium text-gray-600 hover:text-primary">
+                Shipments
+              </a>
             </Link>
           </nav>
           <div className="flex items-center gap-2">
@@ -262,13 +268,17 @@ export default function CreateShippingPage() {
                   Welcome, {user.fullName}
                 </span>
                 <Link href="/admin">
-                  <Button variant="outline" className="hidden md:inline-flex">Dashboard</Button>
+                  <Button variant="outline" className="hidden md:inline-flex">
+                    Dashboard
+                  </Button>
                 </Link>
               </div>
             ) : (
               <>
                 <Link href="/auth">
-                  <Button variant="outline" className="hidden md:inline-flex">Log In</Button>
+                  <Button variant="outline" className="hidden md:inline-flex">
+                    Log In
+                  </Button>
                 </Link>
                 <Link href="/auth?register=true">
                   <Button className="hidden md:inline-flex">Sign Up</Button>
@@ -285,30 +295,49 @@ export default function CreateShippingPage() {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">Create a Shipment</h1>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Fill out the form below to create a new shipment. We'll provide you with tracking information and a receipt for your records.
+              Fill out the form below to create a new shipment. We'll provide
+              you with tracking information and a receipt for your records.
             </p>
           </div>
 
           {!isComplete ? (
             <div className="max-w-4xl mx-auto">
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
                   <Tabs value={activeTab} onValueChange={handleTabChange}>
                     <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="details">Shipment Details</TabsTrigger>
+                      <TabsTrigger value="details">
+                        Shipment Details
+                      </TabsTrigger>
                       <TabsTrigger value="quotes">Get Quotes</TabsTrigger>
                       <TabsTrigger value="review">Review</TabsTrigger>
                     </TabsList>
-                    
+
                     <TabsContent value="details">
                       <PackageForm form={form} />
-                      <AddressForm form={form} type="sender" title="Sender Information" />
-                      <AddressForm form={form} type="receiver" title="Recipient Information" />
+                      <AddressForm
+                        form={form}
+                        type="sender"
+                        title="Sender Information"
+                      />
+                      <AddressForm
+                        form={form}
+                        type="receiver"
+                        title="Recipient Information"
+                      />
                       <div className="flex justify-end mt-6">
-                        <Button type="button" onClick={() => setActiveTab("quotes")}>Next</Button>
+                        <Button
+                          type="button"
+                          onClick={() => setActiveTab("quotes")}
+                        >
+                          Next
+                        </Button>
                       </div>
                     </TabsContent>
-                    
+
                     <TabsContent value="quotes">
                       <div className="space-y-4">
                         {/* Rate Comparison Modal */}
@@ -317,11 +346,15 @@ export default function CreateShippingPage() {
                             <div className="bg-white rounded-lg shadow-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto">
                               <div className="p-6">
                                 <div className="flex items-center justify-between mb-6">
-                                  <h2 className="text-2xl font-bold">Compare Shipping Rates</h2>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon" 
-                                    onClick={() => setDisplayRateComparison(false)}
+                                  <h2 className="text-2xl font-bold">
+                                    Compare Shipping Rates
+                                  </h2>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() =>
+                                      setDisplayRateComparison(false)
+                                    }
                                   >
                                     <X className="h-5 w-5" />
                                   </Button>
@@ -331,24 +364,43 @@ export default function CreateShippingPage() {
                             </div>
                           </div>
                         )}
-                        
-                        <QuoteForm 
-                          form={form} 
-                          onShowRateComparison={() => setDisplayRateComparison(true)} 
+
+                        <QuoteForm
+                          form={form}
+                          onShowRateComparison={() =>
+                            setDisplayRateComparison(true)
+                          }
                         />
                       </div>
                       <div className="flex justify-between mt-6">
-                        <Button type="button" variant="outline" onClick={() => setActiveTab("details")}>Previous</Button>
-                        <Button type="button" onClick={() => setActiveTab("review")}>Next</Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setActiveTab("details")}
+                        >
+                          Previous
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={() => setActiveTab("review")}
+                        >
+                          Next
+                        </Button>
                       </div>
                     </TabsContent>
-                    
+
                     <TabsContent value="review">
                       <ShippingSummary formData={form.getValues()} />
                       <div className="flex justify-between mt-6">
-                        <Button type="button" variant="outline" onClick={() => setActiveTab("quotes")}>Previous</Button>
-                        <Button 
-                          type="submit" 
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setActiveTab("quotes")}
+                        >
+                          Previous
+                        </Button>
+                        <Button
+                          type="submit"
                           disabled={createShipmentMutation.isPending}
                           className="flex items-center gap-2"
                         >
@@ -379,23 +431,32 @@ export default function CreateShippingPage() {
                   <div className="border border-border rounded-md p-4 flex items-center gap-4">
                     <Package className="h-10 w-10 text-primary" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Your Reference Number</p>
-                      <p className="font-semibold">#{createShipmentMutation.data?.id || "N/A"}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Your Reference Number
+                      </p>
+                      <p className="font-semibold">
+                        #{createShipmentMutation.data?.id || "N/A"}
+                      </p>
                     </div>
                   </div>
-                  
+
                   <p className="text-sm text-muted-foreground">
-                    Please keep your reference number for future tracking. Once your shipment is processed, 
-                    you will receive a tracking number via email.
+                    Please keep your reference number for future tracking. Once
+                    your shipment is processed, you will receive a tracking
+                    number via email.
                   </p>
                 </div>
               </CardContent>
               <CardFooter className="flex flex-col sm:flex-row gap-3 justify-end">
                 <Link href="/shipments">
-                  <Button variant="outline" className="w-full sm:w-auto">View All Shipments</Button>
+                  <Button variant="outline" className="w-full sm:w-auto">
+                    View All Shipments
+                  </Button>
                 </Link>
                 <Link href="/shipping">
-                  <Button className="w-full sm:w-auto">Create Another Shipment</Button>
+                  <Button className="w-full sm:w-auto">
+                    Create Another Shipment
+                  </Button>
                 </Link>
               </CardFooter>
             </Card>
