@@ -2,21 +2,28 @@ import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
 import * as schema from "@shared/schema";
-import { dbConfig, validateConfig } from './config';
-
-// Setup websocket for Neon database
-neonConfig.webSocketConstructor = ws;
+import { storageConfig, validateConfig } from './config';
 
 // Validate critical configuration is present
 validateConfig();
 
-// Initialize database connection pool with config from environment variables
-export const pool = new Pool({
-  connectionString: dbConfig.connectionString,
-  max: dbConfig.maxConnections,
-  idleTimeoutMillis: dbConfig.idleTimeoutMs,
-  ssl: dbConfig.ssl ? { rejectUnauthorized: false } : undefined
-});
+// Setup Postgres connection only if we're using it
+export let pool: Pool | undefined = undefined;
+export let db: any = undefined;
 
-// Initialize and export Drizzle ORM instance
-export const db = drizzle({ client: pool, schema });
+// Only initialize PostgreSQL if it's configured
+if (storageConfig.type === 'postgres' && storageConfig.connectionString) {
+  // Setup websocket for Neon database
+  neonConfig.webSocketConstructor = ws;
+  
+  // Initialize database connection pool with config from environment variables
+  pool = new Pool({
+    connectionString: storageConfig.connectionString,
+    max: storageConfig.maxConnections,
+    idleTimeoutMillis: storageConfig.idleTimeoutMs,
+    ssl: storageConfig.ssl ? { rejectUnauthorized: false } : undefined
+  });
+  
+  // Initialize Drizzle ORM instance
+  db = drizzle({ client: pool, schema });
+}

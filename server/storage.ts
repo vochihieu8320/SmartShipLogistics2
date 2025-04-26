@@ -1,10 +1,10 @@
 import { users, type User, type InsertUser, address, orders, payments, type Address, type InsertAddress, type Order, type InsertOrder, type Payment, type InsertPayment } from "@shared/schema";
-import { db } from "./db";
+import { db, pool } from "./db";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
-import { pool } from "./db";
 import { eq, desc } from "drizzle-orm";
-import { sessionConfig } from './config';
+import { sessionConfig, storageConfig } from './config';
+import createMemoryStore from "memorystore";
 
 const PostgresSessionStore = connectPg(session);
 
@@ -180,4 +180,159 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+// In-memory storage implementation
+export class MemStorage implements IStorage {
+  private users: User[] = [];
+  private addresses: Address[] = [];
+  private orderList: Order[] = [];
+  private paymentList: Payment[] = [];
+  sessionStore: session.Store;
+  
+  private lastUserId = 0;
+  private lastAddressId = 0;
+  private lastOrderId = 0;
+  private lastPaymentId = 0;
+
+  constructor() {
+    // Initialize in-memory session store
+    const MemoryStore = createMemoryStore(session);
+    this.sessionStore = new MemoryStore({
+      checkPeriod: 86400000 // Prune expired entries every 24h
+    });
+  }
+
+  async getUser(id: number): Promise<User | undefined> {
+    return this.users.find(user => user.id === id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return this.users.find(user => user.username === username);
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return [...this.users];
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = ++this.lastUserId;
+    const createdAt = new Date();
+    const user: User = { id, createdAt, ...insertUser };
+    this.users.push(user);
+    return user;
+  }
+
+  async createAddress(insertAddress: InsertAddress): Promise<Address> {
+    const id = ++this.lastAddressId;
+    const address: Address = { id, ...insertAddress };
+    this.addresses.push(address);
+    return address;
+  }
+
+  async getAddress(id: number): Promise<Address | undefined> {
+    return this.addresses.find(addr => addr.id === id);
+  }
+
+  async createOrder(insertOrder: InsertOrder): Promise<Order> {
+    const id = ++this.lastOrderId;
+    const createdAt = new Date();
+    const updatedAt = createdAt;
+    const order: Order = { id, createdAt, updatedAt, ...insertOrder };
+    this.orderList.push(order);
+    return order;
+  }
+
+  async getOrder(id: number): Promise<Order | undefined> {
+    return this.orderList.find(order => order.id === id);
+  }
+
+  async getOrderByNumber(orderNumber: string): Promise<Order | undefined> {
+    return this.orderList.find(order => order.orderNumber === orderNumber);
+  }
+
+  async getAllOrders(): Promise<Order[]> {
+    return [...this.orderList].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getOrdersByUserId(userId: number): Promise<Order[]> {
+    return this.orderList
+      .filter(order => order.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async updateOrderStatus(id: number, status: string): Promise<Order | undefined> {
+    const order = await this.getOrder(id);
+    if (!order) return undefined;
+    
+    order.status = status;
+    order.updatedAt = new Date();
+    return order;
+  }
+
+  async createPayment(insertPayment: InsertPayment): Promise<Payment> {
+    const id = ++this.lastPaymentId;
+    const createdAt = new Date();
+    const payment: Payment = { id, createdAt, ...insertPayment };
+    this.paymentList.push(payment);
+    return payment;
+  }
+
+  async getPaymentsByOrderId(orderId: number): Promise<Payment[]> {
+    return this.paymentList
+      .filter(payment => payment.orderId === orderId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getPaymentsByUserId(userId: number): Promise<Payment[]> {
+    const userOrders = await this.getOrdersByUserId(userId);
+    const orderIds = userOrders.map(order => order.id);
+    
+    return this.paymentList
+      .filter(payment => orderIds.includes(payment.orderId))
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getRecentOrders(limit: number): Promise<Order[]> {
+    return [...this.orderList]
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limit);
+  }
+
+  async getOrderStats(): Promise<{ total: number, processing: number, delivered: number, returned: number }> {
+    const allOrders = this.orderList;
+    const total = allOrders.length;
+    const processing = allOrders.filter(o => o.status === 'processing').length;
+    const delivered = allOrders.filter(o => o.status === 'delivered').length;
+    const returned = allOrders.filter(o => o.status === 'returned').length;
+    
+    return { total, processing, delivered, returned };
+  }
+
+  async getRevenueStats(): Promise<{ total: number, paid: number, unpaid: number }> {
+    const allOrders = this.orderList;
+    
+    const total = allOrders.reduce((sum, order) => sum + Number(order.totalPrice), 0);
+    const paid = allOrders
+      .filter(o => o.paymentStatus === 'paid')
+      .reduce((sum, order) => sum + Number(order.totalPrice), 0);
+    const unpaid = total - paid;
+    
+    return { total, paid, unpaid };
+  }
+
+  async getCarrierDistribution(): Promise<{ carrier: string, count: number }[]> {
+    const allOrders = this.orderList;
+    const carrierMap = new Map<string, number>();
+    
+    allOrders.forEach(order => {
+      const count = carrierMap.get(order.carrier) || 0;
+      carrierMap.set(order.carrier, count + 1);
+    });
+    
+    return Array.from(carrierMap.entries()).map(([carrier, count]) => ({ carrier, count }));
+  }
+}
+
+// Create the appropriate storage implementation based on configuration
+export const storage = storageConfig.type === 'postgres' && pool && db 
+  ? new DatabaseStorage() 
+  : new MemStorage();

@@ -5,12 +5,15 @@
  * No hard-coded database credentials or sensitive information should be stored here.
  */
 
-// Database Configuration
-export const dbConfig = {
-  // Connection string for PostgreSQL database (required)
+// Storage Configuration
+export const storageConfig = {
+  // Use in-memory storage by default, PostgreSQL if DATABASE_URL is provided
+  type: process.env.DATABASE_URL ? 'postgres' : 'memory',
+  
+  // Connection string for PostgreSQL database (optional)
   connectionString: process.env.DATABASE_URL,
   
-  // Optional database configuration params
+  // Optional database configuration params (only used if type is 'postgres')
   ssl: process.env.DB_SSL === 'true',
   maxConnections: process.env.DB_MAX_CONNECTIONS ? 
     parseInt(process.env.DB_MAX_CONNECTIONS) : 20,
@@ -57,11 +60,6 @@ export const authConfig = {
 // Validate critical configuration
 export function validateConfig() {
   const missingVars = [];
-  
-  // Check required database configuration
-  if (!dbConfig.connectionString) {
-    missingVars.push('DATABASE_URL');
-  }
   
   // Check production-required variables
   if (serverConfig.environment === 'production') {
