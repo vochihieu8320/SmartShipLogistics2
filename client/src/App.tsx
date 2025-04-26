@@ -28,17 +28,17 @@ function App() {
         <ThemeProvider defaultTheme="light" storageKey="smartship-theme">
           <TooltipProvider>
             <Switch>
-              {/* Auth route */}
+              {/* Auth route - always public */}
               <Route path="/auth" component={AuthPage} />
               
-              {/* Public routes */}
+              {/* Public landing page */}
               <Route path="/" component={HomePage} />
-              <Route path="/track" component={TrackingPage} />
-              <Route path="/tracking" component={TrackingPage} />
               
-              {/* Public shipping routes */}
-              <Route path="/shipping" component={ShippingPage} />
-              <Route path="/shipping/create" component={CreateShippingPage} />
+              {/* All other routes require authentication */}
+              <ProtectedRoute path="/track" component={TrackingPage} />
+              <ProtectedRoute path="/tracking" component={TrackingPage} />
+              <ProtectedRoute path="/shipping" component={ShippingPage} />
+              <ProtectedRoute path="/shipping/create" component={CreateShippingPage} />
               <ProtectedRoute path="/shipments" component={ShipmentsPage} />
               
               {/* Protected admin dashboard routes */}
