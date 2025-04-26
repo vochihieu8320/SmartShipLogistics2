@@ -293,23 +293,28 @@ export default function CreateShippingPage() {
                                       Authorization: `Bearer ${localStorage.getItem("token")}`,
                                     },
                                     body: JSON.stringify(form.getValues()),
-                                  }
+                                  },
                                 );
-                                
+
                                 if (!response.ok) {
                                   throw new Error("Failed to create shipment");
                                 }
-                                
+
                                 const data = await response.json();
                                 if (data.success && data.shipment?.id) {
                                   setShipmentId(data.shipment.id);
-                                  createShipmentMutation.setData(data);
-                                  setActiveTab("service"); // Only change tab after successful API call
+                                  setActiveTab("service");
+                                  console.log(
+                                    "Shipment created with ID:",
+                                    data.shipment.id,
+                                  );
+                                  setTimeout(() => setActiveTab("service"), 0);
                                 }
                               } catch (error) {
                                 toast({
                                   title: "Lỗi",
-                                  description: "Không thể tạo đơn hàng. Vui lòng thử lại.",
+                                  description:
+                                    "Không thể tạo đơn hàng. Vui lòng thử lại.",
                                   variant: "destructive",
                                 });
                               }
