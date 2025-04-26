@@ -1,12 +1,12 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { API_BASE_URL } from "../config/api";
 
-async function throwIfResNotOk(res: Response) {
-  if (!res.ok) {
-    const text = (await res.text()) || res.statusText;
-    throw new Error(`${res.status}: ${text}`);
-  }
-}
+import { api } from '@/services/api';
+
+const defaultQueryFn = async ({ queryKey }) => {
+  const [endpoint] = queryKey;
+  return api.get(endpoint);
+};
 
 // This function handles URL resolution based on whether we're using external or local API
 function resolveApiUrl(url: string): string {

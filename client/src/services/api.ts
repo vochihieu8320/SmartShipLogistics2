@@ -31,13 +31,19 @@ export async function apiCall<T>(endpoint: string, options: ApiOptions = {}): Pr
     config.body = JSON.stringify(options.body);
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-  
-  if (!response.ok) {
-    throw new Error(`API Error: ${response.status} ${response.statusText}`);
-  }
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
 
-  return response.json();
+    const data = await response.json();
+    return data as T;
+  } catch (error) {
+    console.error('API call failed:', error);
+    throw error;
+  }
 }
 
 // Common API methods

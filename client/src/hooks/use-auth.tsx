@@ -8,6 +8,8 @@ import { insertUserSchema, User as SelectUser, InsertUser, loginUserSchema, Logi
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { API_BASE_URL, API_ENDPOINTS } from "@/config/api";
+import api from '../lib/api'; // Assuming api service is imported here
+
 
 type AuthContextType = {
   user: SelectUser | null;
@@ -39,13 +41,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: credentials.username, // API uses email instead of username
           password: credentials.password
         };
-        
+
         // Call login endpoint using centralized API service
         const data = await api.post(API_ENDPOINTS.LOGIN, loginData);
-        
+
         // Store token in localStorage
         localStorage.setItem('token', data.token);
-        
+
         // Return user data in the format our application expects
         return {
           id: data.user_id,
@@ -103,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: async () => {
       // Remove token from localStorage
       localStorage.removeItem('token');
-      
+
       // We don't need to call the server for logout with token-based auth
       // but we'll keep this line for compatibility with session auth if needed
       try {
@@ -116,11 +118,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     onSuccess: () => {
       // Clear user from cache
       queryClient.setQueryData(["/api/user"], null);
-      
+
       toast({
         title: "Logged out successfully",
       });
-      
+
       // Redirect to login page
       window.location.href = '/auth';
     },
@@ -128,13 +130,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Even if there's an error, still remove the token and redirect
       localStorage.removeItem('token');
       queryClient.setQueryData(["/api/user"], null);
-      
+
       toast({
         title: "Logout had issues",
         description: "You have been logged out, but there were some issues.",
         variant: "destructive",
       });
-      
+
       // Redirect to login page
       window.location.href = '/auth';
     },
