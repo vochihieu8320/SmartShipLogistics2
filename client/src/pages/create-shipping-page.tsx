@@ -326,11 +326,10 @@ export default function CreateShippingPage() {
                             {createShipmentMutation.data ? (
                               <ServiceQuoteForm
                                 shipmentId={createShipmentMutation.data.id}
-                                onServiceSelect={(service) => {
-                                  // Handle service selection
+                                onQuoteSelect={(quote) => {
                                   form.setValue(
-                                    "shipment.service_id",
-                                    service.id,
+                                    "shipment.provider_service_id",
+                                    quote.id,
                                   );
                                   setActiveTab("review");
                                 }}

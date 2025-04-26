@@ -1,29 +1,46 @@
 
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { API_BASE_URL } from "@/config/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle2 } from "lucide-react";
 
-interface ServiceQuote {
+interface Quote {
   id: number;
   name: string;
-  description: string;
-  price: number;
-  currency: string;
-  delivery_time: string;
+  prices: {
+    net_price: number;
+    fuel_surcharge: number;
+    peak_season: number;
+    oversize_fee: Array<{
+      package: number;
+      applied_fees: Array<any>;
+    }>;
+    total_price: number;
+  };
 }
 
 interface ServiceQuoteFormProps {
   shipmentId: number;
-  onServiceSelect: (service: ServiceQuote) => void;
+  onQuoteSelect: (quote: Quote) => void;
 }
 
-export default function ServiceQuoteForm({ shipmentId, onServiceSelect }: ServiceQuoteFormProps) {
-  const { data: quotes, isLoading } = useQuery({
+function formatCurrency(amount: number) {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  }).format(amount);
+}
+
+export default function ServiceQuoteForm({ shipmentId, onQuoteSelect }: ServiceQuoteFormProps) {
+  const { data: quoteResponse, isLoading } = useQuery({
     queryKey: ['shipmentQuotes', shipmentId],
     queryFn: async () => {
-      const response = await fetch(`/api/v1/shipments/${shipmentId}/quote`);
+      const response = await fetch(`${API_BASE_URL}/shipments/${shipmentId}/quote`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch quotes');
       }
@@ -39,30 +56,41 @@ export default function ServiceQuoteForm({ shipmentId, onServiceSelect }: Servic
     );
   }
 
+  const quotes = quoteResponse?.quote || [];
+
   return (
     <div className="grid gap-4">
-      {quotes?.map((quote: ServiceQuote) => (
-        <Card key={quote.id} className="cursor-pointer hover:border-primary">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <h3 className="font-medium">{quote.name}</h3>
-              <p className="text-sm text-gray-500">{quote.description}</p>
-              <p className="text-sm text-gray-500">Thời gian giao hàng: {quote.delivery_time}</p>
-            </div>
-            <div className="text-right">
-              <p className="font-medium">
-                {new Intl.NumberFormat('vi-VN', {
-                  style: 'currency',
-                  currency: quote.currency
-                }).format(quote.price)}
-              </p>
-              <Button 
-                size="sm" 
-                className="mt-2"
-                onClick={() => onServiceSelect(quote)}
-              >
+      {quotes.map((quote: Quote) => (
+        <Card key={quote.id} className="overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold">{quote.name}</h3>
+                <p className="text-2xl font-bold text-primary mt-1">
+                  {formatCurrency(quote.prices.total_price)}
+                </p>
+              </div>
+              <Button onClick={() => onQuoteSelect(quote)}>
+                <CheckCircle2 className="h-4 w-4 mr-2" />
                 Chọn
               </Button>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-muted-foreground">Giá Gốc</p>
+                <p className="font-medium">{formatCurrency(quote.prices.net_price)}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Phụ Phí Nhiên Liệu ({quote.prices.fuel_surcharge}%)</p>
+                <p className="font-medium">{formatCurrency((quote.prices.net_price * quote.prices.fuel_surcharge) / 100)}</p>
+              </div>
+              {quote.prices.peak_season > 0 && (
+                <div>
+                  <p className="text-muted-foreground">Phụ Phí Mùa Cao Điểm ({quote.prices.peak_season}%)</p>
+                  <p className="font-medium">{formatCurrency((quote.prices.net_price * quote.prices.peak_season) / 100)}</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
