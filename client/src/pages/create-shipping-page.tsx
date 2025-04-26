@@ -158,11 +158,11 @@ export default function CreateShippingPage() {
     },
   });
 
-  useEffect(() => {
-    if (!isLoading && !user) {
-      navigate('/auth');
-    }
-  }, [user, isLoading, navigate]);
+  // useEffect(() => {
+  //   if (!localStorage.getItem("token")) {
+  //     navigate("/auth");
+  //   }
+  // }, [user, isLoading, navigate]);
 
   if (isLoading) {
     return (
