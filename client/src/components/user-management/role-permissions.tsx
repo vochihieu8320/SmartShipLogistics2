@@ -48,12 +48,12 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [expandedModules, setExpandedModules] = useState<string[]>([]);
-  
+
   interface PermissionAction {
     name: string;
     display: string;
   }
-  
+
   // Permission actions with display names
   const permissionActions: PermissionAction[] = [
     { name: "create", display: "Create" },
@@ -61,23 +61,23 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
     { name: "update", display: "Update" },
     { name: "delete", display: "Delete" }
   ];
-  
+
   useEffect(() => {
     if (roleName) {
       console.log('Role name changed to:', roleName);
       loadPermissions();
     }
   }, [roleName]);
-  
+
   const loadPermissions = async () => {
     try {
       setIsLoading(true);
-      
+
       // Call the external API to get role permissions
       // Use our server-side proxy endpoint instead of direct API call
-      const apiUrl = `/api/v1/roles/permissions_by_feature?role_name=${roleName}`;
+      const apiUrl = `${API_BASE_URL}/api/v1/roles/permissions_by_feature?role_name=${roleName}`;
       console.log('Calling API URL:', apiUrl);
-      
+
       const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
@@ -85,13 +85,13 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
+
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       if (data.success && data.modules) {
         console.log('Received permissions data:', data);
         setPermissionsData(data.modules);
@@ -99,7 +99,7 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
       } else {
         throw new Error('Invalid response format');
       }
-      
+
     } catch (error) {
       console.error('Error loading permissions:', error);
       toast({
@@ -107,65 +107,65 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
         description: `Failed to load role permissions: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive"
       });
-      
+
       // If the API fails, we'll use a fallback empty state
       setPermissionsData({});
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   // Initialize the edited permissions state based on the loaded data
   const initializeEditedPermissions = (modules: PermissionsData) => {
     const initialEdited: {[key: string]: {[key: string]: string[]}} = {};
-    
+
     Object.entries(modules).forEach(([moduleName, moduleData]) => {
       initialEdited[moduleName] = {};
-      
+
       Object.entries(moduleData.features).forEach(([featureName, featureData]) => {
         initialEdited[moduleName][featureName] = featureData.permissions.map(p => p.name);
       });
     });
-    
+
     setEditedPermissions(initialEdited);
   };
-  
+
   // Toggle a permission for a feature
   const togglePermission = (moduleName: string, featureName: string, permissionName: string) => {
     setEditedPermissions(prev => {
       const newState = { ...prev };
-      
+
       if (!newState[moduleName]) {
         newState[moduleName] = {};
       }
-      
+
       if (!newState[moduleName][featureName]) {
         newState[moduleName][featureName] = [];
       }
-      
+
       const permissions = [...newState[moduleName][featureName]];
       const index = permissions.indexOf(permissionName);
-      
+
       if (index === -1) {
         permissions.push(permissionName);
       } else {
         permissions.splice(index, 1);
       }
-      
+
       newState[moduleName][featureName] = permissions;
       return newState;
     });
   };
-  
+
   // Check if a feature has a specific permission
   const hasPermission = (moduleName: string, featureName: string, permissionName: string): boolean => {
     if (!editedPermissions[moduleName] || !editedPermissions[moduleName][featureName]) {
       return false;
     }
-    
+
     return editedPermissions[moduleName][featureName].includes(permissionName);
   };
-  
+
   // Toggle expanding a module in the accordion
   const toggleExpandModule = (moduleName: string) => {
     setExpandedModules(prev => {
@@ -176,22 +176,22 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
       }
     });
   };
-  
+
   // Save the edited permissions
   const savePermissions = async () => {
     try {
       setIsSaving(true);
-      
+
       // Format the data for the API
       const formattedData = {
         role_name: roleName,
         permissions: editedPermissions
       };
-      
+
       // Call API to update permissions through our server proxy
-      const apiUrl = `/api/v1/roles/update_permissions`;
+      const apiUrl = `${API_BASE_URL}/api/v1/roles/update_permissions`;
       console.log('Saving permissions to API URL:', apiUrl);
-      
+
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -200,13 +200,13 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
         },
         body: JSON.stringify(formattedData)
       });
-      
+
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         toast({
           title: "Success",
@@ -226,7 +226,7 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
       setIsSaving(false);
     }
   };
-  
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -235,7 +235,7 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
       </div>
     );
   }
-  
+
   if (!permissionsData || Object.keys(permissionsData).length === 0) {
     return (
       <Card>
@@ -256,7 +256,7 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
               </Button>
             </AlertDescription>
           </Alert>
-          
+
           {/* Show mock data structure for debugging */}
           <div className="mt-4 p-4 border rounded-md bg-muted/30">
             <p className="text-sm font-medium mb-2">Expected Data Structure:</p>
@@ -281,7 +281,7 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
       </Card>
     );
   }
-  
+
   return (
     <Card>
       <CardHeader>
@@ -330,7 +330,7 @@ export default function RolePermissions({ roleName }: RolePermissionsProps) {
                 </AccordionItem>
               ))}
             </Accordion>
-            
+
             <div className="flex justify-end">
               <Button onClick={savePermissions} disabled={isSaving}>
                 {isSaving ? (

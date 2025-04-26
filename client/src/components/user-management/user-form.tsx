@@ -52,8 +52,8 @@ export default function UserForm({ onSuccess }: UserFormProps) {
       setIsLoading(true);
       const token = localStorage.getItem('token');
 
-      // Using the exact API endpoint specified
-      const res = await fetch(`${API_BASE_URL}/users`, {
+      // Use configured API URL and endpoints
+      const res = await fetch(`${ACTIVE_API_URL}${API_ENDPOINTS.USERS}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
