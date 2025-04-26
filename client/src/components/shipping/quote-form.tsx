@@ -1,527 +1,156 @@
-import React, { useState, useEffect } from "react";
-import { UseFormReturn } from "react-hook-form";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { InfoIcon, Calculator, HelpCircle } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { API_BASE_URL } from "@/config/api";
 
-// Types for the rate quote response from the API
-interface AppliedFee {
-  name: string;
-  display_name: string;
-  amount: string;
-  description: string;
-  note: string | null;
-}
-
-interface PackageFee {
-  package: number;
-  applied_fees: AppliedFee[];
-}
-
-interface ServicePrices {
-  net_price: number;
-  fuel_surcharge: number;
-  peak_season: number;
-  oversize_fee: PackageFee[];
-  total_price: number;
-}
-
-interface ProviderService {
+interface Quote {
   id: number;
   name: string;
-  prices: ServicePrices;
+  prices: {
+    net_price: number;
+    fuel_surcharge: number;
+    peak_season: number;
+    oversize_fee: Array<{
+      package: number;
+      applied_fees: Array<{
+        name: string;
+        display_name: string;
+        amount: string;
+        description: string;
+        note: string | null;
+      }>;
+    }>;
+  };
 }
 
 interface QuoteFormProps {
-  form: UseFormReturn<any>;
-  onShowRateComparison: () => void;
+  shipmentId: number;
+  onQuoteSelect: (quote: Quote) => void;
 }
 
-export default function QuoteForm({
-  form,
-  onShowRateComparison,
-}: QuoteFormProps) {
-  const { toast } = useToast();
-  const [providerServices, setProviderServices] = useState<ProviderService[]>(
-    [],
-  );
-  const [selectedService, setSelectedService] =
-    useState<ProviderService | null>(null);
-  const [customFee, setCustomFee] = useState<number>(0);
-  const [vatRate] = useState<number>(0.08); // 8% VAT
+function formatCurrency(amount: number) {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
 
-  // Calculate total price based on the selected service
-  const calculateTotalPriceBeforeVAT = () => {
-    if (!selectedService) return 0;
-
-    const {
-      net_price,
-      fuel_surcharge,
-      peak_season,
-      oversize_fee,
-      total_price,
-    } = selectedService.prices;
-
-    // Calculate the sum of all oversize fees
-    let oversizeFeeTotal = 0;
-    oversize_fee.forEach((packageFee) => {
-      packageFee.applied_fees.forEach((fee) => {
-        oversizeFeeTotal += parseFloat(fee.amount);
-      });
-    });
-
-    // Calculate percentages
-    const fuelSurchargeAmount = (net_price * fuel_surcharge) / 100;
-    const peakSeasonAmount = peak_season;
-
-    return (
-      net_price + fuelSurchargeAmount + peakSeasonAmount + oversizeFeeTotal
-    );
-  };
-
-  const priceBeforeVAT = calculateTotalPriceBeforeVAT();
-  const vatAmount = priceBeforeVAT * vatRate;
-  const totalPrice = priceBeforeVAT + vatAmount + customFee;
-
-  // Fetch service quotes
-  const quotesMutation = useMutation({
-    mutationFn: async (shipmentId: number) => {
-      const res = await apiRequest("GET", `/api/shipments/${shipmentId}/quote`);
-      return (await res.json()) as ProviderService[];
-    },
-    onSuccess: (data) => {
-      setProviderServices(data);
-      if (data.length > 0) {
-        toast({
-          title: "Service quotes loaded",
-          description: `Found ${data.length} service options`,
-        });
+export default function QuoteForm({ shipmentId, onQuoteSelect }: QuoteFormProps) {
+  const { data: quotes, isLoading } = useQuery({
+    queryKey: ["shipmentQuotes", shipmentId],
+    queryFn: async () => {
+      const response = await fetch(
+        `${API_BASE_URL}/shipments/${shipmentId}/quote`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch quotes");
       }
-    },
-    onError: (error) => {
-      toast({
-        title: "Failed to load service quotes",
-        description: error.message,
-        variant: "destructive",
-      });
+      const data = await response.json();
+      return data.quotes || [];
     },
   });
 
-  // Mock fetch quotes on component mount
-  useEffect(() => {
-    // This would typically fetch based on the shipment ID
-    // For now, we'll use a hardcoded mock API response
-    const mockQuotes: ProviderService[] = [
-      {
-        id: 1,
-        name: "Worldwide Saver",
-        prices: {
-          net_price: 6558288.04,
-          fuel_surcharge: 26.75,
-          peak_season: 9.0,
-          oversize_fee: [
-            {
-              package: 80,
-              applied_fees: [
-                {
-                  name: "local_ups_freight",
-                  display_name: "VÙNG DÂN CƯ UPS Worldwide Express Freight",
-                  amount: "3019515.0",
-                  description: "Có một kiện hàng nặng hơn 70 kg",
-                  note: null,
-                },
-                {
-                  name: "ahc",
-                  display_name: "AHC",
-                  amount: "368715.0",
-                  description: "Có một kiện hàng năng hơn 25kg",
-                  note: null,
-                },
-                {
-                  name: "lps",
-                  display_name: "LPS",
-                  amount: "1602700.0",
-                  description:
-                    "Nếu chu vi nằm trong khoảng từ 300 đến 400cm thì dù kiện hàng có nghẹ hơn hãng vấn tính 40kg",
-                  note: "Chu vi = (2 × 2 cạnh ngắn nhất) + cạnh dài nhất",
-                },
-              ],
-            },
-          ],
-        },
-      },
-      {
-        id: 2,
-        name: "Worldwide Expedited",
-        prices: {
-          net_price: 5500000.0,
-          fuel_surcharge: 26.75,
-          peak_season: 0.0,
-          oversize_fee: [
-            {
-              package: 80,
-              applied_fees: [
-                {
-                  name: "local_ups_freight",
-                  display_name: "VÙNG DÂN CƯ UPS Worldwide Express Freight",
-                  amount: "3019515.0",
-                  description: "Có một kiện hàng nặng hơn 70 kg",
-                  note: null,
-                },
-                {
-                  name: "ahc",
-                  display_name: "AHC",
-                  amount: "368715.0",
-                  description: "Có một kiện hàng năng hơn 25kg",
-                  note: null,
-                },
-              ],
-            },
-          ],
-        },
-      },
-    ];
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
-    setProviderServices(mockQuotes);
-  }, []);
-
-  // Update selected service when the provider service ID changes
-  useEffect(() => {
-    const serviceId = form.getValues("shipment.provider_service_id");
-    if (serviceId && providerServices.length > 0) {
-      const service = providerServices.find(
-        (s) => s.id === parseInt(serviceId),
-      );
-      setSelectedService(service || null);
-    }
-  }, [form, providerServices]);
-
-  // Format currency helper
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  // Update form values when total price changes
-  useEffect(() => {
-    if (selectedService) {
-      form.setValue("shipment.total_price", totalPrice);
-    }
-  }, [totalPrice, selectedService, form]);
-
-  // Handle custom fee change
-  const handleCustomFeeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value) || 0;
-    setCustomFee(value);
-    form.setValue("shipment.custom_fee", value);
-  };
+  if (!quotes || quotes.length === 0) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        No shipping quotes available at this time.
+      </div>
+    );
+  }
 
   return (
-    <Card className="mb-6">
-      <CardContent className="pt-6">
-        <h3 className="text-lg font-semibold mb-4">
-          Carrier and Service Selection
-        </h3>
-
-        <div className="mb-6">
-          <Button
-            variant="outline"
-            type="button"
-            onClick={onShowRateComparison}
-            className="flex items-center gap-2"
-          >
-            <Calculator className="h-4 w-4" />
-            Compare Shipping Rates
-          </Button>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-4 mb-6">
-          <FormField
-            control={form.control}
-            name="shipment.provider_id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Carrier</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value?.toString()}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select carrier" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="1">FedEx</SelectItem>
-                    <SelectItem value="2">DHL</SelectItem>
-                    <SelectItem value="3">UPS</SelectItem>
-                    <SelectItem value="4">SF Express</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="shipment.provider_service_id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Service Type</FormLabel>
-                <Select
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    const service = providerServices.find(
-                      (s) => s.id === parseInt(value),
-                    );
-                    setSelectedService(service || null);
-                  }}
-                  defaultValue={field.value?.toString()}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select service type" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {providerServices.map((service) => (
-                      <SelectItem
-                        key={service.id}
-                        value={service.id.toString()}
-                      >
-                        {service.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {selectedService && (
-          <div className="mt-6 border rounded-lg p-4">
-            <h4 className="font-medium text-lg mb-4">Price Details</h4>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                <div className="text-sm text-muted-foreground">Base Price:</div>
-                <div className="text-sm font-medium">
-                  {formatCurrency(selectedService.prices.net_price)}
-                </div>
-
-                <div className="text-sm text-muted-foreground flex items-center">
-                  Fuel Surcharge ({selectedService.prices.fuel_surcharge}%):
-                </div>
-                <div className="text-sm font-medium">
-                  {formatCurrency(
-                    (selectedService.prices.net_price *
-                      selectedService.prices.fuel_surcharge) /
-                      100,
-                  )}
-                </div>
-
-                {selectedService.prices.peak_season > 0 && (
-                  <>
-                    <div className="text-sm text-muted-foreground">
-                      Peak Season ({selectedService.prices.peak_season}%):
-                    </div>
-                    <div className="text-sm font-medium">
-                      {formatCurrency(
-                        (selectedService.prices.net_price *
-                          selectedService.prices.peak_season) /
-                          100,
-                      )}
-                    </div>
-                  </>
-                )}
+    <div className="space-y-4">
+      {quotes.map((quote: Quote) => (
+        <Card 
+          key={quote.id} 
+          className="cursor-pointer hover:bg-accent/5"
+          onClick={() => onQuoteSelect(quote)}
+        >
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">{quote.name}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Base Price:</span>
+                <span className="font-medium">{formatCurrency(quote.prices.net_price)}</span>
               </div>
 
-              <div className="space-y-4">
-                {selectedService.prices.oversize_fee.map(
-                  (packageFee, packageIndex) => {
-                    // Calculate total for this package's fees
-                    const totalFees = packageFee.applied_fees.reduce(
-                      (sum, fee) => sum + parseFloat(fee.amount),
-                      0,
-                    );
-
-                    return (
-                      <div key={packageIndex} className="border rounded-lg p-4">
-                        <div className="flex justify-between items-center mb-4">
-                          <h4 className="font-medium">
-                            Phụ phí quá khổ - Kiện #{packageFee.package}
-                          </h4>
-                          <div className="text-right">
-                            <div className="text-sm text-muted-foreground">
-                              Tổng phụ phí:
-                            </div>
-                            <div className="font-bold text-primary">
-                              {formatCurrency(totalFees)}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="space-y-3">
-                          {packageFee.applied_fees.map((fee, feeIndex) => (
-                            <div
-                              key={feeIndex}
-                              className="bg-muted/50 rounded-lg p-3"
-                            >
-                              <div className="flex justify-between items-start mb-2">
-                                <div className="font-medium">
-                                  {fee.display_name}
-                                </div>
-                                <div className="font-medium">
-                                  {formatCurrency(parseFloat(fee.amount))}
-                                </div>
-                              </div>
-                              <p className="text-sm text-muted-foreground">
-                                {fee.description}
-                              </p>
-                              {fee.note && (
-                                <div className="mt-2 text-xs flex items-center text-muted-foreground">
-                                  <InfoIcon className="h-3 w-3 mr-1" />
-                                  {fee.note}
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  },
-                )}
-              </div>
-
-              <Separator />
-
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                <div className="text-sm text-muted-foreground">Subtotal:</div>
-                <div className="text-sm font-medium">
-                  {formatCurrency(priceBeforeVAT)}
+              {quote.prices.fuel_surcharge > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    Fuel Surcharge ({quote.prices.fuel_surcharge}%):
+                  </span>
+                  <span className="font-medium">
+                    {formatCurrency((quote.prices.net_price * quote.prices.fuel_surcharge) / 100)}
+                  </span>
                 </div>
+              )}
 
-                <div className="text-sm text-muted-foreground">
-                  VAT ({(vatRate * 100).toFixed(0)}%):
+              {quote.prices.peak_season > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    Peak Season Surcharge ({quote.prices.peak_season}%):
+                  </span>
+                  <span className="font-medium">
+                    {formatCurrency((quote.prices.net_price * quote.prices.peak_season) / 100)}
+                  </span>
                 </div>
-                <div className="text-sm font-medium">
-                  {formatCurrency(vatAmount)}
-                </div>
+              )}
 
-                <div className="text-sm">
-                  <div className="flex items-center">
-                    <FormLabel
-                      htmlFor="custom-fee"
-                      className="text-muted-foreground mr-2"
-                    >
-                      Additional Fees:
-                    </FormLabel>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <HelpCircle className="h-3 w-3 text-muted-foreground" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>
-                            Add any custom or additional fees not included in
-                            the carrier quote
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+              {quote.prices.oversize_fee.map((fee, index) => (
+                <div key={index} className="mt-2 pt-2 border-t">
+                  <div className="text-sm font-medium mb-1">
+                    Additional Fees - Package #{fee.package}
                   </div>
+                  {fee.applied_fees.map((appliedFee, feeIndex) => (
+                    <div key={feeIndex} className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">{appliedFee.display_name}:</span>
+                      <span>{formatCurrency(parseFloat(appliedFee.amount))}</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="text-sm">
-                  <Input
-                    id="custom-fee"
-                    type="number"
-                    placeholder="0"
-                    className="h-8"
-                    value={customFee || ""}
-                    onChange={handleCustomFeeChange}
-                  />
-                </div>
+              ))}
 
-                <Separator className="col-span-2 my-1" />
-
-                <div className="text-base font-bold">Total:</div>
-                <div className="text-base font-bold text-primary">
-                  {formatCurrency(totalPrice)}
-                </div>
+              <div className="mt-4 pt-2 border-t flex justify-between font-medium text-lg">
+                <span>Total:</span>
+                <span className="text-primary">
+                  {formatCurrency(
+                    quote.prices.net_price +
+                    (quote.prices.net_price * quote.prices.fuel_surcharge) / 100 +
+                    (quote.prices.net_price * quote.prices.peak_season) / 100 +
+                    quote.prices.oversize_fee.reduce(
+                      (sum, fee) =>
+                        sum +
+                        fee.applied_fees.reduce(
+                          (feeSum, applied) => feeSum + parseFloat(applied.amount),
+                          0
+                        ),
+                      0
+                    )
+                  )}
+                </span>
               </div>
-
-              <FormField
-                control={form.control}
-                name="shipment.total_price"
-                render={({ field }) => (
-                  <input type="hidden" {...field} value={totalPrice} />
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="shipment.custom_fee"
-                render={({ field }) => (
-                  <input type="hidden" {...field} value={customFee} />
-                )}
-              />
             </div>
-
-            <div className="mt-4">
-              <Badge variant="outline" className="text-xs">
-                Service: {selectedService.name}
-              </Badge>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   );
 }
