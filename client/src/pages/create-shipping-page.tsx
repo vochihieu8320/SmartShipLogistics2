@@ -141,8 +141,8 @@ export default function CreateShippingPage() {
           items_attributes: [], // Empty array - items will be added via the table interface
         },
       ],
-    },
-  };
+    }
+  }
 
   // Submit mutation
   const createShipmentMutation = useMutation({
