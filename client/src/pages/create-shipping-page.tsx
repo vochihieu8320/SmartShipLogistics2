@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { API_BASE_URL } from "@/config/api";
 import { useLocation, Link } from "wouter";
 import ServiceQuoteForm from "@/components/shipping/service-quote-form";
@@ -79,11 +79,11 @@ const createShipmentSchema = z.object({
 type CreateShipmentFormValues = z.infer<typeof createShipmentSchema>;
 
 export default function CreateShippingPage() {
+  const { user, isLoading } = useAuth();
+  const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("address");
   const [shipmentId, setShipmentId] = useState<number | null>(null);
   const { toast } = useToast();
-  const { user } = useAuth();
-  const [, navigate] = useLocation();
 
   const form = useForm<CreateShipmentFormValues>({
     resolver: zodResolver(createShipmentSchema),
@@ -157,6 +157,24 @@ export default function CreateShippingPage() {
       });
     },
   });
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      navigate('/auth');
+    }
+  }, [user, isLoading, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   function onSubmit(data: CreateShipmentFormValues) {
     createShipmentMutation.mutate(data);

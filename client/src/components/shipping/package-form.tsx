@@ -341,8 +341,8 @@ export default function PackageForm({ form }: PackageFormProps) {
         
         {/* Edit Item Dialog */}
         {editingItemIndex !== null && tempItem && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg w-full max-w-3xl overflow-hidden">
+          <Dialog open={editingItemIndex !== null} onOpenChange={() => cancelEditItem()}>
+            <DialogContent className="max-w-3xl">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-semibold">
@@ -467,8 +467,8 @@ export default function PackageForm({ form }: PackageFormProps) {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </DialogContent>
+          </Dialog>
         )}
       </CardContent>
     </Card>
