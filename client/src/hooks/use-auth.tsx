@@ -45,8 +45,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Call login endpoint using centralized API service
         const data = await api.post(API_ENDPOINTS.LOGIN, loginData);
 
-        // Store token in localStorage
+        // Store auth details in localStorage
         localStorage.setItem('token', data.token);
+        localStorage.setItem('email', data.email);
+        localStorage.setItem('role', data.roles.includes('admin') ? 'admin' : 'user');
 
         // Return user data in the format our application expects
         return {
@@ -103,8 +105,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      // Remove token from localStorage
+      // Remove all auth data from localStorage
       localStorage.removeItem('token');
+      localStorage.removeItem('email');
+      localStorage.removeItem('role');
 
       // We don't need to call the server for logout with token-based auth
       // but we'll keep this line for compatibility with session auth if needed
