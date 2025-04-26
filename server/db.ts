@@ -3,13 +3,21 @@ import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
 import * as schema from "@shared/schema";
 
+// Setup websocket for Neon database
 neonConfig.webSocketConstructor = ws;
 
+// Validate environment variable is present
 if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+  throw new Error("DATABASE_URL environment variable is required");
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Initialize database connection pool
+const getDatabaseConfig = () => {
+  return {
+    connectionString: process.env.DATABASE_URL,
+  };
+};
+
+// Export database connection
+export const pool = new Pool(getDatabaseConfig());
 export const db = drizzle({ client: pool, schema });
