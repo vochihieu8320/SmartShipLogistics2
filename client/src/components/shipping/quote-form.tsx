@@ -38,7 +38,10 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-export default function QuoteForm({ shipmentId, onQuoteSelect }: QuoteFormProps) {
+export default function QuoteForm({
+  shipmentId,
+  onQuoteSelect,
+}: QuoteFormProps) {
   const { data: quotes, isLoading } = useQuery({
     queryKey: ["shipmentQuotes", shipmentId],
     queryFn: async () => {
@@ -77,8 +80,8 @@ export default function QuoteForm({ shipmentId, onQuoteSelect }: QuoteFormProps)
   return (
     <div className="space-y-4">
       {quotes.map((quote: Quote) => (
-        <Card 
-          key={quote.id} 
+        <Card
+          key={quote.id}
           className="cursor-pointer hover:bg-accent/5"
           onClick={() => onQuoteSelect(quote)}
         >
@@ -89,16 +92,18 @@ export default function QuoteForm({ shipmentId, onQuoteSelect }: QuoteFormProps)
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Base Price:</span>
-                <span className="font-medium">{formatCurrency(quote.prices.net_price)}</span>
+                <span className="font-medium">
+                  {formatCurrency(quote.prices.net_price)}
+                </span>
               </div>
 
               {quote.prices.fuel_surcharge > 0 && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
-                    Fuel Surcharge ({quote.prices.fuel_surcharge}%):
+                    Fuel Surcharge):
                   </span>
                   <span className="font-medium">
-                    {formatCurrency((quote.prices.net_price * quote.prices.fuel_surcharge) / 100)}
+                    {formatCurrency(quote.prices.fuel_surcharge)}
                   </span>
                 </div>
               )}
@@ -109,7 +114,9 @@ export default function QuoteForm({ shipmentId, onQuoteSelect }: QuoteFormProps)
                     Peak Season Surcharge ({quote.prices.peak_season}%):
                   </span>
                   <span className="font-medium">
-                    {formatCurrency((quote.prices.net_price * quote.prices.peak_season) / 100)}
+                    {formatCurrency(
+                      (quote.prices.net_price * quote.prices.peak_season) / 100,
+                    )}
                   </span>
                 </div>
               )}
@@ -120,9 +127,16 @@ export default function QuoteForm({ shipmentId, onQuoteSelect }: QuoteFormProps)
                     Additional Fees - Package #{fee.package}
                   </div>
                   {fee.applied_fees.map((appliedFee, feeIndex) => (
-                    <div key={feeIndex} className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{appliedFee.display_name}:</span>
-                      <span>{formatCurrency(parseFloat(appliedFee.amount))}</span>
+                    <div
+                      key={feeIndex}
+                      className="flex justify-between text-sm"
+                    >
+                      <span className="text-muted-foreground">
+                        {appliedFee.display_name}:
+                      </span>
+                      <span>
+                        {formatCurrency(parseFloat(appliedFee.amount))}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -131,20 +145,7 @@ export default function QuoteForm({ shipmentId, onQuoteSelect }: QuoteFormProps)
               <div className="mt-4 pt-2 border-t flex justify-between font-medium text-lg">
                 <span>Total:</span>
                 <span className="text-primary">
-                  {formatCurrency(
-                    quote.prices.net_price +
-                    (quote.prices.net_price * quote.prices.fuel_surcharge) / 100 +
-                    (quote.prices.net_price * quote.prices.peak_season) / 100 +
-                    quote.prices.oversize_fee.reduce(
-                      (sum, fee) =>
-                        sum +
-                        fee.applied_fees.reduce(
-                          (feeSum, applied) => feeSum + parseFloat(applied.amount),
-                          0
-                        ),
-                      0
-                    )
-                  )}
+                  {formatCurrency(quote.prices.fuel_surcharge)}
                 </span>
               </div>
             </div>
