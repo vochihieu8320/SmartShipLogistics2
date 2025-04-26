@@ -55,17 +55,19 @@ export default function PackageForm({ form }: PackageFormProps) {
 
   // Start editing an item
   const startEditItem = (index: number) => {
+    const defaultItem = createNewItem();
+    const currentField = fields[index] || defaultItem;
+
     setTempItem({
-      ...fields[index],
-      weight: fields[index].weight || 0,
-      length: fields[index].length || 0,
-      width: fields[index].width || 0,
-      height: fields[index].height || 0,
-      quantity: fields[index].quantity || 1,
-      description: fields[index].description || "",
-      value: fields[index].value || 0,
-      country_of_origin: fields[index].country_of_origin || "VN",
-      hs_code: fields[index].hs_code || ""
+      weight: currentField.weight || 0,
+      length: currentField.length || 0,
+      width: currentField.width || 0,
+      height: currentField.height || 0,
+      quantity: currentField.quantity || 1,
+      description: currentField.description || "",
+      value: currentField.value || 0,
+      country_of_origin: currentField.country_of_origin || "VN",
+      hs_code: currentField.hs_code || ""
     });
     setEditingItemIndex(index);
   };
@@ -97,8 +99,9 @@ export default function PackageForm({ form }: PackageFormProps) {
 
   // Add a new item
   const addNewItem = () => {
-    append(createNewItem());
-    startEditItem(fields.length);
+    const newItem = createNewItem();
+    append(newItem);
+    startEditItem(fields.length -1);
   };
 
   return (
