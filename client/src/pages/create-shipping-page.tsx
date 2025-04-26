@@ -147,13 +147,6 @@ export default function CreateShippingPage() {
 
       return response.json();
     },
-    onSuccess: () => {
-      toast({
-        title: "Thành công",
-        description: "Đơn hàng đã được tạo",
-      });
-      navigate("/shipments");
-    },
     onError: (error: Error) => {
       toast({
         title: "Lỗi",
