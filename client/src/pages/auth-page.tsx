@@ -18,7 +18,7 @@ export default function AuthPage() {
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const { user, isLoading } = useAuth();
-  
+
   // If user is already logged in, redirect to home
   useEffect(() => {
     if (user && !isLoading) {
@@ -58,15 +58,15 @@ export default function AuthPage() {
           </CardContent>
         </Card>
       </div>
-      
+
       {/* Right side - Hero section */}
       <div className="hidden lg:flex flex-1 bg-primary p-12 text-white justify-center items-center">
         <div className="max-w-md">
           <h1 className="text-4xl font-bold mb-6">
-            Modern Logistics Management System
+            Hệ Thống Quản Lý Vận Chuyển Hiện Đại
           </h1>
           <p className="text-lg mb-8">
-            SmartShip Pro helps you manage shipments, track deliveries, handle payments, and generate insightful reports - all in one platform.
+            SmartShip Pro giúp bạn quản lý vận chuyển, theo dõi giao hàng, xử lý thanh toán và tạo báo cáo chi tiết - tất cả trong một nền tảng.
           </p>
           <ul className="space-y-4">
             <li className="flex items-center">
@@ -96,7 +96,7 @@ function LoginForm() {
   const { loginMutation } = useAuth();
   const { toast } = useToast();
   const [, navigate] = useLocation();
-  
+
   const form = useForm<LoginCredentials>({
     resolver: zodResolver(loginUserSchema),
     defaultValues: {
@@ -104,7 +104,7 @@ function LoginForm() {
       password: ""
     }
   });
-  
+
   function onSubmit(data: LoginCredentials) {
     loginMutation.mutate(data, {
       onSuccess: (user) => {
@@ -117,7 +117,7 @@ function LoginForm() {
       }
     });
   }
-  
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -139,7 +139,7 @@ function LoginForm() {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="password"
@@ -158,12 +158,12 @@ function LoginForm() {
             </FormItem>
           )}
         />
-        
+
         <div className="text-sm text-right">
           <span className="text-muted-foreground">Demo credentials: </span>
           <span className="font-medium">admin@example.com / password123</span>
         </div>
-        
+
         <Button type="submit" className="w-full mt-6" disabled={loginMutation.isPending}>
           {loginMutation.isPending ? (
             <>
@@ -186,7 +186,7 @@ interface RegisterFormProps {
 function RegisterForm({ onSuccess }: RegisterFormProps) {
   const { registerMutation } = useAuth();
   const { toast } = useToast();
-  
+
   const form = useForm<InsertUser>({
     resolver: zodResolver(insertUserSchema),
     defaultValues: {
@@ -197,7 +197,7 @@ function RegisterForm({ onSuccess }: RegisterFormProps) {
       role: UserRole.STAFF
     }
   });
-  
+
   function onSubmit(data: InsertUser) {
     registerMutation.mutate(data, {
       onSuccess: () => {
@@ -210,7 +210,7 @@ function RegisterForm({ onSuccess }: RegisterFormProps) {
       }
     });
   }
-  
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -227,7 +227,7 @@ function RegisterForm({ onSuccess }: RegisterFormProps) {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="email"
@@ -241,7 +241,7 @@ function RegisterForm({ onSuccess }: RegisterFormProps) {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="username"
@@ -255,7 +255,7 @@ function RegisterForm({ onSuccess }: RegisterFormProps) {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="password"
@@ -269,7 +269,7 @@ function RegisterForm({ onSuccess }: RegisterFormProps) {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="role"
@@ -292,7 +292,7 @@ function RegisterForm({ onSuccess }: RegisterFormProps) {
             </FormItem>
           )}
         />
-        
+
         <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
           {registerMutation.isPending ? (
             <>

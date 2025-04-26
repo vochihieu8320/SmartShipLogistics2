@@ -110,14 +110,14 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
         {/* Navigation */}
         <nav className="p-2 flex-1 overflow-y-auto">
           <div className="text-sm text-neutral-400 mb-2 px-3 py-2">
-            {user?.role ? `${user.role.charAt(0).toUpperCase() + user.role.slice(1)} Role` : 'User Role'}
+            {user?.role ? `Vai trò ${user.role.charAt(0).toUpperCase() + user.role.slice(1)}` : 'Vai trò người dùng'}
           </div>
 
           <ul>
             <NavItem 
               href="/admin" 
               icon={<LayoutDashboard className="h-5 w-5" />} 
-              label="Dashboard" 
+              label="Trang Chủ" 
               active={location === "/admin"} 
             />
 
