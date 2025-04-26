@@ -48,9 +48,9 @@ export default function AuthPage() {
               <Package className="h-6 w-6 text-primary mr-2" />
               <span className="text-2xl font-bold">SmartShip Pro</span>
             </div>
-            <CardTitle className="text-2xl">Welcome Back</CardTitle>
+            <CardTitle className="text-2xl">Chào Mừng Trở Lại</CardTitle>
             <CardDescription>
-              Enter your credentials to access your account
+              Nhập thông tin đăng nhập để truy cập tài khoản của bạn
             </CardDescription>
           </CardHeader>
           <CardContent>

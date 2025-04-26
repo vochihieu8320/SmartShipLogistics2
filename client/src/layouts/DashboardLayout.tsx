@@ -60,7 +60,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
   const { toast } = useToast();
   const { user, logoutMutation } = useAuth();
   const [, navigate] = useLocation();
-  
+
   // Redirect if not authenticated
   useEffect(() => {
     if (!user) {
@@ -78,9 +78,9 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
       .toUpperCase()
       .substring(0, 2);
   };
-  
+
   const userInitials = user ? getInitials(user.fullName) : "";
-  
+
   // Handle logout
   const handleLogout = () => {
     logoutMutation.mutate(undefined, {
@@ -93,7 +93,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
       }
     });
   };
-  
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -103,16 +103,16 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
         <div className="p-4 border-b border-neutral-700">
           <h1 className="text-xl font-bold flex items-center">
             <Package className="mr-2 h-5 w-5" />
-            SmartShip Pro
+            Hệ Thống Vận Chuyển
           </h1>
         </div>
-        
+
         {/* Navigation */}
         <nav className="p-2 flex-1 overflow-y-auto">
           <div className="text-sm text-neutral-400 mb-2 px-3 py-2">
             {user?.role ? `${user.role.charAt(0).toUpperCase() + user.role.slice(1)} Role` : 'User Role'}
           </div>
-          
+
           <ul>
             <NavItem 
               href="/admin" 
@@ -120,62 +120,62 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
               label="Dashboard" 
               active={location === "/admin"} 
             />
-            
+
             <NavItem 
               href="/admin/booking" 
               icon={<Package className="h-5 w-5" />} 
-              label="New Booking" 
+              label="Đặt Hàng Mới" 
               active={location === "/admin/booking"} 
             />
-            
+
             <NavItem 
               href="/admin/orders" 
               icon={<ShoppingCart className="h-5 w-5" />} 
-              label="Orders" 
+              label="Đơn Hàng" 
               active={location === "/admin/orders"} 
             />
-            
+
             <NavItem 
               href="/admin/finance" 
               icon={<CreditCard className="h-5 w-5" />} 
-              label="Finance" 
+              label="Tài Chính" 
               active={location === "/admin/finance"} 
             />
-            
+
             <NavItem 
               href="/admin/reports" 
               icon={<BarChart2 className="h-5 w-5" />} 
-              label="Reports" 
+              label="Báo Cáo" 
               active={location === "/admin/reports"} 
             />
-            
+
             {/* Admin only sections */}
             {(user?.role === UserRole.ADMIN || user?.role === UserRole.MANAGER) && (
               <>
                 <li className="border-t border-neutral-700 mt-4 pt-4">
-                  <div className="text-sm text-neutral-400 mb-2 px-3">Admin Actions</div>
+                  <div className="text-sm text-neutral-400 mb-2 px-3">Quản Trị Viên</div>
                 </li>
-                
+
                 {user?.role === UserRole.ADMIN && (
                   <NavItem 
                     href="/admin/users" 
                     icon={<Users className="h-5 w-5" />} 
-                    label="User Management" 
+                    label="Quản Lý Người Dùng" 
                     active={location === "/admin/users"} 
                   />
                 )}
-                
+
                 <NavItem 
                   href="/admin/settings" 
                   icon={<Settings className="h-5 w-5" />} 
-                  label="System Settings" 
+                  label="Cài Đặt Hệ Thống" 
                   active={location === "/admin/settings"} 
                 />
               </>
             )}
           </ul>
         </nav>
-        
+
         {/* User profile section */}
         <div className="p-4 border-t border-neutral-700">
           <div className="flex items-center">
@@ -198,13 +198,13 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Logout</p>
+                <p>Đăng Xuất</p>
               </TooltipContent>
             </Tooltip>
           </div>
         </div>
       </aside>
-      
+
       {/* Mobile overlay */}
       {isMobile && sidebarOpen && (
         <div 
@@ -212,7 +212,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      
+
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top header */}
@@ -228,19 +228,19 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                 <Menu className="h-5 w-5" />
               </Button>
             )}
-            
+
             <h2 className="text-xl font-semibold text-neutral-800">{title}</h2>
-            
+
             <div className="flex items-center space-x-4">
               <div className="relative hidden md:block">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
-                  placeholder="Search..."
+                  placeholder="Tìm kiếm..."
                   className="w-[200px] md:w-[300px] pl-9 rounded-md"
                 />
               </div>
-              
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="ghost" size="icon" className="relative">
@@ -249,10 +249,10 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Notifications</p>
+                  <p>Thông báo</p>
                 </TooltipContent>
               </Tooltip>
-              
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="ghost" size="icon">
@@ -260,13 +260,13 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Help</p>
+                  <p>Trợ giúp</p>
                 </TooltipContent>
               </Tooltip>
             </div>
           </div>
         </header>
-        
+
         {/* Main content */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {children}
