@@ -289,10 +289,12 @@ export default function CreateShippingPage() {
                             disabled={createShipmentMutation.isPending}
                             onClick={async () => {
                               try {
-                                await createShipmentMutation.mutateAsync(
+                                const response = await createShipmentMutation.mutateAsync(
                                   form.getValues(),
                                 );
-                                setActiveTab("service");
+                                if (response) {
+                                  setActiveTab("service");
+                                }
                               } catch (error) {
                                 toast({
                                   title: "Lỗi",
