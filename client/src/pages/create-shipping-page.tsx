@@ -158,12 +158,6 @@ export default function CreateShippingPage() {
     },
   });
 
-  useEffect(() => {
-    if (!localStorage.getItem("token")) {
-      navigate("/auth");
-    }
-  }, [user, isLoading, navigate]);
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
