@@ -27,7 +27,7 @@ export const apiConfig = {
   useExternalApi: process.env.USE_EXTERNAL_API !== 'false',
   
   // External API endpoint base URL (using the ngrok URL from the frontend config)
-  externalApiUrl: process.env.EXTERNAL_API_URL || 'https://f155-103-249-22-81.ngrok-free.app/api/v1',
+  externalApiUrl: process.env.EXTERNAL_API_URL || 'https://370e-103-249-22-81.ngrok-free.app/api/v1',
   
   // API key for external authentication if needed
   apiKey: process.env.EXTERNAL_API_KEY,
