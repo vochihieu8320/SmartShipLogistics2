@@ -237,7 +237,7 @@ export default function CreateShippingPage() {
       <main className="flex-1 bg-gray-50 py-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">Tạo Đơn Hàng</h1>
+            <h1 className="text-3xl font-bold mb-2">T ��o Đơn Hàng</h1>
           </div>
 
           <Card>
@@ -411,7 +411,7 @@ export default function CreateShippingPage() {
                                 const response = await fetch(
                                   `${API_BASE_URL}/shipments/${shipmentId}/complete`,
                                   {
-                                    method: "PATCH",
+                                    method: "POST",
                                     headers: {
                                       Authorization: `Bearer ${localStorage.getItem("token")}`,
                                     },
