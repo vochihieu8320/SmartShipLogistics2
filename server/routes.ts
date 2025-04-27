@@ -657,6 +657,14 @@ export function registerRoutes(app: Express): Server {
         try {
           console.log('[API] Using external API to create shipment');
           
+          // Send auth token in header if available from client request
+          const authHeader = req.headers.authorization;
+          if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.substring(7);
+            console.log('[DEBUG] Using authorization token from request for creating shipment');
+            (global as any).authToken = token;
+          }
+          
           // Call the external API using our generic function
           const data = await callExternalApi('/shipments', 'POST', req.body);
           return res.status(201).json(data);
@@ -969,6 +977,42 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // API proxy endpoint to handle CORS issues
+  app.all("/api/proxy/:path(*)", async (req, res, next) => {
+    try {
+      const path = req.params.path;
+      const method = req.method;
+      const body = ['POST', 'PUT', 'PATCH'].includes(method) ? req.body : undefined;
+      
+      console.log(`[API Proxy] Proxying ${method} request to ${path}`);
+      
+      // Get auth token from request header
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        console.log('[API Proxy] Using authorization token from request');
+        (global as any).authToken = token;
+      } else {
+        console.log('[API Proxy] No authorization token in request headers');
+        delete (global as any).authToken;
+      }
+      
+      try {
+        // Call the external API through our server to avoid CORS
+        const data = await callExternalApi(`/${path}`, method, body);
+        return res.status(200).json(data);
+      } catch (error: any) {
+        console.error(`[API Proxy] Error calling external API for ${path}:`, error);
+        return res.status(500).json({ 
+          success: false, 
+          message: `Failed to proxy request to external API: ${error?.message || 'Unknown error'}` 
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
+  
   // Role permissions endpoints
   app.get("/api/v1/roles/permissions_by_feature", async (req, res, next) => {
     try {

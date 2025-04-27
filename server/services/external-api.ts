@@ -57,6 +57,16 @@ async function apiCall<T>(endpoint: string, method: string = 'GET', body?: any):
   
   try {
     console.log(`[API] Sending request to ${url} with headers:`, options.headers);
+    
+    // Add special handling for HTTPS URLs without valid certificates 
+    // and handle CORS issues by proxying the request through our server
+    if (url.startsWith('https://128.199.198.8')) {
+      console.log('[API] Using special handling for HTTPS API calls to avoid CORS issues');
+      options.agent = new (require('https').Agent)({
+        rejectUnauthorized: false // Allow self-signed certificates
+      });
+    }
+    
     const response = await fetch(url, options);
     
     // Check if the response is successful
