@@ -382,27 +382,90 @@ export default function CreateShippingPage() {
 
                     <TabsContent value="review">
                       <div className="space-y-6">
-                        {/* Review summary will be implemented here */}
+                        {shipmentId && (
+                          <Card>
+                            <CardHeader>
+                              <CardTitle>Chi Tiết Đơn Hàng</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              {(() => {
+                                const { data: shipment, isLoading } = useQuery({
+                                  queryKey: ["shipment", shipmentId],
+                                  queryFn: async () => {
+                                    const response = await fetch(
+                                      `${API_BASE_URL}/shipments/${shipmentId}`,
+                                      {
+                                        headers: {
+                                          Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                        },
+                                      }
+                                    );
+                                    if (!response.ok) {
+                                      throw new Error("Failed to fetch shipment");
+                                    }
+                                    return response.json();
+                                  },
+                                });
+
+                                if (isLoading) {
+                                  return (
+                                    <div className="flex justify-center py-4">
+                                      <Loader2 className="h-6 w-6 animate-spin" />
+                                    </div>
+                                  );
+                                }
+
+                                return shipment && (
+                                  <div className="space-y-4">
+                                    <ShippingSummary formData={form.getValues()} />
+                                  </div>
+                                );
+                              })()}
+                            </CardContent>
+                          </Card>
+                        )}
                         <div className="flex justify-between">
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() => setActiveTab("package")}
+                            onClick={() => setActiveTab("service")}
                           >
                             Quay Lại
                           </Button>
                           <Button
-                            type="submit"
-                            disabled={createShipmentMutation.isPending}
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                const response = await fetch(
+                                  `${API_BASE_URL}/shipments/${shipmentId}/complete`,
+                                  {
+                                    method: "PATCH",
+                                    headers: {
+                                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                    },
+                                  }
+                                );
+
+                                if (!response.ok) {
+                                  throw new Error("Failed to complete shipment");
+                                }
+
+                                toast({
+                                  title: "Thành công",
+                                  description: "Đơn hàng đã được tạo thành công",
+                                });
+                                
+                                navigate("/shipments");
+                              } catch (error) {
+                                toast({
+                                  title: "Lỗi",
+                                  description: "Không thể hoàn thành đơn hàng",
+                                  variant: "destructive",
+                                });
+                              }
+                            }}
                           >
-                            {createShipmentMutation.isPending ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Đang Xử Lý...
-                              </>
-                            ) : (
-                              "Tạo Đơn Hàng"
-                            )}
+                            Hoàn Thành Đơn Hàng
                           </Button>
                         </div>
                       </div>
