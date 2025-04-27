@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { API_BASE_URL } from "@/config/api";
 import { useLocation, Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import ServiceQuoteForm from "@/components/shipping/service-quote-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -398,10 +399,12 @@ export default function CreateShippingPage() {
                                         headers: {
                                           Authorization: `Bearer ${localStorage.getItem("token")}`,
                                         },
-                                      }
+                                      },
                                     );
                                     if (!response.ok) {
-                                      throw new Error("Failed to fetch shipment");
+                                      throw new Error(
+                                        "Failed to fetch shipment",
+                                      );
                                     }
                                     return response.json();
                                   },
@@ -415,10 +418,14 @@ export default function CreateShippingPage() {
                                   );
                                 }
 
-                                return shipment && (
-                                  <div className="space-y-4">
-                                    <ShippingSummary formData={form.getValues()} />
-                                  </div>
+                                return (
+                                  shipment && (
+                                    <div className="space-y-4">
+                                      <ShippingSummary
+                                        formData={form.getValues()}
+                                      />
+                                    </div>
+                                  )
                                 );
                               })()}
                             </CardContent>
@@ -443,18 +450,21 @@ export default function CreateShippingPage() {
                                     headers: {
                                       Authorization: `Bearer ${localStorage.getItem("token")}`,
                                     },
-                                  }
+                                  },
                                 );
 
                                 if (!response.ok) {
-                                  throw new Error("Failed to complete shipment");
+                                  throw new Error(
+                                    "Failed to complete shipment",
+                                  );
                                 }
 
                                 toast({
                                   title: "Thành công",
-                                  description: "Đơn hàng đã được tạo thành công",
+                                  description:
+                                    "Đơn hàng đã được tạo thành công",
                                 });
-                                
+
                                 navigate("/shipments");
                               } catch (error) {
                                 toast({
