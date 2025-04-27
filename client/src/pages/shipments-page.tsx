@@ -19,6 +19,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Loader2, Search, Package, Truck } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -54,6 +55,8 @@ interface ShipmentsResponse {
 
 export default function ShipmentsPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedShipmentId, setSelectedShipmentId] = useState<number | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const { toast } = useToast();
 
   const [page, setPage] = useState(1);
@@ -406,6 +409,24 @@ export default function ShipmentsPage() {
             </Card>
           </div>
         </div>
+
+        {/* Shipment Details Dialog */}
+        <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Shipment Details</DialogTitle>
+              <DialogDescription>
+                View shipment information and credentials
+              </DialogDescription>
+            </DialogHeader>
+            {selectedShipmentId && (
+              <div>
+                {/* Add shipment details content here */}
+                <p>Shipment ID: {selectedShipmentId}</p>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
 
       {/* Footer */}
