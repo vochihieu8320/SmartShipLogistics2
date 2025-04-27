@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { API_BASE_URL } from "@/config/api";
 import {
   Table,
   TableBody,
@@ -62,6 +63,7 @@ export default function ShipmentsPage() {
       const response = await fetch(`${API_BASE_URL}/shipments`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
         },
       });
       if (!response.ok) {
@@ -86,11 +88,11 @@ export default function ShipmentsPage() {
   const filteredShipments = data?.shipments.filter((shipment) => {
     const searchTermLower = searchTerm.toLowerCase();
     return (
-      shipment.tracking_number.toLowerCase().includes(searchTermLower) ||
-      shipment.sender.name.toLowerCase().includes(searchTermLower) ||
-      shipment.receiver.name.toLowerCase().includes(searchTermLower) ||
-      shipment.sender.city.toLowerCase().includes(searchTermLower) ||
-      shipment.receiver.city.toLowerCase().includes(searchTermLower)
+      shipment.tracking_number?.toLowerCase().includes(searchTermLower) ||
+      shipment.sender?.name?.toLowerCase().includes(searchTermLower) ||
+      shipment.receiver?.name?.toLowerCase().includes(searchTermLower) ||
+      shipment.sender?.city?.toLowerCase().includes(searchTermLower) ||
+      shipment.receiver?.city?.toLowerCase().includes(searchTermLower)
     );
   });
 
@@ -146,31 +148,54 @@ export default function ShipmentsPage() {
           </div>
           <nav className="hidden md:flex gap-8">
             <Link href="/">
-              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">Home</span>
+              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">
+                Home
+              </span>
             </Link>
             <Link href="/shipping">
-              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">Shipping</span>
+              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">
+                Shipping
+              </span>
             </Link>
             <Link href="/tracking">
-              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">Track</span>
+              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">
+                Track
+              </span>
             </Link>
             <Link href="/shipments">
-              <span className="font-medium text-primary cursor-pointer">Shipments</span>
+              <span className="font-medium text-primary cursor-pointer">
+                Shipments
+              </span>
             </Link>
             <Link href="/#contact">
-              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">Contact</span>
+              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">
+                Contact
+              </span>
             </Link>
           </nav>
           <div className="flex items-center gap-2">
             <Link href="/auth">
-              <Button variant="outline" className="hidden md:inline-flex">Log In</Button>
+              <Button variant="outline" className="hidden md:inline-flex">
+                Log In
+              </Button>
             </Link>
             <Link href="/auth?register=true">
               <Button className="hidden md:inline-flex">Sign Up</Button>
             </Link>
             <Button variant="ghost" className="md:hidden p-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             </Button>
           </div>
@@ -199,7 +224,10 @@ export default function ShipmentsPage() {
               <CardContent>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <Search
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      size={18}
+                    />
                     <Input
                       placeholder="Search shipments..."
                       value={searchTerm}
@@ -207,9 +235,7 @@ export default function ShipmentsPage() {
                       className="pl-10"
                     />
                   </div>
-                  <Button>
-                    Search
-                  </Button>
+                  <Button>Search</Button>
                 </div>
               </CardContent>
             </Card>
@@ -254,12 +280,15 @@ export default function ShipmentsPage() {
                             <TableCell className="font-medium">
                               {shipment.tracking_number}
                             </TableCell>
-                            <TableCell>{formatDate(shipment.created_at)}</TableCell>
+                            <TableCell>
+                              {formatDate(shipment.created_at)}
+                            </TableCell>
                             <TableCell>
                               <div>
                                 <div>{shipment.sender.name}</div>
                                 <div className="text-xs text-gray-500">
-                                  {shipment.sender.city}, {shipment.sender.country}
+                                  {shipment.sender.city},{" "}
+                                  {shipment.sender.country}
                                 </div>
                               </div>
                             </TableCell>
@@ -267,41 +296,58 @@ export default function ShipmentsPage() {
                               <div>
                                 <div>{shipment.receiver.name}</div>
                                 <div className="text-xs text-gray-500">
-                                  {shipment.receiver.city}, {shipment.receiver.country}
+                                  {shipment.receiver.city},{" "}
+                                  {shipment.receiver.country}
                                 </div>
                               </div>
                             </TableCell>
                             <TableCell>
-                              <Badge className={`${getStatusColor(shipment.status)} text-white`}>
+                              <Badge
+                                className={`${getStatusColor(shipment.status)} text-white`}
+                              >
                                 {formatStatus(shipment.status)}
                               </Badge>
                             </TableCell>
                             <TableCell>
-                              {shipment.total_price 
-                                ? `$${shipment.total_price.toFixed(2)}` 
+                              {shipment.total_price
+                                ? `$${shipment.total_price}`
                                 : "-"}
                             </TableCell>
                             {shipment.credentials?.map((credential) => (
                               <TableCell key={credential.key}>
                                 {credential.key === "house_bill" && (
-                                  <a href={credential.value} target="_blank" rel="noopener noreferrer">
+                                  <a
+                                    href={credential.value}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
                                     {shipment.tracking_number}
                                   </a>
                                 )}
                                 {credential.key === "invoice" && (
-                                  <a href={credential.value} target="_blank" rel="noopener noreferrer">
+                                  <a
+                                    href={credential.value}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
                                     {credential.value}
                                   </a>
                                 )}
                                 {credential.key === "air_way_bill" && (
-                                  <a href={credential.value} target="_blank" rel="noopener noreferrer">
+                                  <a
+                                    href={credential.value}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
                                     {credential.value}
                                   </a>
                                 )}
                               </TableCell>
                             ))}
                             <TableCell className="text-right">
-                              <Link href={`/tracking?number=${shipment.tracking_number}`}>
+                              <Link
+                                href={`/tracking?number=${shipment.tracking_number}`}
+                              >
                                 <Button size="sm" variant="outline">
                                   Track
                                 </Button>
@@ -319,7 +365,7 @@ export default function ShipmentsPage() {
                       No shipments found
                     </h3>
                     <p className="text-gray-500 mb-4">
-                      {searchTerm 
+                      {searchTerm
                         ? "Try adjusting your search criteria."
                         : "You have no shipments yet."}
                     </p>
@@ -341,7 +387,9 @@ export default function ShipmentsPage() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Truck className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold text-white">SmartShip Pro</span>
+                <span className="text-xl font-bold text-white">
+                  SmartShip Pro
+                </span>
               </div>
               <p className="text-sm">
                 Global logistics solutions for businesses and individuals.
@@ -349,26 +397,68 @@ export default function ShipmentsPage() {
             </div>
 
             <div className="text-sm">
-              <h4 className="text-white text-lg font-semibold mb-2">Quick Links</h4>
+              <h4 className="text-white text-lg font-semibold mb-2">
+                Quick Links
+              </h4>
               <ul className="space-y-1">
-                <li><Link href="/"><span className="hover:text-primary cursor-pointer">Home</span></Link></li>
-                <li><Link href="/shipping"><span className="hover:text-primary cursor-pointer">Shipping</span></Link></li>
-                <li><Link href="/tracking"><span className="hover:text-primary cursor-pointer">Tracking</span></Link></li>
-                <li><Link href="/shipments"><span className="hover:text-primary cursor-pointer">Shipments</span></Link></li>
+                <li>
+                  <Link href="/">
+                    <span className="hover:text-primary cursor-pointer">
+                      Home
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/shipping">
+                    <span className="hover:text-primary cursor-pointer">
+                      Shipping
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/tracking">
+                    <span className="hover:text-primary cursor-pointer">
+                      Tracking
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/shipments">
+                    <span className="hover:text-primary cursor-pointer">
+                      Shipments
+                    </span>
+                  </Link>
+                </li>
               </ul>
             </div>
 
             <div className="text-sm">
-              <h4 className="text-white text-lg font-semibold mb-2">Services</h4>
+              <h4 className="text-white text-lg font-semibold mb-2">
+                Services
+              </h4>
               <ul className="space-y-1">
-                <li><span className="hover:text-primary cursor-pointer">Package Delivery</span></li>
-                <li><span className="hover:text-primary cursor-pointer">Freight Shipping</span></li>
-                <li><span className="hover:text-primary cursor-pointer">International Shipping</span></li>
+                <li>
+                  <span className="hover:text-primary cursor-pointer">
+                    Package Delivery
+                  </span>
+                </li>
+                <li>
+                  <span className="hover:text-primary cursor-pointer">
+                    Freight Shipping
+                  </span>
+                </li>
+                <li>
+                  <span className="hover:text-primary cursor-pointer">
+                    International Shipping
+                  </span>
+                </li>
               </ul>
             </div>
 
             <div className="text-sm">
-              <h4 className="text-white text-lg font-semibold mb-2">Contact Us</h4>
+              <h4 className="text-white text-lg font-semibold mb-2">
+                Contact Us
+              </h4>
               <ul className="space-y-1">
                 <li>123 Shipping Street, LC 12345</li>
                 <li>+1 (555) 123-4567</li>
@@ -378,7 +468,9 @@ export default function ShipmentsPage() {
           </div>
 
           <div className="border-t border-gray-800 mt-6 pt-4 text-center text-sm">
-            <p>© {new Date().getFullYear()} SmartShip Pro. All rights reserved.</p>
+            <p>
+              © {new Date().getFullYear()} SmartShip Pro. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>
