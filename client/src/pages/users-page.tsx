@@ -6,6 +6,7 @@ import UserForm from "@/components/user-management/user-form";
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function UsersPage() {
   const [activeTab, setActiveTab] = useState("list");
