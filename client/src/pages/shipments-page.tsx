@@ -56,11 +56,14 @@ export default function ShipmentsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
 
-  // Fetch shipments data
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
+  // Fetch shipments data with pagination
   const { data, isLoading, error } = useQuery<ShipmentsResponse>({
-    queryKey: ["shipments"],
+    queryKey: ["shipments", page],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/shipments`, {
+      const response = await fetch(`${API_BASE_URL}/shipments?page=${page}&per_page=${pageSize}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
@@ -359,6 +362,29 @@ export default function ShipmentsPage() {
                         ))}
                       </TableBody>
                     </Table>
+                    <div className="flex items-center justify-between py-4">
+                      <div className="text-sm text-muted-foreground">
+                        Page {page} of {Math.ceil((data?.count || 0) / pageSize)}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setPage(p => Math.max(1, p - 1))}
+                          disabled={page === 1}
+                        >
+                          Previous
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setPage(p => p + 1)}
+                          disabled={!data || page >= Math.ceil(data.count / pageSize)}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center py-12">

@@ -71,8 +71,8 @@ export default function ServiceQuoteForm({
   return (
     <div className="space-y-4">
       {quotes.map((quote: Quote) => (
-        <Card 
-          key={quote.id} 
+        <Card
+          key={quote.id}
           className="cursor-pointer hover:bg-accent/5"
           onClick={() => onQuoteSelect(quote)}
         >
@@ -85,17 +85,20 @@ export default function ServiceQuoteForm({
                 <div className="text-2xl font-bold text-primary">
                   {formatCurrency(
                     quote.prices.net_price +
-                    (quote.prices.net_price * quote.prices.fuel_surcharge) / 100 +
-                    (quote.prices.net_price * quote.prices.peak_season) / 100 +
-                    quote.prices.oversize_fee.reduce(
-                      (sum, fee) =>
-                        sum +
-                        fee.applied_fees.reduce(
-                          (feeSum, applied) => feeSum + parseFloat(applied.amount),
-                          0
-                        ),
-                      0
-                    )
+                      (quote.prices.net_price * quote.prices.fuel_surcharge) /
+                        100 +
+                      (quote.prices.net_price * quote.prices.peak_season) /
+                        100 +
+                      quote.prices.oversize_fee.reduce(
+                        (sum, fee) =>
+                          sum +
+                          fee.applied_fees.reduce(
+                            (feeSum, applied) =>
+                              feeSum + parseFloat(applied.amount),
+                            0,
+                          ),
+                        0,
+                      ),
                   )}
                 </div>
               </div>
@@ -109,24 +112,16 @@ export default function ServiceQuoteForm({
                 </p>
               </div>
               <div>
-                <p className="text-muted-foreground">
-                  Phụ Phí Nhiên Liệu ({quote.prices.fuel_surcharge}%)
-                </p>
+                <p className="text-muted-foreground">Phụ Phí Nhiên Liệu</p>
                 <p className="font-medium">
-                  {formatCurrency(
-                    (quote.prices.net_price * quote.prices.fuel_surcharge) / 100
-                  )}
+                  {formatCurrency(quote.prices.fuel_surcharge)}
                 </p>
               </div>
               {quote.prices.peak_season > 0 && (
                 <div>
-                  <p className="text-muted-foreground">
-                    Phụ Phí Mùa Cao Điểm ({quote.prices.peak_season}%)
-                  </p>
+                  <p className="text-muted-foreground">Phụ Phí Mùa Cao Điểm</p>
                   <p className="font-medium">
-                    {formatCurrency(
-                      (quote.prices.net_price * quote.prices.peak_season) / 100
-                    )}
+                    {formatCurrency(quote.prices.peak_season)}
                   </p>
                 </div>
               )}
@@ -135,10 +130,16 @@ export default function ServiceQuoteForm({
                   <p className="text-muted-foreground">Phụ Phí Quá Khổ</p>
                   {fee.applied_fees.map((appliedFee, appliedIndex) => (
                     <div key={appliedIndex}>
-                      <p className="text-muted-foreground text-xs">{appliedFee.display_name}</p>
-                      <p className="font-medium">{formatCurrency(parseFloat(appliedFee.amount))}</p>
+                      <p className="text-muted-foreground text-xs">
+                        {appliedFee.display_name}
+                      </p>
+                      <p className="font-medium">
+                        {formatCurrency(parseFloat(appliedFee.amount))}
+                      </p>
                       {appliedFee.description && (
-                        <p className="text-xs text-muted-foreground mt-1">{appliedFee.description}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {appliedFee.description}
+                        </p>
                       )}
                     </div>
                   ))}
@@ -146,37 +147,37 @@ export default function ServiceQuoteForm({
               ))}
             </div>
 
-            <Button 
-                  className="w-full mt-4" 
-                  onClick={async () => {
-                    try {
-                      const response = await fetch(
-                        `${API_BASE_URL}/shipments/${shipmentId}/select_service`,
-                        {
-                          method: 'PATCH',
-                          headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${localStorage.getItem("token")}`,
-                          },
-                          body: JSON.stringify({
-                            provider_id: 1,
-                            provider_service_id: quote.id
-                          })
-                        }
-                      );
+            <Button
+              className="w-full mt-4"
+              onClick={async () => {
+                try {
+                  const response = await fetch(
+                    `${API_BASE_URL}/shipments/${shipmentId}/select_service`,
+                    {
+                      method: "PATCH",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                      },
+                      body: JSON.stringify({
+                        provider_id: 1,
+                        provider_service_id: quote.id,
+                      }),
+                    },
+                  );
 
-                      if (!response.ok) {
-                        throw new Error('Failed to select service');
-                      }
+                  if (!response.ok) {
+                    throw new Error("Failed to select service");
+                  }
 
-                      onQuoteSelect(quote);
-                    } catch (error) {
-                      console.error('Error selecting service:', error);
-                    }
-                  }}
-                >
-                  Chọn Dịch Vụ Này
-                </Button>
+                  onQuoteSelect(quote);
+                } catch (error) {
+                  console.error("Error selecting service:", error);
+                }
+              }}
+            >
+              Chọn Dịch Vụ Này
+            </Button>
           </CardContent>
         </Card>
       ))}
