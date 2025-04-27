@@ -390,25 +390,34 @@ export default function CreateShippingPage() {
                             </CardHeader>
                             <CardContent>
                               {(() => {
-                                const { data: shipment, isLoading } = useQuery({
-                                  queryKey: ["shipment", shipmentId],
-                                  queryFn: async () => {
-                                    const response = await fetch(
-                                      `${API_BASE_URL}/shipments/${shipmentId}`,
-                                      {
-                                        headers: {
-                                          Authorization: `Bearer ${localStorage.getItem("token")}`,
-                                        },
-                                      },
-                                    );
-                                    if (!response.ok) {
-                                      throw new Error(
-                                        "Failed to fetch shipment",
+                                const [shipment, setShipment] = useState(null);
+                                const [isLoading, setIsLoading] = useState(true);
+
+                                useEffect(() => {
+                                  const fetchShipment = async () => {
+                                    try {
+                                      const response = await fetch(
+                                        `${API_BASE_URL}/shipments/${shipmentId}`,
+                                        {
+                                          headers: {
+                                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                          },
+                                        }
                                       );
+                                      if (!response.ok) {
+                                        throw new Error("Failed to fetch shipment");
+                                      }
+                                      const data = await response.json();
+                                      setShipment(data);
+                                      setIsLoading(false);
+                                    } catch (error) {
+                                      console.error(error);
+                                      setIsLoading(false);
                                     }
-                                    return response.json();
-                                  },
-                                });
+                                  };
+
+                                  fetchShipment();
+                                }, [shipmentId]);
 
                                 if (isLoading) {
                                   return (
