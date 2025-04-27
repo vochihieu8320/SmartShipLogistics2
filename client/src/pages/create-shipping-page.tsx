@@ -406,6 +406,7 @@ export default function CreateShippingPage() {
                           </Button>
                           <Button
                             type="button"
+                            disabled={createShipmentMutation.isPending}
                             onClick={async () => {
                               try {
                                 const response = await fetch(
@@ -440,7 +441,14 @@ export default function CreateShippingPage() {
                               }
                             }}
                           >
-                            Hoàn Thành Đơn Hàng
+                            {createShipmentMutation.isPending ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Đang xử lý...
+                              </>
+                            ) : (
+                              "Hoàn Thành Đơn Hàng"
+                            )}
                           </Button>
                         </div>
                       </div>
