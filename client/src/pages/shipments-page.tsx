@@ -57,9 +57,13 @@ export default function ShipmentsPage() {
 
   // Fetch shipments data
   const { data, isLoading, error } = useQuery<ShipmentsResponse>({
-    queryKey: ["/api/v1/shipments"],
+    queryKey: ["shipments"],
     queryFn: async () => {
-      const response = await fetch("/api/v1/shipments");
+      const response = await fetch(`${API_BASE_URL}/shipments`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch shipments");
       }
@@ -277,7 +281,7 @@ export default function ShipmentsPage() {
                                 ? `$${shipment.total_price.toFixed(2)}` 
                                 : "-"}
                             </TableCell>
-                            {shipment.credentials.map((credential) => (
+                            {shipment.credentials?.map((credential) => (
                               <TableCell key={credential.key}>
                                 {credential.key === "house_bill" && (
                                   <a href={credential.value} target="_blank" rel="noopener noreferrer">
