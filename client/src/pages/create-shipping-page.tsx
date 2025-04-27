@@ -389,54 +389,9 @@ export default function CreateShippingPage() {
                               <CardTitle>Chi Tiết Đơn Hàng</CardTitle>
                             </CardHeader>
                             <CardContent>
-                              {(() => {
-                                const [shipment, setShipment] = useState(null);
-                                const [isLoading, setIsLoading] = useState(true);
-
-                                useEffect(() => {
-                                  const fetchShipment = async () => {
-                                    try {
-                                      const response = await fetch(
-                                        `${API_BASE_URL}/shipments/${shipmentId}`,
-                                        {
-                                          headers: {
-                                            Authorization: `Bearer ${localStorage.getItem("token")}`,
-                                          },
-                                        }
-                                      );
-                                      if (!response.ok) {
-                                        throw new Error("Failed to fetch shipment");
-                                      }
-                                      const data = await response.json();
-                                      setShipment(data);
-                                      setIsLoading(false);
-                                    } catch (error) {
-                                      console.error(error);
-                                      setIsLoading(false);
-                                    }
-                                  };
-
-                                  fetchShipment();
-                                }, [shipmentId]);
-
-                                if (isLoading) {
-                                  return (
-                                    <div className="flex justify-center py-4">
-                                      <Loader2 className="h-6 w-6 animate-spin" />
-                                    </div>
-                                  );
-                                }
-
-                                return (
-                                  shipment && (
-                                    <div className="space-y-4">
-                                      <ShippingSummary
-                                        formData={form.getValues()}
-                                      />
-                                    </div>
-                                  )
-                                );
-                              })()}
+                              <div className="space-y-4">
+                                <ShippingSummary formData={form.getValues()} />
+                              </div>
                             </CardContent>
                           </Card>
                         )}
