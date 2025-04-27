@@ -31,7 +31,7 @@ interface Shipment {
   sender: {
     name: string;
     city: string;
-    country: string;
+    country: string | null;
   };
   receiver: {
     name: string;
@@ -39,6 +39,10 @@ interface Shipment {
     country: string;
   };
   total_price: number | null;
+  credentials: {
+    key: string;
+    value: string;
+  }[];
 }
 
 interface ShipmentsResponse {
@@ -99,7 +103,7 @@ export default function ShipmentsPage() {
   // Get status badge color
   const getStatusColor = (status: string | null) => {
     if (!status) return "bg-gray-500";
-    
+
     switch (status.toLowerCase()) {
       case "delivered":
         return "bg-green-500";
@@ -119,7 +123,7 @@ export default function ShipmentsPage() {
   // Format status for display
   const formatStatus = (status: string | null) => {
     if (!status) return "Pending";
-    
+
     // Convert snake_case to Title Case
     return status
       .split("_")
@@ -234,6 +238,9 @@ export default function ShipmentsPage() {
                           <TableHead>Recipient</TableHead>
                           <TableHead>Status</TableHead>
                           <TableHead>Price</TableHead>
+                          <TableHead>House Bill</TableHead>
+                          <TableHead>Invoice</TableHead>
+                          <TableHead>Air Way Bill</TableHead>
                           <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -270,6 +277,25 @@ export default function ShipmentsPage() {
                                 ? `$${shipment.total_price.toFixed(2)}` 
                                 : "-"}
                             </TableCell>
+                            {shipment.credentials.map((credential) => (
+                              <TableCell key={credential.key}>
+                                {credential.key === "house_bill" && (
+                                  <a href={credential.value} target="_blank" rel="noopener noreferrer">
+                                    {shipment.tracking_number}
+                                  </a>
+                                )}
+                                {credential.key === "invoice" && (
+                                  <a href={credential.value} target="_blank" rel="noopener noreferrer">
+                                    {credential.value}
+                                  </a>
+                                )}
+                                {credential.key === "air_way_bill" && (
+                                  <a href={credential.value} target="_blank" rel="noopener noreferrer">
+                                    {credential.value}
+                                  </a>
+                                )}
+                              </TableCell>
+                            ))}
                             <TableCell className="text-right">
                               <Link href={`/tracking?number=${shipment.tracking_number}`}>
                                 <Button size="sm" variant="outline">
@@ -317,7 +343,7 @@ export default function ShipmentsPage() {
                 Global logistics solutions for businesses and individuals.
               </p>
             </div>
-            
+
             <div className="text-sm">
               <h4 className="text-white text-lg font-semibold mb-2">Quick Links</h4>
               <ul className="space-y-1">
@@ -327,7 +353,7 @@ export default function ShipmentsPage() {
                 <li><Link href="/shipments"><span className="hover:text-primary cursor-pointer">Shipments</span></Link></li>
               </ul>
             </div>
-            
+
             <div className="text-sm">
               <h4 className="text-white text-lg font-semibold mb-2">Services</h4>
               <ul className="space-y-1">
@@ -336,7 +362,7 @@ export default function ShipmentsPage() {
                 <li><span className="hover:text-primary cursor-pointer">International Shipping</span></li>
               </ul>
             </div>
-            
+
             <div className="text-sm">
               <h4 className="text-white text-lg font-semibold mb-2">Contact Us</h4>
               <ul className="space-y-1">
@@ -346,7 +372,7 @@ export default function ShipmentsPage() {
               </ul>
             </div>
           </div>
-          
+
           <div className="border-t border-gray-800 mt-6 pt-4 text-center text-sm">
             <p>© {new Date().getFullYear()} SmartShip Pro. All rights reserved.</p>
           </div>
