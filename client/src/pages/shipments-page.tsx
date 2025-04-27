@@ -320,6 +320,7 @@ export default function ShipmentsPage() {
                                     href={credential.value}
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    className="text-primary hover:text-primary/80 hover:underline"
                                   >
                                     {shipment.tracking_number}
                                   </a>
@@ -329,8 +330,9 @@ export default function ShipmentsPage() {
                                     href={credential.value}
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    className="text-primary hover:text-primary/80 hover:underline"
                                   >
-                                    {credential.value}
+                                    {shipment.invoice_number}
                                   </a>
                                 )}
                                 {credential.key === "air_way_bill" && (
