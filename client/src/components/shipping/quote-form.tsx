@@ -111,12 +111,10 @@ export default function QuoteForm({
               {quote.prices.peak_season > 0 && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
-                    Peak Season Surcharge ({quote.prices.peak_season}%):
+                    Peak Season Surcharge):
                   </span>
                   <span className="font-medium">
-                    {formatCurrency(
-                      (quote.prices.net_price * quote.prices.peak_season) / 100,
-                    )}
+                    {formatCurrency(quote.prices.peak_season)}
                   </span>
                 </div>
               )}
@@ -141,13 +139,6 @@ export default function QuoteForm({
                   ))}
                 </div>
               ))}
-
-              <div className="mt-4 pt-2 border-t flex justify-between font-medium text-lg">
-                <span>Total:</span>
-                <span className="text-primary">
-                  {formatCurrency(quote.prices.fuel_surcharge)}
-                </span>
-              </div>
             </div>
           </CardContent>
         </Card>
