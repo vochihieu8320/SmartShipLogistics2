@@ -45,19 +45,19 @@ export function ProtectedRoute({
     );
   }
 
-  if (requiredRoles && !requiredRoles.includes(user.role)) {
-    return (
-      <Route path={path}>
-        <div className="flex flex-col items-center justify-center min-h-screen p-4">
-          <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
-          <p className="text-gray-600 text-center mb-4">
-            You don't have permission to access this page.
-          </p>
-          <Redirect to="/" />
-        </div>
-      </Route>
-    );
-  }
+  // if (requiredRoles && !requiredRoles.includes(user.role)) {
+  //   return (
+  //     <Route path={path}>
+  //       <div className="flex flex-col items-center justify-center min-h-screen p-4">
+  //         <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
+  //         <p className="text-gray-600 text-center mb-4">
+  //           You don't have permission to access this page.
+  //         </p>
+  //         <Redirect to="/" />
+  //       </div>
+  //     </Route>
+  //   );
+  // }
 
   return <Route path={path} component={Component} />;
 }
