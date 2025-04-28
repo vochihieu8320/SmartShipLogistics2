@@ -1,30 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link, useLocation } from "wouter";
 import { API_BASE_URL } from "@/config/api";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Loader2, Search, Package, Truck } from "lucide-react";
-import { Link } from "wouter";
-import { useToast } from "@/hooks/use-toast";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { AlertCircle, ChevronRight, Loader2, PackageOpen, Plus, Search, Truck } from "lucide-react";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 
-// Define the shipment interface based on the API response
 interface Shipment {
   id: number;
   tracking_number: string;
@@ -33,7 +19,7 @@ interface Shipment {
   sender: {
     name: string;
     city: string;
-    country: string | null;
+    country: string;
   };
   receiver: {
     name: string;
@@ -41,488 +27,247 @@ interface Shipment {
     country: string;
   };
   total_price: number | null;
-  credentials: {
-    key: string;
-    value: string;
-  }[];
-}
-
-interface ShipmentsResponse {
-  success: boolean;
-  count: number;
-  shipments: Shipment[];
+  provider?: string;
+  provider_service?: string;
+  estimated_delivery?: string;
 }
 
 export default function ShipmentsPage() {
+  const [, navigate] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedShipmentId, setSelectedShipmentId] = useState<number | null>(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const { toast } = useToast();
-
-  const [page, setPage] = useState(1);
-  const pageSize = 10;
-
-  // Fetch shipments data with pagination
-  const { data, isLoading, error } = useQuery<ShipmentsResponse>({
-    queryKey: ["shipments", page],
+  
+  const { data: shipments, isLoading, error } = useQuery<Shipment[]>({
+    queryKey: ["/shipments"],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/shipments?page=${page}&per_page=${pageSize}`, {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/auth");
+        return [];
+      }
+      
+      const response = await fetch(`${API_BASE_URL}/shipments`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       });
+      
       if (!response.ok) {
-        throw new Error("Failed to fetch shipments");
+        throw new Error("Không thể tải danh sách vận chuyển");
       }
-      return response.json();
+      
+      const data = await response.json();
+      return data.shipments || [];
     },
   });
 
-  // Show error toast if query fails
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error fetching shipments",
-        description: (error as Error).message,
-        variant: "destructive",
-      });
-    }
-  }, [error, toast]);
+  const filteredShipments = shipments?.filter(shipment => 
+    shipment.tracking_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    shipment.sender.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    shipment.receiver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (shipment.provider && shipment.provider.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
-  // Filter shipments based on search term
-  const filteredShipments = data?.shipments.filter((shipment) => {
-    const searchTermLower = searchTerm.toLowerCase();
-    return (
-      shipment.tracking_number?.toLowerCase().includes(searchTermLower) ||
-      shipment.sender?.name?.toLowerCase().includes(searchTermLower) ||
-      shipment.receiver?.name?.toLowerCase().includes(searchTermLower) ||
-      shipment.sender?.city?.toLowerCase().includes(searchTermLower) ||
-      shipment.receiver?.city?.toLowerCase().includes(searchTermLower)
-    );
-  });
-
-  // Format date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  // Get status badge color
   const getStatusColor = (status: string | null) => {
-    if (!status) return "bg-gray-500";
-
-    switch (status.toLowerCase()) {
+    switch (status) {
       case "delivered":
-        return "bg-green-500";
+        return "bg-green-100 text-green-800 border-green-200";
       case "in_transit":
-      case "out_for_delivery":
-        return "bg-blue-500";
+        return "bg-blue-100 text-blue-800 border-blue-200";
       case "processing":
-      case "pending":
-        return "bg-yellow-500";
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "cancelled":
-        return "bg-red-500";
+        return "bg-red-100 text-red-800 border-red-200";
       default:
-        return "bg-gray-500";
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
-  // Format status for display
-  const formatStatus = (status: string | null) => {
-    if (!status) return "Pending";
+  const getStatusText = (status: string | null) => {
+    switch (status) {
+      case "delivered":
+        return "Đã Giao Hàng";
+      case "in_transit":
+        return "Đang Vận Chuyển";
+      case "processing":
+        return "Đang Xử Lý";
+      case "created":
+        return "Đã Tạo";
+      case "cancelled":
+        return "Đã Hủy";
+      default:
+        return "Không Xác Định";
+    }
+  };
 
-    // Convert snake_case to Title Case
-    return status
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return format(date, "dd/MM/yyyy", { locale: vi });
+    } catch (e) {
+      return dateString;
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Navigation */}
-      <header className="bg-white border-b border-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Truck className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">SmartShip Pro</span>
+            <Link href="/">
+              <a className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">VN Logistics</a>
+            </Link>
           </div>
           <nav className="hidden md:flex gap-8">
             <Link href="/">
-              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">
-                Home
-              </span>
+              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
+                Trang Chủ
+              </a>
             </Link>
             <Link href="/shipping">
-              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">
-                Shipping
-              </span>
+              <a className="font-medium text-gray-600 hover:text-primary transition-colors">Vận Chuyển</a>
             </Link>
-            <Link href="/tracking">
-              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">
-                Track
-              </span>
+            <Link href="/track">
+              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
+                Theo Dõi
+              </a>
             </Link>
             <Link href="/shipments">
-              <span className="font-medium text-primary cursor-pointer">
-                Shipments
-              </span>
-            </Link>
-            <Link href="/#contact">
-              <span className="font-medium text-gray-600 hover:text-primary cursor-pointer">
-                Contact
-              </span>
+              <a className="font-medium text-primary border-b-2 border-primary pb-1">
+                Đơn Hàng
+              </a>
             </Link>
           </nav>
-          <div className="flex items-center gap-2">
-            <Link href="/auth">
-              <Button variant="outline" className="hidden md:inline-flex">
-                Log In
-              </Button>
-            </Link>
-            <Link href="/auth?register=true">
-              <Button className="hidden md:inline-flex">Sign Up</Button>
-            </Link>
-            <Button variant="ghost" className="md:hidden p-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </Button>
-          </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 bg-gray-50">
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold mb-2">Shipments</h1>
-              <p className="text-gray-600">
-                View and manage all your shipments
-              </p>
+      <main className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Đơn Hàng Của Tôi</h1>
+          <p className="text-gray-600">Quản lý và theo dõi tất cả các đơn vận chuyển của bạn</p>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-md mb-6 p-4 border border-gray-200">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Tìm kiếm theo mã vận đơn, tên người gửi/nhận, hoặc dịch vụ..."
+                className="pl-10"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-
-            {/* Search and Filter */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Find Shipments</CardTitle>
-                <CardDescription>
-                  Search by tracking number, sender or recipient
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <Search
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                      size={18}
-                    />
-                    <Input
-                      placeholder="Search shipments..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                  <Button>Search</Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Shipments Table */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Your Shipments</CardTitle>
-                <CardDescription>
-                  Showing {filteredShipments?.length || 0} shipments
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isLoading ? (
-                  <div className="flex justify-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
-                ) : error ? (
-                  <div className="text-center py-8 text-red-500">
-                    <p>Failed to load shipments. Please try again.</p>
-                  </div>
-                ) : filteredShipments && filteredShipments.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Tracking Number</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Sender</TableHead>
-                          <TableHead>Recipient</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Price</TableHead>
-                          <TableHead>House Bill</TableHead>
-                          <TableHead>Invoice</TableHead>
-                          <TableHead>Air Way Bill</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filteredShipments.map((shipment) => (
-                          <TableRow key={shipment.id}>
-                            <TableCell className="font-medium">
-                              {shipment.tracking_number}
-                            </TableCell>
-                            <TableCell>
-                              {formatDate(shipment.created_at)}
-                            </TableCell>
-                            <TableCell>
-                              <div>
-                                <div>{shipment.sender.name}</div>
-                                <div className="text-xs text-gray-500">
-                                  {shipment.sender.city},{" "}
-                                  {shipment.sender.country}
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div>
-                                <div>{shipment.receiver.name}</div>
-                                <div className="text-xs text-gray-500">
-                                  {shipment.receiver.city},{" "}
-                                  {shipment.receiver.country}
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge
-                                className={`${getStatusColor(shipment.status)} text-white`}
-                              >
-                                {formatStatus(shipment.status)}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              {shipment.total_price
-                                ? `$${shipment.total_price}`
-                                : "-"}
-                            </TableCell>
-                            {shipment.credentials?.map((credential) => (
-                              <TableCell key={credential.key}>
-                                {credential.key === "house_bill" && (
-                                  <a
-                                    href={credential.value}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-primary hover:text-primary/80 hover:underline"
-                                  >
-                                    {shipment.tracking_number}
-                                  </a>
-                                )}
-                                {credential.key === "invoice" && (
-                                  <a
-                                    href={credential.value}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-primary hover:text-primary/80 hover:underline"
-                                  >
-                                    {shipment.invoice_number}
-                                  </a>
-                                )}
-                                {credential.key === "air_way_bill" && (
-                                  <a
-                                    href={credential.value}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                  >
-                                    {credential.value}
-                                  </a>
-                                )}
-                              </TableCell>
-                            ))}
-                            <TableCell className="text-right">
-                              <Link
-                                href={`/tracking?number=${shipment.tracking_number}`}
-                              >
-                                <Button size="sm" variant="outline">
-                                  Track
-                                </Button>
-                              </Link>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                    <div className="flex items-center justify-between py-4">
-                      <div className="text-sm text-muted-foreground">
-                        Page {page} of {Math.ceil((data?.count || 0) / pageSize)}
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setPage(p => Math.max(1, p - 1))}
-                          disabled={page === 1}
-                        >
-                          Previous
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setPage(p => p + 1)}
-                          disabled={!data || page >= Math.ceil(data.count / pageSize)}
-                        >
-                          Next
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-xl font-medium text-gray-500 mb-2">
-                      No shipments found
-                    </h3>
-                    <p className="text-gray-500 mb-4">
-                      {searchTerm
-                        ? "Try adjusting your search criteria."
-                        : "You have no shipments yet."}
-                    </p>
-                    <Link href="/shipping">
-                      <Button>Create a Shipment</Button>
-                    </Link>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <Button asChild className="flex gap-2">
+              <Link href="/shipping/create">
+                <Plus className="h-4 w-4" />
+                Tạo Đơn Hàng Mới
+              </Link>
+            </Button>
           </div>
         </div>
 
-        {/* Shipment Details Dialog */}
-        <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Shipment Details</DialogTitle>
-              <DialogDescription>
-                View shipment information and credentials
-              </DialogDescription>
-            </DialogHeader>
-            {selectedShipmentId && (
-              <div>
-                {/* Add shipment details content here */}
-                <p>Shipment ID: {selectedShipmentId}</p>
+        {isLoading ? (
+          <div className="h-64 flex items-center justify-center">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          </div>
+        ) : error ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-10">
+              <AlertCircle className="h-16 w-16 text-red-500 mb-4" />
+              <h3 className="text-xl font-medium mb-2">Không thể tải danh sách đơn hàng</h3>
+              <p className="text-gray-500 text-center max-w-md mb-6">
+                Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ.
+              </p>
+              <Button onClick={() => window.location.reload()}>Tải lại</Button>
+            </CardContent>
+          </Card>
+        ) : filteredShipments && filteredShipments.length > 0 ? (
+          <Card>
+            <CardHeader className="px-6">
+              <CardTitle className="text-lg">Đơn Hàng ({filteredShipments.length})</CardTitle>
+            </CardHeader>
+            <CardContent className="px-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[180px]">Mã Vận Đơn</TableHead>
+                      <TableHead>Người Gửi / Nhận</TableHead>
+                      <TableHead>Ngày Tạo</TableHead>
+                      <TableHead>Trạng Thái</TableHead>
+                      <TableHead>Dịch Vụ</TableHead>
+                      <TableHead className="text-right">Giá</TableHead>
+                      <TableHead className="w-[50px]"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredShipments.map((shipment) => (
+                      <TableRow key={shipment.id}>
+                        <TableCell className="font-medium">{shipment.tracking_number}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col space-y-1">
+                            <span className="text-sm">
+                              <span className="font-medium">Từ:</span> {shipment.sender.name}
+                            </span>
+                            <span className="text-sm">
+                              <span className="font-medium">Đến:</span> {shipment.receiver.name}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>{formatDate(shipment.created_at)}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={`${getStatusColor(shipment.status)}`}>
+                            {getStatusText(shipment.status)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{shipment.provider || "-"}</TableCell>
+                        <TableCell className="text-right">
+                          {shipment.total_price ? `$${shipment.total_price.toFixed(2)}` : "-"}
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="icon" asChild>
+                            <Link href={`/shipments/${shipment.id}`}>
+                              <ChevronRight className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
-            )}
-          </DialogContent>
-        </Dialog>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="text-center">
+            <CardContent className="flex flex-col items-center justify-center py-10">
+              <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                <PackageOpen className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-medium mb-2">Không tìm thấy đơn hàng nào</h3>
+              {searchTerm ? (
+                <p className="text-gray-500 text-center max-w-md mb-6">
+                  Không tìm thấy đơn hàng phù hợp với từ khóa "{searchTerm}". Vui lòng thử từ khóa khác.
+                </p>
+              ) : (
+                <p className="text-gray-500 text-center max-w-md mb-6">
+                  Bạn chưa có đơn hàng nào. Hãy tạo đơn hàng đầu tiên để bắt đầu vận chuyển.
+                </p>
+              )}
+              {searchTerm ? (
+                <Button variant="outline" onClick={() => setSearchTerm("")}>Xóa tìm kiếm</Button>
+              ) : (
+                <Button asChild>
+                  <Link href="/shipping/create">
+                    <Truck className="mr-2 h-4 w-4" />
+                    Tạo Đơn Hàng Mới
+                  </Link>
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </main>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-8">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Truck className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold text-white">
-                  SmartShip Pro
-                </span>
-              </div>
-              <p className="text-sm">
-                Global logistics solutions for businesses and individuals.
-              </p>
-            </div>
-
-            <div className="text-sm">
-              <h4 className="text-white text-lg font-semibold mb-2">
-                Quick Links
-              </h4>
-              <ul className="space-y-1">
-                <li>
-                  <Link href="/">
-                    <span className="hover:text-primary cursor-pointer">
-                      Home
-                    </span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/shipping">
-                    <span className="hover:text-primary cursor-pointer">
-                      Shipping
-                    </span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/tracking">
-                    <span className="hover:text-primary cursor-pointer">
-                      Tracking
-                    </span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/shipments">
-                    <span className="hover:text-primary cursor-pointer">
-                      Shipments
-                    </span>
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div className="text-sm">
-              <h4 className="text-white text-lg font-semibold mb-2">
-                Services
-              </h4>
-              <ul className="space-y-1">
-                <li>
-                  <span className="hover:text-primary cursor-pointer">
-                    Package Delivery
-                  </span>
-                </li>
-                <li>
-                  <span className="hover:text-primary cursor-pointer">
-                    Freight Shipping
-                  </span>
-                </li>
-                <li>
-                  <span className="hover:text-primary cursor-pointer">
-                    International Shipping
-                  </span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="text-sm">
-              <h4 className="text-white text-lg font-semibold mb-2">
-                Contact Us
-              </h4>
-              <ul className="space-y-1">
-                <li>123 Shipping Street, LC 12345</li>
-                <li>+1 (555) 123-4567</li>
-                <li>info@smartshippro.com</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 mt-6 pt-4 text-center text-sm">
-            <p>
-              © {new Date().getFullYear()} SmartShip Pro. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
