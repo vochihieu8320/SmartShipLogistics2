@@ -60,12 +60,27 @@ export default function ShipmentsPage() {
     },
   });
 
-  const filteredShipments = shipments?.filter(shipment => 
-    shipment.tracking_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    shipment.sender.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    shipment.receiver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (shipment.provider && shipment.provider.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredShipments = shipments?.filter(shipment => {
+    if (!shipment) return false;
+    
+    const trackingMatch = shipment.tracking_number 
+      ? shipment.tracking_number.toLowerCase().includes(searchTerm.toLowerCase()) 
+      : false;
+      
+    const senderMatch = shipment.sender?.name 
+      ? shipment.sender.name.toLowerCase().includes(searchTerm.toLowerCase()) 
+      : false;
+      
+    const receiverMatch = shipment.receiver?.name 
+      ? shipment.receiver.name.toLowerCase().includes(searchTerm.toLowerCase()) 
+      : false;
+      
+    const providerMatch = shipment.provider 
+      ? shipment.provider.toLowerCase().includes(searchTerm.toLowerCase()) 
+      : false;
+      
+    return trackingMatch || senderMatch || receiverMatch || providerMatch;
+  });
 
   const getStatusColor = (status: string | null) => {
     switch (status) {
@@ -203,18 +218,18 @@ export default function ShipmentsPage() {
                   <TableBody>
                     {filteredShipments.map((shipment) => (
                       <TableRow key={shipment.id}>
-                        <TableCell className="font-medium">{shipment.tracking_number}</TableCell>
+                        <TableCell className="font-medium">{shipment.tracking_number || "N/A"}</TableCell>
                         <TableCell>
                           <div className="flex flex-col space-y-1">
                             <span className="text-sm">
-                              <span className="font-medium">Từ:</span> {shipment.sender.name}
+                              <span className="font-medium">Từ:</span> {shipment.sender?.name || "Không có thông tin"}
                             </span>
                             <span className="text-sm">
-                              <span className="font-medium">Đến:</span> {shipment.receiver.name}
+                              <span className="font-medium">Đến:</span> {shipment.receiver?.name || "Không có thông tin"}
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell>{formatDate(shipment.created_at)}</TableCell>
+                        <TableCell>{shipment.created_at ? formatDate(shipment.created_at) : "N/A"}</TableCell>
                         <TableCell>
                           <Badge variant="outline" className={`${getStatusColor(shipment.status)}`}>
                             {getStatusText(shipment.status)}
@@ -222,7 +237,8 @@ export default function ShipmentsPage() {
                         </TableCell>
                         <TableCell>{shipment.provider || "-"}</TableCell>
                         <TableCell className="text-right">
-                          {shipment.total_price ? `$${shipment.total_price.toFixed(2)}` : "-"}
+                          {shipment.total_price !== null && shipment.total_price !== undefined ? 
+                            `$${shipment.total_price.toFixed(2)}` : "-"}
                         </TableCell>
                         <TableCell>
                           <Button variant="ghost" size="icon" asChild>
