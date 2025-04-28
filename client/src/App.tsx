@@ -19,6 +19,7 @@ import TrackingPage from "@/pages/tracking-page";
 import ShippingPage from "@/pages/shipping-page";
 import ShipmentsPage from "@/pages/shipments-page";
 import CreateShippingPage from "@/pages/create-shipping-page";
+import ShipmentDetailPage from "@/pages/shipment-detail-page";
 import { ThemeProvider } from "@/components/theme-provider";
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
               <ProtectedRoute path="/shipping" component={ShippingPage} />
               <ProtectedRoute path="/shipping/create" component={CreateShippingPage} />
               <ProtectedRoute path="/shipments" component={ShipmentsPage} />
+              <ProtectedRoute path="/shipments/:id" component={ShipmentDetailPage} />
 
               {/* Protected admin dashboard routes */}
               <ProtectedRoute path="/admin" component={DashboardPage} />
