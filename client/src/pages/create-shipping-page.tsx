@@ -180,28 +180,28 @@ export default function CreateShippingPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-white border-b border-gray-200">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
+      <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold">SmartShip Pro</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">SmartShip Pro</span>
           </div>
           <nav className="hidden md:flex gap-8">
             <Link href="/">
-              <a className="font-medium text-gray-600 hover:text-primary">
+              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
                 Home
               </a>
             </Link>
             <Link href="/shipping">
-              <a className="font-medium text-primary">Shipping</a>
+              <a className="font-medium text-primary border-b-2 border-primary pb-1">Shipping</a>
             </Link>
             <Link href="/track">
-              <a className="font-medium text-gray-600 hover:text-primary">
+              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
                 Track
               </a>
             </Link>
             <Link href="/shipments">
-              <a className="font-medium text-gray-600 hover:text-primary">
+              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
                 Shipments
               </a>
             </Link>
@@ -210,10 +210,10 @@ export default function CreateShippingPage() {
             {user ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm font-medium hidden md:inline-block">
-                  Welcome, {user.fullName}
+                  Welcome, <span className="text-primary font-semibold">{user.fullName}</span>
                 </span>
                 <Link href="/admin">
-                  <Button variant="outline" className="hidden md:inline-flex">
+                  <Button variant="outline" className="hidden md:inline-flex hover:bg-primary hover:text-white transition-colors">
                     Dashboard
                   </Button>
                 </Link>
@@ -221,12 +221,12 @@ export default function CreateShippingPage() {
             ) : (
               <>
                 <Link href="/auth">
-                  <Button variant="outline" className="hidden md:inline-flex">
+                  <Button variant="outline" className="hidden md:inline-flex hover:bg-primary hover:text-white transition-colors">
                     Log In
                   </Button>
                 </Link>
                 <Link href="/auth?register=true">
-                  <Button className="hidden md:inline-flex">Sign Up</Button>
+                  <Button className="hidden md:inline-flex shadow-md hover:shadow-lg transition-shadow">Sign Up</Button>
                 </Link>
               </>
             )}
@@ -234,71 +234,116 @@ export default function CreateShippingPage() {
         </div>
       </header>
 
-      <main className="flex-1 bg-gray-50 py-12">
+      <main className="flex-1 py-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">T ��o Đơn Hàng</h1>
+            <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Tạo Đơn Hàng</h1>
+            <p className="text-gray-600 max-w-2xl mx-auto">Điền thông tin chi tiết để tạo đơn hàng mới và so sánh báo giá vận chuyển từ các nhà cung cấp hàng đầu.</p>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Tạo Đơn Hàng Mới</CardTitle>
+          <Card className="shadow-lg border-0 overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10 border-b">
+              <CardTitle className="text-2xl flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                  <span className="text-lg font-bold">+</span>
+                </div>
+                Tạo Đơn Hàng Mới
+              </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="space-y-6"
                 >
-                  <Tabs value={activeTab} onValueChange={setActiveTab}>
-                    <TabsList className="grid w-full grid-cols-4">
-                      <TabsTrigger value="address">
-                        Thông Tin Địa Chỉ
+                  <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
+                    <TabsList className="grid w-full grid-cols-4 p-1 rounded-xl bg-gray-100">
+                      <TabsTrigger 
+                        value="address" 
+                        className={`rounded-lg ${activeTab === "address" ? "bg-white shadow-md" : ""} transition-all`}
+                      >
+                        <div className="flex flex-col items-center gap-1.5 py-1">
+                          <span className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "address" ? "bg-primary text-white" : "bg-gray-200"}`}>1</span>
+                          <span>Thông Tin Địa Chỉ</span>
+                        </div>
                       </TabsTrigger>
-                      <TabsTrigger value="package">
-                        Thông Tin Hàng Hóa
+                      <TabsTrigger 
+                        value="package"
+                        className={`rounded-lg ${activeTab === "package" ? "bg-white shadow-md" : ""} transition-all`}
+                      >
+                        <div className="flex flex-col items-center gap-1.5 py-1">
+                          <span className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "package" ? "bg-primary text-white" : "bg-gray-200"}`}>2</span>
+                          <span>Thông Tin Hàng Hóa</span>
+                        </div>
                       </TabsTrigger>
-                      <TabsTrigger value="service">Chọn Dịch Vụ</TabsTrigger>
-                      <TabsTrigger value="review">Xác Nhận</TabsTrigger>
+                      <TabsTrigger 
+                        value="service"
+                        className={`rounded-lg ${activeTab === "service" ? "bg-white shadow-md" : ""} transition-all`}
+                      >
+                        <div className="flex flex-col items-center gap-1.5 py-1">
+                          <span className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "service" ? "bg-primary text-white" : "bg-gray-200"}`}>3</span>
+                          <span>Chọn Dịch Vụ</span>
+                        </div>
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="review"
+                        className={`rounded-lg ${activeTab === "review" ? "bg-white shadow-md" : ""} transition-all`}
+                      >
+                        <div className="flex flex-col items-center gap-1.5 py-1">
+                          <span className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "review" ? "bg-primary text-white" : "bg-gray-200"}`}>4</span>
+                          <span>Xác Nhận</span>
+                        </div>
+                      </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="address">
-                      <div className="space-y-6">
-                        <AddressForm
-                          form={form}
-                          type="sender"
-                          title="Thông Tin Người Gửi"
-                        />
-                        <AddressForm
-                          form={form}
-                          type="receiver"
-                          title="Thông Tin Người Nhận"
-                        />
-                        <div className="flex justify-end">
+                    <TabsContent value="address" className="mt-6">
+                      <div className="space-y-8">
+                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                          <AddressForm
+                            form={form}
+                            type="sender"
+                            title="Thông Tin Người Gửi"
+                          />
+                        </div>
+                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                          <AddressForm
+                            form={form}
+                            type="receiver"
+                            title="Thông Tin Người Nhận"
+                          />
+                        </div>
+                        <div className="flex justify-end mt-6">
                           <Button
                             type="button"
                             onClick={() => setActiveTab("package")}
+                            className="px-6 py-5 rounded-lg gap-2 shadow-md hover:shadow-lg transition-all"
                           >
                             Tiếp Theo
+                            <span className="inline-block ml-1">→</span>
                           </Button>
                         </div>
                       </div>
                     </TabsContent>
 
-                    <TabsContent value="package">
+                    <TabsContent value="package" className="mt-6">
                       <div className="space-y-6">
-                        <PackageForm form={form} />
-                        <div className="flex justify-between">
+                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                          <PackageForm form={form} />
+                        </div>
+                        <div className="flex justify-between mt-6">
                           <Button
                             type="button"
                             variant="outline"
                             onClick={() => setActiveTab("address")}
+                            className="px-6 py-5 rounded-lg gap-2"
                           >
+                            <span className="inline-block mr-1">←</span>
                             Quay Lại
                           </Button>
                           <Button
                             type="button"
                             disabled={createShipmentMutation.isPending}
+                            className="px-6 py-5 rounded-lg gap-2 shadow-md hover:shadow-lg transition-all"
                             onClick={async () => {
                               try {
                                 const response = await fetch(
@@ -314,15 +359,25 @@ export default function CreateShippingPage() {
                                 );
 
                                 if (!response.ok) {
-                                  throw new Error("Failed to create shipment");
+                                  throw new Error("Không thể tạo đơn hàng");
                                 }
 
                                 const data = await response.json();
                                 if (data) {
-                                  setShipmentId(data.id); // Set the shipment ID
-                                  setActiveTab("service"); // Move to the "service" tab
+                                  setShipmentId(data.id);
+                                  toast({
+                                    title: "Đã lưu thông tin",
+                                    description: "Đang tìm báo giá từ các nhà vận chuyển",
+                                  });
+                                  setActiveTab("service");
                                 }
-                              } catch (error) {}
+                              } catch (error) {
+                                toast({
+                                  title: "Lỗi",
+                                  description: "Không thể tạo đơn hàng, vui lòng thử lại",
+                                  variant: "destructive",
+                                });
+                              }
                             }}
                           >
                             {createShipmentMutation.isPending ? (
@@ -331,21 +386,28 @@ export default function CreateShippingPage() {
                                 Đang xử lý...
                               </>
                             ) : (
-                              "Tiếp Theo"
+                              <>
+                                Tiếp Theo
+                                <span className="inline-block ml-1">→</span>
+                              </>
                             )}
                           </Button>
                         </div>
                       </div>
                     </TabsContent>
 
-                    <TabsContent value="service">
+                    <TabsContent value="service" className="mt-6">
                       <div className="space-y-6">
-                        <Card>
-                          <CardHeader>
-                            <CardTitle>Chọn Dịch Vụ Vận Chuyển</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            {shipmentId && activeTab === "service" ? (
+                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                          <div className="mb-4 flex items-center">
+                            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
+                              <span className="text-xl font-bold">$</span>
+                            </div>
+                            <h3 className="text-xl font-semibold">Chọn Dịch Vụ Vận Chuyển</h3>
+                          </div>
+                          
+                          {shipmentId && activeTab === "service" ? (
+                            <div className="py-3">
                               <ServiceQuoteForm
                                 key={`quote-form-${shipmentId}`}
                                 shipmentId={shipmentId}
@@ -354,59 +416,83 @@ export default function CreateShippingPage() {
                                     "shipment.provider_service_id",
                                     quote.id,
                                   );
+                                  toast({
+                                    title: "Đã chọn dịch vụ",
+                                    description: `Đã chọn ${quote.provider_name} - ${quote.service_name}`,
+                                  });
                                   setActiveTab("review");
                                 }}
                               />
-                            ) : (
-                              <div className="text-center py-4">
-                                <p>Vui lòng hoàn thành các bước trước</p>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                        <div className="flex justify-between">
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center py-12 text-center">
+                              <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+                              <p className="text-lg">Đang tải báo giá từ các nhà vận chuyển...</p>
+                              <p className="text-gray-500 mt-2">Vui lòng đợi trong giây lát</p>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex justify-between mt-6">
                           <Button
                             type="button"
                             variant="outline"
                             onClick={() => setActiveTab("package")}
+                            className="px-6 py-5 rounded-lg gap-2"
                           >
+                            <span className="inline-block mr-1">←</span>
                             Quay Lại
                           </Button>
                           <Button
                             type="button"
-                            onClick={() => setActiveTab("review")}
+                            onClick={() => {
+                              if (form.getValues().shipment.provider_service_id) {
+                                setActiveTab("review");
+                              } else {
+                                toast({
+                                  title: "Chưa chọn dịch vụ",
+                                  description: "Vui lòng chọn một dịch vụ vận chuyển trước khi tiếp tục",
+                                  variant: "destructive",
+                                });
+                              }
+                            }}
+                            className="px-6 py-5 rounded-lg gap-2 shadow-md hover:shadow-lg transition-all"
                           >
                             Tiếp Theo
+                            <span className="inline-block ml-1">→</span>
                           </Button>
                         </div>
                       </div>
                     </TabsContent>
 
-                    <TabsContent value="review">
+                    <TabsContent value="review" className="mt-6">
                       <div className="space-y-6">
                         {shipmentId && (
-                          <Card>
-                            <CardHeader>
-                              <CardTitle>Chi Tiết Đơn Hàng</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                              <div className="space-y-4">
-                                <ShippingSummary formData={form.getValues()} />
+                          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                            <div className="mb-4 flex items-center">
+                              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3">
+                                <span className="text-xl font-bold">✓</span>
                               </div>
-                            </CardContent>
-                          </Card>
+                              <h3 className="text-xl font-semibold">Chi Tiết Đơn Hàng</h3>
+                            </div>
+                            <div className="space-y-6">
+                              <ShippingSummary formData={form.getValues()} />
+                            </div>
+                          </div>
                         )}
-                        <div className="flex justify-between">
+                        <div className="flex justify-between mt-6">
                           <Button
                             type="button"
                             variant="outline"
                             onClick={() => setActiveTab("service")}
+                            className="px-6 py-5 rounded-lg gap-2"
                           >
+                            <span className="inline-block mr-1">←</span>
                             Quay Lại
                           </Button>
                           <Button
                             type="button"
                             disabled={createShipmentMutation.isPending}
+                            className="px-6 py-5 rounded-lg bg-gradient-to-r from-primary to-blue-600 hover:opacity-90 text-white shadow-md hover:shadow-lg transition-all"
                             onClick={async () => {
                               try {
                                 const response = await fetch(
@@ -421,7 +507,7 @@ export default function CreateShippingPage() {
 
                                 if (!response.ok) {
                                   throw new Error(
-                                    "Failed to complete shipment",
+                                    "Không thể hoàn thành đơn hàng",
                                   );
                                 }
 
@@ -443,11 +529,14 @@ export default function CreateShippingPage() {
                           >
                             {createShipmentMutation.isPending ? (
                               <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                                 Đang xử lý...
                               </>
                             ) : (
-                              "Hoàn Thành Đơn Hàng"
+                              <>
+                                Hoàn Thành Đơn Hàng
+                                <span className="inline-block ml-1">✓</span>
+                              </>
                             )}
                           </Button>
                         </div>

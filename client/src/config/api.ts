@@ -1,6 +1,6 @@
 // API Base URLs
 export const EXTERNAL_API_URL = "https://128.199.198.8/api/v1";
-export const API_BASE_URL = "/api/proxy"; // Using our server proxy to avoid CORS issues
+export const API_BASE_URL = "https://128.199.198.8/api/v1";
 
 export const API_ENDPOINTS = {
   // External API endpoints

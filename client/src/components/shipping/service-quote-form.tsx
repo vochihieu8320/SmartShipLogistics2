@@ -7,6 +7,8 @@ import { Loader2 } from "lucide-react";
 interface Quote {
   id: number;
   name: string;
+  provider_name: string;
+  service_name: string;
   prices: {
     net_price: number;
     fuel_surcharge: number;
