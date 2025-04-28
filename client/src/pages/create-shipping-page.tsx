@@ -140,7 +140,7 @@ export default function CreateShippingPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(data),
       });
@@ -352,7 +352,7 @@ export default function CreateShippingPage() {
                                     method: "POST",
                                     headers: {
                                       "Content-Type": "application/json",
-                                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                      Authorization: `${localStorage.getItem("token")}`,
                                     },
                                     body: JSON.stringify(form.getValues()),
                                   },
@@ -500,7 +500,7 @@ export default function CreateShippingPage() {
                                   {
                                     method: "POST",
                                     headers: {
-                                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                      Authorization: `${localStorage.getItem("token")}`,
                                     },
                                   },
                                 );

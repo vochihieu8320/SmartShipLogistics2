@@ -304,6 +304,18 @@ export function registerRoutes(app: Express): Server {
   // API endpoint for listing shipments
   app.get("/api/v1/shipments", async (req, res, next) => {
     try {
+      // Get auth token from request header and make it available to the external API call
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        console.log('[DEBUG] Using authorization token from request for shipments list');
+        (global as any).authToken = token;
+      } else {
+        console.log('[DEBUG] No authorization token in request headers');
+        delete (global as any).authToken;
+        return res.status(401).json({ error: "Authorization required" });
+      }
+      
       // Check if we should use the external API
       if (apiConfig.useExternalApi) {
         try {
