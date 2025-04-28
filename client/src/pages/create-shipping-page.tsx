@@ -184,25 +184,25 @@ export default function CreateShippingPage() {
       <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">SmartShip Pro</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">VN Logistics</span>
           </div>
           <nav className="hidden md:flex gap-8">
             <Link href="/">
               <a className="font-medium text-gray-600 hover:text-primary transition-colors">
-                Home
+                Trang Chủ
               </a>
             </Link>
             <Link href="/shipping">
-              <a className="font-medium text-primary border-b-2 border-primary pb-1">Shipping</a>
+              <a className="font-medium text-primary border-b-2 border-primary pb-1">Vận Chuyển</a>
             </Link>
             <Link href="/track">
               <a className="font-medium text-gray-600 hover:text-primary transition-colors">
-                Track
+                Theo Dõi
               </a>
             </Link>
             <Link href="/shipments">
               <a className="font-medium text-gray-600 hover:text-primary transition-colors">
-                Shipments
+                Đơn Hàng
               </a>
             </Link>
           </nav>
@@ -210,11 +210,11 @@ export default function CreateShippingPage() {
             {user ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm font-medium hidden md:inline-block">
-                  Welcome, <span className="text-primary font-semibold">{user.fullName}</span>
+                  Xin chào, <span className="text-primary font-semibold">{user.fullName}</span>
                 </span>
                 <Link href="/admin">
                   <Button variant="outline" className="hidden md:inline-flex hover:bg-primary hover:text-white transition-colors">
-                    Dashboard
+                    Bảng Điều Khiển
                   </Button>
                 </Link>
               </div>
@@ -222,11 +222,11 @@ export default function CreateShippingPage() {
               <>
                 <Link href="/auth">
                   <Button variant="outline" className="hidden md:inline-flex hover:bg-primary hover:text-white transition-colors">
-                    Log In
+                    Đăng Nhập
                   </Button>
                 </Link>
                 <Link href="/auth?register=true">
-                  <Button className="hidden md:inline-flex shadow-md hover:shadow-lg transition-shadow">Sign Up</Button>
+                  <Button className="hidden md:inline-flex shadow-md hover:shadow-lg transition-shadow">Đăng Ký</Button>
                 </Link>
               </>
             )}
@@ -237,8 +237,8 @@ export default function CreateShippingPage() {
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Tạo Đơn Hàng</h1>
-            <p className="text-gray-600 max-w-2xl mx-auto">Điền thông tin chi tiết để tạo đơn hàng mới và so sánh báo giá vận chuyển từ các nhà cung cấp hàng đầu.</p>
+            <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Tạo Đơn Vận Chuyển</h1>
+            <p className="text-gray-600 max-w-2xl mx-auto">Điền thông tin chi tiết để tạo đơn vận chuyển mới và so sánh báo giá từ các đối tác vận chuyển hàng đầu Việt Nam và Quốc tế.</p>
           </div>
 
           <Card className="shadow-lg border-0 overflow-hidden">
@@ -247,7 +247,7 @@ export default function CreateShippingPage() {
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
                   <span className="text-lg font-bold">+</span>
                 </div>
-                Tạo Đơn Hàng Mới
+                Đơn Hàng Vận Chuyển Mới
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
