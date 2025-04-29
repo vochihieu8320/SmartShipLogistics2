@@ -147,21 +147,51 @@ export default function ServiceQuoteForm({
                     )}
                     
                     {quote.prices.oversize_fee.some(fee => fee.applied_fees.length > 0) && (
-                      <div className="bg-gray-50 rounded-lg p-3">
-                        <p className="text-gray-500 text-xs uppercase font-medium mb-1">Phí Bổ Sung</p>
-                        <p className="font-semibold text-base">
-                          {formatCurrency(
-                            quote.prices.oversize_fee.reduce(
-                              (sum, fee) =>
-                                sum +
-                                fee.applied_fees.reduce(
-                                  (feeSum, applied) => feeSum + parseFloat(applied.amount),
-                                  0,
-                                ),
-                              0,
+                      <div className="bg-gray-50 rounded-lg p-3 md:col-span-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <p className="text-gray-500 text-xs uppercase font-medium">Phí Bổ Sung Kích Thước</p>
+                          <p className="font-semibold text-base">
+                            {formatCurrency(
+                              quote.prices.oversize_fee.reduce(
+                                (sum, fee) =>
+                                  sum +
+                                  fee.applied_fees.reduce(
+                                    (feeSum, applied) => feeSum + parseFloat(applied.amount),
+                                    0,
+                                  ),
+                                0,
+                              )
+                            )}
+                          </p>
+                        </div>
+                        
+                        <div className="mt-2 space-y-3 bg-white p-3 rounded-lg border border-gray-100">
+                          {quote.prices.oversize_fee.map((feePkg, pkgIndex) => (
+                            feePkg.applied_fees.length > 0 && (
+                              <div key={pkgIndex} className="border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
+                                <p className="text-sm font-medium text-gray-700 mb-1">
+                                  Kiện hàng #{feePkg.package + 1}
+                                </p>
+                                <div className="space-y-1">
+                                  {feePkg.applied_fees.map((fee, feeIndex) => (
+                                    <div key={feeIndex} className="flex justify-between text-sm">
+                                      <div className="flex items-start">
+                                        <span className="text-gray-600">{fee.display_name}</span>
+                                        {fee.note && (
+                                          <span className="ml-1 text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
+                                            {fee.note}
+                                          </span>
+                                        )}
+                                      </div>
+                                      <span className="font-medium">{formatCurrency(parseFloat(fee.amount))}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1 italic">{feePkg.applied_fees[0]?.description}</p>
+                              </div>
                             )
-                          )}
-                        </p>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
