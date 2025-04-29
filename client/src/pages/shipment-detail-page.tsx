@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
 import { API_BASE_URL } from "@/config/api";
-import { Loader2, ChevronLeft, Truck, Package, Calendar, Clock, MapPin, CreditCard, Check, AlertTriangle, X } from "lucide-react";
+import { Loader2, ChevronLeft, Truck, Package, Calendar, Clock, MapPin, CreditCard, Check, AlertTriangle, X, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,8 +34,8 @@ interface Shipment {
   tracking_number: string;
   status: string | null;
   created_at: string;
-  sender: Address;
-  receiver: Address;
+  sender_address: Address;
+  receiver_address: Address;
   total_price: number | null;
   provider?: string;
   provider_service?: string;
@@ -52,6 +52,195 @@ interface Shipment {
   payment_status?: string;
   estimated_delivery?: string;
 }
+
+interface DocumentsSectionProps {
+  shipmentId: string | number;
+}
+
+interface Credential {
+  id: number;
+  name: string;
+  url: string;
+  file_size?: string;
+  file_type?: string;
+}
+
+const DocumentsSection = ({ shipmentId }: DocumentsSectionProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [credentials, setCredentials] = useState<Credential[]>([]);
+
+  useEffect(() => {
+    const fetchCredentials = async () => {
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`${API_BASE_URL}/credentials?shipment_id=${shipmentId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error("Không thể tải danh sách chứng từ");
+        }
+        
+        const data = await response.json();
+        const credentialsList = data.credentials || [];
+        setCredentials(credentialsList);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Đã xảy ra lỗi khi tải chứng từ'));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchCredentials();
+  }, [shipmentId]);
+
+  // Hàm lấy icon dựa trên loại file
+  const getFileIcon = (fileType?: string) => {
+    // Nếu không có file type, mặc định là file document
+    if (!fileType) return (
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+        <polyline points="14 2 14 8 20 8" />
+      </svg>
+    );
+    
+    // Dựa vào file type để trả về icon phù hợp
+    const type = fileType.toLowerCase();
+    
+    if (type.includes('pdf')) {
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+          <path d="M9 15h6" />
+          <path d="M9 11h6" />
+        </svg>
+      );
+    } else if (type.includes('image') || type.includes('jpg') || type.includes('jpeg') || type.includes('png')) {
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <polyline points="21 15 16 10 5 21" />
+        </svg>
+      );
+    } else if (type.includes('excel') || type.includes('spreadsheet') || type.includes('xlsx') || type.includes('xls')) {
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+          <path d="M8 13h2" />
+          <path d="M8 17h2" />
+          <path d="M14 13h2" />
+          <path d="M14 17h2" />
+        </svg>
+      );
+    } else {
+      // Mặc định cho các loại file khác
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+        </svg>
+      );
+    }
+  };
+
+  // Xử lý tải xuống file
+  const handleDownload = (url: string, documentName: string) => {
+    // Kiểm tra URL
+    if (!url) {
+      alert('Không có URL tải xuống cho tài liệu này');
+      return;
+    }
+
+    // Tạo một thẻ a ẩn để tải xuống
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = documentName || 'document'; // Tên file khi tải xuống
+    anchor.target = '_blank'; // Mở trong tab mới nếu không thể tải trực tiếp
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <AlertTriangle className="h-10 w-10 text-yellow-500 mx-auto mb-4" />
+        <h3 className="text-lg font-medium mb-2">Không thể tải danh sách chứng từ</h3>
+        <p className="text-gray-500 max-w-md mx-auto">
+          Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ.
+        </p>
+        <Button 
+          variant="outline" 
+          className="mt-4"
+          onClick={() => window.location.reload()}
+        >
+          Tải lại
+        </Button>
+      </div>
+    );
+  }
+
+  if (credentials.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-medium mb-2">Chưa có chứng từ nào</h3>
+        <p className="text-gray-500 max-w-md mx-auto">
+          Đơn hàng này hiện chưa có chứng từ nào. Các chứng từ sẽ được tự động cập nhật khi có sẵn.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {credentials.map((credential) => (
+        <div key={credential.id} className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="bg-primary/10 p-2.5 rounded-lg mr-3">
+              {getFileIcon(credential.file_type)}
+            </div>
+            <div>
+              <h3 className="font-medium">{credential.name}</h3>
+              <p className="text-sm text-gray-500">
+                {credential.file_type?.toUpperCase() || 'PDF'}{credential.file_size ? `, ${credential.file_size}` : ''}
+              </p>
+            </div>
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => handleDownload(credential.url, credential.name)}
+          >
+            Tải xuống
+          </Button>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default function ShipmentDetailPage() {
   const [location] = useLocation();
@@ -195,134 +384,121 @@ export default function ShipmentDetailPage() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Button variant="outline" size="sm" asChild className="h-8">
-                <Link href="/shipments">
-                  <ChevronLeft className="h-4 w-4 mr-1" />
-                  Quay Lại
-                </Link>
-              </Button>
-              <Badge variant="outline" className={`px-3 py-1 border ${getStatusColor(shipment.status)}`}>
+            <Button variant="outline" size="sm" asChild className="mb-2">
+              <Link href="/shipments">
+                <ChevronLeft className="mr-1 h-4 w-4" />
+                Quay Lại Danh Sách
+              </Link>
+            </Button>
+            <h1 className="text-3xl font-bold flex items-center gap-3">
+              Đơn Hàng #{shipment.tracking_number}
+              <Badge variant="outline" className={`ml-2 ${getStatusColor(shipment.status)}`}>
                 <span className="flex items-center gap-1.5">
                   {getStatusIcon(shipment.status)}
                   {getStatusText(shipment.status)}
                 </span>
               </Badge>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold flex flex-wrap items-center gap-2">
-              Chi Tiết Đơn Vận Chuyển
-              <span className="text-gray-500 text-base font-medium">#{shipment.tracking_number}</span>
             </h1>
+            <p className="text-gray-600 mt-1">Tạo lúc: {formatDate(shipment.created_at)}</p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" className="gap-1">
-              <span className="mr-2">
-                <Printer />
-              </span>
-              In Hóa Đơn
+          
+          <div className="flex gap-3">
+            <Button variant="outline">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide mr-2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Tải PDF
             </Button>
-            <Button className="gap-1">
-              <CreditCard className="h-4 w-4" />
-              Thanh Toán
+            <Button>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide mr-2">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+              </svg>
+              In Đơn Hàng
             </Button>
           </div>
         </div>
-
-        <div className="bg-white rounded-xl shadow-md mb-6 p-4 border border-gray-200">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 flex items-start">
-              <div className="bg-primary/10 p-3 rounded-full mr-4">
-                <Calendar className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">Ngày Tạo</h3>
-                <p className="font-medium">{formatDate(shipment.created_at)}</p>
-              </div>
-            </div>
-            
-            <div className="p-4 flex items-start">
-              <div className="bg-primary/10 p-3 rounded-full mr-4">
-                <Package className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">Mã Vận Đơn</h3>
-                <p className="font-medium">{shipment.tracking_number}</p>
-              </div>
-            </div>
-            
-            <div className="p-4 flex items-start">
-              <div className="bg-primary/10 p-3 rounded-full mr-4">
-                <Truck className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">Dịch Vụ</h3>
-                <p className="font-medium">{shipment.provider || "Chưa chọn"} {shipment.provider_service && `- ${shipment.provider_service}`}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid w-full grid-cols-3 lg:w-auto">
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Tổng Quan</TabsTrigger>
             <TabsTrigger value="tracking">Theo Dõi</TabsTrigger>
-            <TabsTrigger value="documents">Tài Liệu</TabsTrigger>
+            <TabsTrigger value="documents">Chứng Từ</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="overview" className="mt-6">
+          <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2 space-y-6">
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg">Thông Tin Vận Chuyển</CardTitle>
+                    <CardTitle className="text-lg">Thông Tin Địa Chỉ</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-500 mb-2">Người Gửi</h3>
-                          <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                            <p className="font-medium">{shipment.sender.name}</p>
-                            {shipment.sender.company && <p className="text-gray-700">{shipment.sender.company}</p>}
-                            {shipment.sender.address1 && <p className="text-gray-700">{shipment.sender.address1}</p>}
-                            {shipment.sender.address2 && <p className="text-gray-700">{shipment.sender.address2}</p>}
-                            <p className="text-gray-700">{shipment.sender.city}, {shipment.sender.country}</p>
-                            {shipment.sender.phone && (
-                              <p className="text-gray-700 mt-2">
-                                <span className="font-medium">SĐT:</span> {shipment.sender.phone}
-                              </p>
-                            )}
-                            {shipment.sender.email && (
-                              <p className="text-gray-700">
-                                <span className="font-medium">Email:</span> {shipment.sender.email}
-                              </p>
-                            )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                              <circle cx="12" cy="10" r="3" />
+                            </svg>
                           </div>
+                          <h3 className="font-semibold text-lg">Người Gửi</h3>
+                        </div>
+                        <div className="ml-10">
+                          <p className="font-medium text-gray-900">{shipment.sender_address.name}</p>
+                          {shipment.sender_address.company && <p className="text-gray-700">{shipment.sender_address.company}</p>}
+                          {shipment.sender_address.address1 && <p className="text-gray-700">{shipment.sender_address.address1}</p>}
+                          {shipment.sender_address.address2 && <p className="text-gray-700">{shipment.sender_address.address2}</p>}
+                          <p className="text-gray-700">{shipment.sender_address.city}, {shipment.sender_address.country}</p>
+                          {shipment.sender_address.phone && (
+                            <p className="text-gray-700 mt-2">
+                              <span className="font-medium">SĐT:</span> {shipment.sender_address.phone}
+                            </p>
+                          )}
+                          {shipment.sender_address.email && (
+                            <p className="text-gray-700">
+                              <span className="font-medium">Email:</span> {shipment.sender_address.email}
+                            </p>
+                          )}
                         </div>
                       </div>
                       
-                      <div className="space-y-4">
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-500 mb-2">Người Nhận</h3>
-                          <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                            <p className="font-medium">{shipment.receiver.name}</p>
-                            {shipment.receiver.company && <p className="text-gray-700">{shipment.receiver.company}</p>}
-                            {shipment.receiver.address1 && <p className="text-gray-700">{shipment.receiver.address1}</p>}
-                            {shipment.receiver.address2 && <p className="text-gray-700">{shipment.receiver.address2}</p>}
-                            <p className="text-gray-700">{shipment.receiver.city}, {shipment.receiver.country}</p>
-                            {shipment.receiver.phone && (
-                              <p className="text-gray-700 mt-2">
-                                <span className="font-medium">SĐT:</span> {shipment.receiver.phone}
-                              </p>
-                            )}
-                            {shipment.receiver.email && (
-                              <p className="text-gray-700">
-                                <span className="font-medium">Email:</span> {shipment.receiver.email}
-                              </p>
-                            )}
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                              <path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14" />
+                              <path d="M16.5 9.4 7.55 4.24" />
+                              <polyline points="3.29 7 12 12 20.71 7" />
+                              <line x1="12" x2="12" y1="22" y2="12" />
+                              <circle cx="18.5" cy="15.5" r="2.5" />
+                              <path d="M20.27 17.27 22 19" />
+                            </svg>
                           </div>
+                          <h3 className="font-semibold text-lg">Người Nhận</h3>
+                        </div>
+                        <div className="ml-10">
+                          <p className="font-medium text-gray-900">{shipment.receiver_address.name}</p>
+                          {shipment.receiver_address.company && <p className="text-gray-700">{shipment.receiver_address.company}</p>}
+                          {shipment.receiver_address.address1 && <p className="text-gray-700">{shipment.receiver_address.address1}</p>}
+                          {shipment.receiver_address.address2 && <p className="text-gray-700">{shipment.receiver_address.address2}</p>}
+                          <p className="text-gray-700">{shipment.receiver_address.city}, {shipment.receiver_address.country}</p>
+                          {shipment.receiver_address.phone && (
+                            <p className="text-gray-700 mt-2">
+                              <span className="font-medium">SĐT:</span> {shipment.receiver_address.phone}
+                            </p>
+                          )}
+                          {shipment.receiver_address.email && (
+                            <p className="text-gray-700">
+                              <span className="font-medium">Email:</span> {shipment.receiver_address.email}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -492,61 +668,7 @@ export default function ShipmentDetailPage() {
                 <CardTitle>Tài Liệu & Hóa Đơn</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="bg-primary/10 p-2.5 rounded-lg mr-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                          <polyline points="14 2 14 8 20 8" />
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="font-medium">Vận Đơn</h3>
-                        <p className="text-sm text-gray-500">PDF, 156KB</p>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm">Tải xuống</Button>
-                  </div>
-                  
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="bg-primary/10 p-2.5 rounded-lg mr-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                          <polyline points="14 2 14 8 20 8" />
-                          <line x1="16" y1="13" x2="8" y2="13" />
-                          <line x1="16" y1="17" x2="8" y2="17" />
-                          <line x1="10" y1="9" x2="8" y2="9" />
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="font-medium">Hóa Đơn</h3>
-                        <p className="text-sm text-gray-500">PDF, 203KB</p>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm">Tải xuống</Button>
-                  </div>
-                  
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="bg-primary/10 p-2.5 rounded-lg mr-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                          <polyline points="14 2 14 8 20 8" />
-                          <path d="M16 18a2 2 0 0 1-2 2H6"></path>
-                          <path d="M16 8v10"></path>
-                          <path d="M12 20H6"></path>
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="font-medium">Biên Lai Giao Hàng</h3>
-                        <p className="text-sm text-gray-500">PDF, 148KB</p>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm">Tải xuống</Button>
-                  </div>
-                </div>
+                <DocumentsSection shipmentId={shipmentId} />
               </CardContent>
             </Card>
           </TabsContent>
