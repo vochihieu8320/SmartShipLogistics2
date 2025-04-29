@@ -94,31 +94,47 @@ export default function TrackingPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Truck className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">SmartShip Pro</span>
+            <Link href="/">
+              <a className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                VN Logistics
+              </a>
+            </Link>
           </div>
           <nav className="hidden md:flex gap-8">
             <Link href="/">
-              <a className="font-medium text-gray-600 hover:text-primary">Home</a>
+              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
+                Trang Chủ
+              </a>
             </Link>
-            <Link href="/shipping">
-              <a className="font-medium text-gray-600 hover:text-primary">Shipping</a>
+            <Link href="/shipping/create">
+              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
+                Vận Chuyển
+              </a>
             </Link>
             <Link href="/tracking">
-              <a className="font-medium text-primary">Track</a>
+              <a className="font-medium text-primary border-b-2 border-primary pb-1">
+                Theo Dõi
+              </a>
             </Link>
-            <a href="/#services" className="font-medium text-gray-600 hover:text-primary">Services</a>
-            <a href="/#contact" className="font-medium text-gray-600 hover:text-primary">Contact</a>
+            <Link href="/shipments">
+              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
+                Đơn Hàng
+              </a>
+            </Link>
           </nav>
           <div className="flex items-center gap-2">
             <Link href="/auth">
-              <Button variant="outline" className="hidden md:inline-flex">Log In</Button>
+              <Button variant="outline" className="hidden md:inline-flex hover:bg-primary hover:text-white transition-colors">
+                Đăng Nhập
+              </Button>
             </Link>
             <Link href="/auth?register=true">
-              <Button className="hidden md:inline-flex">Sign Up</Button>
+              <Button className="hidden md:inline-flex shadow-md hover:shadow-lg transition-shadow">
+                Đăng Ký
+              </Button>
             </Link>
             <Button variant="ghost" className="md:hidden p-2">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -134,25 +150,25 @@ export default function TrackingPage() {
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold mb-2">Track Your Shipment</h1>
+              <h1 className="text-3xl font-bold mb-2">Theo Dõi Đơn Hàng Của Bạn</h1>
               <p className="text-gray-600">
-                Enter your tracking number to get real-time updates on your shipment.
+                Nhập mã vận đơn để nhận thông tin cập nhật theo thời gian thực về lô hàng của bạn.
               </p>
             </div>
 
             {/* Tracking Form */}
             <Card className="mb-8">
               <CardHeader>
-                <CardTitle>Shipment Tracking</CardTitle>
+                <CardTitle>Theo Dõi Vận Đơn</CardTitle>
                 <CardDescription>
-                  Enter the tracking number provided in your shipping confirmation.
+                  Nhập mã vận đơn được cung cấp trong xác nhận vận chuyển của bạn.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
                     <Input
-                      placeholder="Enter tracking number (e.g. SHIP123456789)"
+                      placeholder="Nhập mã vận đơn (ví dụ: SHIP123456789)"
                       value={trackingNumber}
                       onChange={(e) => setTrackingNumber(e.target.value)}
                       className="w-full"
@@ -176,7 +192,7 @@ export default function TrackingPage() {
                 </form>
                 
                 <div className="mt-4 text-center">
-                  <p className="text-sm text-gray-500 mb-2">Don't have a tracking number?</p>
+                  <p className="text-sm text-gray-500 mb-2">Bạn chưa có mã vận đơn?</p>
                   <Button 
                     variant="outline" 
                     onClick={loadDemoTracking} 
@@ -186,10 +202,10 @@ export default function TrackingPage() {
                     {isDemoLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Loading demo...
+                        Đang tải...
                       </>
                     ) : (
-                      "Try a demo tracking number"
+                      "Dùng thử mã vận đơn mẫu"
                     )}
                   </Button>
                 </div>
@@ -242,7 +258,7 @@ export default function TrackingPage() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Truck className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold text-white">SmartShip Pro</span>
+                <span className="text-xl font-bold text-white">VN Logistics</span>
               </div>
               <p className="text-sm">
                 Global logistics solutions for businesses and individuals.
@@ -252,9 +268,10 @@ export default function TrackingPage() {
             <div className="text-sm">
               <h4 className="text-white text-lg font-semibold mb-2">Quick Links</h4>
               <ul className="space-y-1">
-                <li><a href="/" className="hover:text-primary">Home</a></li>
-                <li><a href="/shipping" className="hover:text-primary">Shipping</a></li>
-                <li><a href="/tracking" className="hover:text-primary">Tracking</a></li>
+                <li><a href="/" className="hover:text-primary">Trang Chủ</a></li>
+                <li><a href="/shipping/create" className="hover:text-primary">Vận Chuyển</a></li>
+                <li><a href="/tracking" className="hover:text-primary">Theo Dõi</a></li>
+                <li><a href="/shipments" className="hover:text-primary">Đơn Hàng</a></li>
               </ul>
             </div>
             
@@ -278,7 +295,7 @@ export default function TrackingPage() {
           </div>
           
           <div className="border-t border-gray-800 mt-6 pt-4 text-center text-sm">
-            <p>© {new Date().getFullYear()} SmartShip Pro. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} VN Logistics. All rights reserved.</p>
           </div>
         </div>
       </footer>
