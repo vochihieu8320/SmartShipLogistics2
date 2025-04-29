@@ -238,7 +238,10 @@ export default function ShipmentsPage() {
                         <TableCell>{shipment.provider || "-"}</TableCell>
                         <TableCell className="text-right">
                           {shipment.total_price !== null && shipment.total_price !== undefined ? 
-                            `${shipment.total_price.toLocaleString('vi-VN')} VND` : "-"}
+                            new Intl.NumberFormat("vi-VN", {
+                              style: "currency",
+                              currency: "VND"
+                            }).format(shipment.total_price) : "-"}
                         </TableCell>
                         <TableCell>
                           <Button variant="ghost" size="icon" asChild>
