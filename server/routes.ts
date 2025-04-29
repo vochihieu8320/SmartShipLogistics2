@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { insertOrderSchema, insertPaymentSchema, insertAddressSchema } from "@shared/schema";
 import { z } from "zod";
 import { apiConfig } from "./config";
+import { apiProxyMiddleware, setupApiProxy } from "./proxy";
 
 // Extend global interface to include our authToken for TypeScript
 declare global {
