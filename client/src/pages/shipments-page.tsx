@@ -238,7 +238,7 @@ export default function ShipmentsPage() {
                         <TableCell>{shipment.provider || "-"}</TableCell>
                         <TableCell className="text-right">
                           {shipment.total_price !== null && shipment.total_price !== undefined ? 
-                            `$${shipment.total_price}` : "-"}
+                            `${shipment.total_price.toLocaleString('vi-VN')} VND` : "-"}
                         </TableCell>
                         <TableCell>
                           <Button variant="ghost" size="icon" asChild>

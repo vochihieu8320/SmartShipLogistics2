@@ -323,27 +323,27 @@ export default function HomePage() {
               <ul className="space-y-2">
                 <li>
                   <a href="/" className="hover:text-primary">
-                    Home
+                    Trang Chủ
                   </a>
                 </li>
                 <li>
                   <a href="/shipping/create" className="hover:text-primary">
-                    Shipping
+                    Vận chuyển
                   </a>
                 </li>
                 <li>
                   <a href="/tracking" className="hover:text-primary">
-                    Tracking
+                    Theo dõi
                   </a>
                 </li>
                 <li>
                   <a href="/shipments" className="hover:text-primary">
-                    Shipments
+                    Đơn hàng
                   </a>
                 </li>
                 <li>
                   <a href="#services" className="hover:text-primary">
-                    Services
+                    Dịch vụ
                   </a>
                 </li>
                 <li>
