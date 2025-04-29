@@ -223,14 +223,14 @@ export function DocumentUpload({ shipmentId }: DocumentUploadProps) {
         );
     }
   };
-  
+
   // Lấy tên tương ứng với loại chứng từ
   const getDocumentName = (key: string) => {
     switch (key) {
       case "house_bill":
-        return "Vận Đơn Đường Biển";
+        return "House Bill";
       case "air_way_bill":
-        return "Vận Đơn Hàng Không";
+        return "AirWay Bill";
       case "invoice":
         return "Hóa Đơn";
       case "fda":
@@ -245,57 +245,59 @@ export function DocumentUpload({ shipmentId }: DocumentUploadProps) {
         return "Tài Liệu";
     }
   };
-  
+
   const handleUpload = async (documentType: string) => {
     try {
       // Hiển thị trạng thái đang upload cho loại chứng từ này
-      setIsUploading(prev => ({ ...prev, [documentType]: true }));
+      setIsUploading((prev) => ({ ...prev, [documentType]: true }));
       setUploadError(null);
 
       // Mở cửa sổ chọn file
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png';
-      
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".pdf,.doc,.docx,.jpg,.jpeg,.png";
+
       input.onchange = async (e) => {
         const file = (e.target as HTMLInputElement).files?.[0];
         if (!file) {
-          setIsUploading(prev => ({ ...prev, [documentType]: false }));
+          setIsUploading((prev) => ({ ...prev, [documentType]: false }));
           return;
         }
 
         // Tạo FormData để gửi file
         const formData = new FormData();
-        formData.append('type', documentType);
-        formData.append('file', file);
+        formData.append("type", documentType);
+        formData.append("file", file);
 
         // Lấy token từ localStorage
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         if (!token) {
-          setUploadError('Không tìm thấy token xác thực. Vui lòng đăng nhập lại.');
-          setIsUploading(prev => ({ ...prev, [documentType]: false }));
+          setUploadError(
+            "Không tìm thấy token xác thực. Vui lòng đăng nhập lại.",
+          );
+          setIsUploading((prev) => ({ ...prev, [documentType]: false }));
           return;
         }
 
         // Gọi API upload file
         const url = `${API_BASE_URL}/credentials/upload?shipment_id=${shipmentId}`;
         const response = await fetch(url, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
-          body: formData
+          body: formData,
         });
 
         // Xử lý kết quả
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || 'Không thể tải lên chứng từ');
+          throw new Error(errorData.message || "Không thể tải lên chứng từ");
         }
 
         // Tải lại danh sách chứng từ sau khi upload thành công
         fetchCredentials();
-        
+
         // Hiển thị thông báo thành công
         alert(`Đã tải lên ${getDocumentName(documentType)} thành công!`);
       };
@@ -303,17 +305,21 @@ export function DocumentUpload({ shipmentId }: DocumentUploadProps) {
       // Kích hoạt chọn file
       input.click();
     } catch (error) {
-      console.error('Upload error:', error);
-      setUploadError(error instanceof Error ? error.message : 'Đã có lỗi xảy ra khi tải lên chứng từ');
+      console.error("Upload error:", error);
+      setUploadError(
+        error instanceof Error
+          ? error.message
+          : "Đã có lỗi xảy ra khi tải lên chứng từ",
+      );
     } finally {
-      setIsUploading(prev => ({ ...prev, [documentType]: false }));
+      setIsUploading((prev) => ({ ...prev, [documentType]: false }));
     }
   };
 
   // Kiểm tra xem có các chứng từ bắt buộc hay không
-  const hasHouseBill = credentials.some(c => c.key === "house_bill");
-  const hasAirWayBill = credentials.some(c => c.key === "air_way_bill");
-  const hasInvoice = credentials.some(c => c.key === "invoice");
+  const hasHouseBill = credentials.some((c) => c.key === "house_bill");
+  const hasAirWayBill = credentials.some((c) => c.key === "air_way_bill");
+  const hasInvoice = credentials.some((c) => c.key === "invoice");
 
   if (isLoading) {
     return (
@@ -388,31 +394,45 @@ export function DocumentUpload({ shipmentId }: DocumentUploadProps) {
                 {getFileIcon(credential.key)}
               </div>
               <div>
-                <h3 className="font-medium">{getDocumentName(credential.key)}</h3>
+                <h3 className="font-medium">
+                  {getDocumentName(credential.key)}
+                </h3>
                 <p className="text-sm text-gray-500">
-                  PDF, {credential.updated_at ? new Date(credential.updated_at).toLocaleDateString("vi-VN") : ""}
+                  PDF,{" "}
+                  {credential.updated_at
+                    ? new Date(credential.updated_at).toLocaleDateString(
+                        "vi-VN",
+                      )
+                    : ""}
                 </p>
               </div>
             </div>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handleDownload(credential.value, getDocumentName(credential.key))}
+              onClick={() =>
+                handleDownload(
+                  credential.value,
+                  getDocumentName(credential.key),
+                )
+              }
             >
               Tải xuống
             </Button>
           </div>
         ))}
       </div>
-      
+
       {/* Hiển thị các nút tải lên cho chứng từ bắt buộc còn thiếu */}
       {(!hasHouseBill || !hasAirWayBill || !hasInvoice) && (
         <div className="mt-6">
-          <h3 className="text-md font-medium mb-3">Tải lên chứng từ còn thiếu</h3>
+          <h3 className="text-md font-medium mb-3">
+            Tải lên chứng từ còn thiếu
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {!hasHouseBill && (
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="flex items-center gap-2"
                 onClick={() => handleUpload("house_bill")}
                 disabled={isUploading["house_bill"]}
@@ -439,10 +459,10 @@ export function DocumentUpload({ shipmentId }: DocumentUploadProps) {
                 Vận Đơn Đường Biển
               </Button>
             )}
-            
+
             {!hasAirWayBill && (
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="flex items-center gap-2"
                 onClick={() => handleUpload("air_way_bill")}
                 disabled={isUploading["air_way_bill"]}
@@ -469,10 +489,10 @@ export function DocumentUpload({ shipmentId }: DocumentUploadProps) {
                 Vận Đơn Hàng Không
               </Button>
             )}
-            
+
             {!hasInvoice && (
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="flex items-center gap-2"
                 onClick={() => handleUpload("invoice")}
                 disabled={isUploading["invoice"]}
@@ -502,11 +522,11 @@ export function DocumentUpload({ shipmentId }: DocumentUploadProps) {
           </div>
         </div>
       )}
-      
+
       {/* Menu chọn loại chứng từ khác để tải lên */}
       <div className="text-center mt-4">
         <div className="relative inline-block">
-          <select 
+          <select
             className="appearance-none bg-transparent border border-gray-300 rounded-md py-2 pl-4 pr-10 text-sm font-medium"
             onChange={(e) => {
               const value = e.target.value;
@@ -517,7 +537,9 @@ export function DocumentUpload({ shipmentId }: DocumentUploadProps) {
             }}
             defaultValue=""
           >
-            <option value="" disabled>Tải lên chứng từ khác</option>
+            <option value="" disabled>
+              Tải lên chứng từ khác
+            </option>
             <option value="fda">Giấy Phép FDA</option>
             <option value="msds">Phiếu An Toàn Hóa Chất (MSDS)</option>
             <option value="fumigation">Giấy Chứng Nhận Xông Hơi</option>
@@ -541,7 +563,7 @@ export function DocumentUpload({ shipmentId }: DocumentUploadProps) {
           </div>
         </div>
       </div>
-      
+
       {/* Hiển thị lỗi upload nếu có */}
       {uploadError && (
         <div className="bg-red-50 text-red-700 p-3 rounded-md mt-4 text-sm border border-red-200">

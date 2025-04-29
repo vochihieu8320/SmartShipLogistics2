@@ -207,12 +207,12 @@ export default function ShipmentDetailPage() {
                 Trang Chủ
               </a>
             </Link>
-            <Link href="/shipping">
+            <Link href="/shipping/create">
               <a className="font-medium text-gray-600 hover:text-primary transition-colors">
                 Vận Chuyển
               </a>
             </Link>
-            <Link href="/track">
+            <Link href="/tracking">
               <a className="font-medium text-gray-600 hover:text-primary transition-colors">
                 Theo Dõi
               </a>
@@ -559,7 +559,7 @@ export default function ShipmentDetailPage() {
                       <div className="flex justify-between">
                         <span className="text-gray-600">Tổng tiền</span>
                         <span className="font-medium">
-                          ${shipment.total_price?.toFixed(2) || "0.00"}
+                          ${shipment.total_price || "0.00"}
                         </span>
                       </div>
 

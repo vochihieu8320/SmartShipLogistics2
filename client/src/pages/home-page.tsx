@@ -327,7 +327,7 @@ export default function HomePage() {
                   </a>
                 </li>
                 <li>
-                  <a href="/shipping" className="hover:text-primary">
+                  <a href="/shipping/create" className="hover:text-primary">
                     Shipping
                   </a>
                 </li>
