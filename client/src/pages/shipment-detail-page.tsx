@@ -277,9 +277,9 @@ const DocumentsSection = ({ shipmentId }: DocumentsSectionProps) => {
   const getDocumentName = (key: string) => {
     switch (key) {
       case "house_bill":
-        return "Vận Đơn Đường Biển";
+        return "House Bill";
       case "air_way_bill":
-        return "Vận Đơn Hàng Không";
+        return "AirWay bill";
       case "invoice":
         return "Hóa Đơn";
       case "fda":
@@ -377,9 +377,104 @@ const DocumentsSection = ({ shipmentId }: DocumentsSectionProps) => {
   const hasAirWayBill = credentials.some(c => c.key === "air_way_bill");
   const hasInvoice = credentials.some(c => c.key === "invoice");
   
-  const handleUpload = (documentType: string) => {
-    // Hiện tại chỉ là hàm giả lập để xử lý tải lên
-    alert(`Chức năng tải lên ${getDocumentName(documentType)} sẽ được triển khai sau.`);
+  const [isUploading, setIsUploading] = useState<Record<string, boolean>>({});
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const handleUpload = async (documentType: string) => {
+    try {
+      // Hiển thị trạng thái đang upload cho loại chứng từ này
+      setIsUploading(prev => ({ ...prev, [documentType]: true }));
+      setUploadError(null);
+
+      // Mở cửa sổ chọn file
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png';
+      
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) {
+          setIsUploading(prev => ({ ...prev, [documentType]: false }));
+          return;
+        }
+
+        // Tạo FormData để gửi file
+        const formData = new FormData();
+        formData.append('type', documentType);
+        formData.append('file', file);
+
+        // Lấy token từ localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setUploadError('Không tìm thấy token xác thực. Vui lòng đăng nhập lại.');
+          setIsUploading(prev => ({ ...prev, [documentType]: false }));
+          return;
+        }
+
+        // Gọi API upload file
+        const url = `${API_BASE_URL}/credentials/upload?shipment_id=${shipmentId}`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+
+        // Xử lý kết quả
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Không thể tải lên chứng từ');
+        }
+
+        // Tải lại danh sách chứng từ sau khi upload thành công
+        fetchCredentials();
+        
+        // Hiển thị thông báo thành công
+        alert(`Đã tải lên ${getDocumentName(documentType)} thành công!`);
+      };
+
+      // Kích hoạt chọn file
+      input.click();
+    } catch (error) {
+      console.error('Upload error:', error);
+      setUploadError(error instanceof Error ? error.message : 'Đã có lỗi xảy ra khi tải lên chứng từ');
+    } finally {
+      setIsUploading(prev => ({ ...prev, [documentType]: false }));
+    }
+  };
+  
+  const fetchCredentials = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${API_BASE_URL}/credentials?shipment_id=${shipmentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Không thể tải danh sách chứng từ");
+      }
+
+      const data = await response.json();
+      const credentialsList = data.credentials || [];
+      setCredentials(credentialsList);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err
+          : new Error("Đã xảy ra lỗi khi tải chứng từ"),
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -439,7 +534,7 @@ const DocumentsSection = ({ shipmentId }: DocumentsSectionProps) => {
                   <polyline points="17 8 12 3 7 8" />
                   <line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
-                Vận Đơn Đường Biển
+                House Bill
               </Button>
             )}
             
@@ -464,7 +559,7 @@ const DocumentsSection = ({ shipmentId }: DocumentsSectionProps) => {
                   <polyline points="17 8 12 3 7 8" />
                   <line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
-                Vận Đơn Hàng Không
+                AirWay Bill
               </Button>
             )}
             
@@ -496,27 +591,69 @@ const DocumentsSection = ({ shipmentId }: DocumentsSectionProps) => {
         </div>
       )}
       
-      {/* Nút tải lên thêm chứng từ khác */}
+      {/* Menu chọn loại chứng từ khác để tải lên */}
       <div className="text-center mt-4">
-        <Button variant="outline" className="flex items-center gap-2 mx-auto">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        <div className="relative inline-block">
+          <select 
+            className="appearance-none bg-transparent border border-gray-300 rounded-md py-2 pl-4 pr-10 text-sm font-medium"
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value) {
+                handleUpload(value);
+                e.target.value = ""; // Reset select sau khi chọn
+              }
+            }}
+            defaultValue=""
           >
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="17 8 12 3 7 8" />
-            <line x1="12" y1="3" x2="12" y2="15" />
-          </svg>
-          Tải lên chứng từ khác
-        </Button>
+            <option value="" disabled>Tải lên chứng từ khác</option>
+            <option value="fda">Giấy Phép FDA</option>
+            <option value="msds">Phiếu An Toàn Hóa Chất (MSDS)</option>
+            <option value="fumigation">Giấy Chứng Nhận Xông Hơi</option>
+            <option value="other">Tài Liệu Khác</option>
+          </select>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-gray-500"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </div>
+        </div>
       </div>
+      
+      {/* Hiển thị lỗi upload nếu có */}
+      {uploadError && (
+        <div className="bg-red-50 text-red-700 p-3 rounded-md mt-4 text-sm border border-red-200">
+          <div className="flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-red-500"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            {uploadError}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
