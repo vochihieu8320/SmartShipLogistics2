@@ -398,7 +398,7 @@ const DocumentsSection = ({ shipmentId }: DocumentsSectionProps) => {
               <div>
                 <h3 className="font-medium">{getDocumentName(credential.key)}</h3>
                 <p className="text-sm text-gray-500">
-                  PDF, {formatDate(credential.updated_at)}
+                  PDF, {credential.updated_at ? new Date(credential.updated_at).toLocaleDateString("vi-VN") : ""}
                 </p>
               </div>
             </div>
@@ -599,14 +599,7 @@ export default function ShipmentDetailPage() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return format(date, "dd/MM/yyyy HH:mm", { locale: vi });
-    } catch (e) {
-      return dateString;
-    }
-  };
+
 
   if (isLoading) {
     return (
@@ -695,7 +688,13 @@ export default function ShipmentDetailPage() {
               </Badge>
             </h1>
             <p className="text-gray-600 mt-1">
-              Tạo lúc: {formatDate(shipment.created_at)}
+              Tạo lúc: {new Date(shipment.created_at).toLocaleDateString("vi-VN", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+              })}
             </p>
           </div>
 
