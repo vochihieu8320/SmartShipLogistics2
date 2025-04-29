@@ -47,6 +47,26 @@ interface Address {
   email?: string;
 }
 
+interface AppliedFee {
+  name: string;
+  display_name: string;
+  amount: string;
+  description: string;
+  note: string | null;
+}
+
+interface PackageFee {
+  package: number;
+  applied_fees: AppliedFee[];
+}
+
+interface ShipmentPrices {
+  net_price: number;
+  fuel_surcharge: number;
+  peak_season: number;
+  oversize_fee: PackageFee[];
+}
+
 interface Shipment {
   id: number;
   tracking_number: string;
@@ -69,6 +89,7 @@ interface Shipment {
   };
   payment_status?: string;
   estimated_delivery?: string;
+  prices?: ShipmentPrices;
 }
 
 export default function ShipmentDetailPage() {
@@ -556,16 +577,124 @@ export default function ShipmentDetailPage() {
 
                       <Separator />
 
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Tổng tiền</span>
-                        <span className="font-medium">
-                          ${shipment.total_price || "0.00"}
-                        </span>
-                      </div>
+                      {shipment.prices ? (
+                        <>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Giá gốc</span>
+                            <span className="font-medium">
+                              {new Intl.NumberFormat("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              }).format(shipment.prices.net_price || 0)}
+                            </span>
+                          </div>
+                          
+                          {shipment.prices.fuel_surcharge > 0 && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Phụ phí nhiên liệu</span>
+                              <span className="font-medium">
+                                {new Intl.NumberFormat("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                }).format((shipment.prices.net_price * shipment.prices.fuel_surcharge) / 100)}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {shipment.prices.peak_season > 0 && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Phụ phí cao điểm</span>
+                              <span className="font-medium">
+                                {new Intl.NumberFormat("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                }).format((shipment.prices.net_price * shipment.prices.peak_season) / 100)}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {shipment.prices.oversize_fee.some(fee => fee.applied_fees.length > 0) && (
+                            <div className="mt-4">
+                              <div className="flex justify-between items-center mb-2">
+                                <span className="text-gray-600 font-medium">Phí bổ sung kích thước</span>
+                                <span className="font-medium">
+                                  {new Intl.NumberFormat("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  }).format(
+                                    shipment.prices.oversize_fee.reduce(
+                                      (sum, fee) =>
+                                        sum +
+                                        fee.applied_fees.reduce(
+                                          (feeSum, applied) => feeSum + parseFloat(applied.amount),
+                                          0,
+                                        ),
+                                      0,
+                                    )
+                                  )}
+                                </span>
+                              </div>
+                              
+                              <div className="mt-2 space-y-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                {shipment.prices.oversize_fee.map((feePkg, pkgIndex) => (
+                                  feePkg.applied_fees.length > 0 && (
+                                    <div key={pkgIndex} className="border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
+                                      <p className="text-sm font-medium text-gray-700 mb-1">
+                                        Kiện hàng #{feePkg.package + 1}
+                                      </p>
+                                      <div className="space-y-1">
+                                        {feePkg.applied_fees.map((fee, feeIndex) => (
+                                          <div key={feeIndex} className="flex justify-between text-sm">
+                                            <div className="flex items-start">
+                                              <span className="text-gray-600">{fee.display_name}</span>
+                                              {fee.note && (
+                                                <span className="ml-1 text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
+                                                  {fee.note}
+                                                </span>
+                                              )}
+                                            </div>
+                                            <span className="font-medium">
+                                              {new Intl.NumberFormat("vi-VN", {
+                                                style: "currency",
+                                                currency: "VND",
+                                              }).format(parseFloat(fee.amount))}
+                                            </span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                      <p className="text-xs text-gray-500 mt-1 italic">{feePkg.applied_fees[0]?.description}</p>
+                                    </div>
+                                  )
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div className="flex justify-between py-2 mt-2 font-semibold">
+                            <span className="text-gray-700">Tổng tiền</span>
+                            <span className="text-primary text-lg">
+                              {new Intl.NumberFormat("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              }).format(shipment.total_price || 0)}
+                            </span>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Tổng tiền</span>
+                          <span className="font-medium">
+                            {new Intl.NumberFormat("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            }).format(shipment.total_price || 0)}
+                          </span>
+                        </div>
+                      )}
 
                       <Separator />
 
-                      <div className="space-y-1">
+                      <div className="space-y-2">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Nhà vận chuyển</span>
                           <span className="font-medium">
@@ -583,16 +712,6 @@ export default function ShipmentDetailPage() {
                       <Separator />
 
                       <div className="space-y-2">
-                        {shipment.provider && (
-                          <p>
-                            <strong>Nhà Vận Chuyển:</strong> {shipment.provider}
-                          </p>
-                        )}
-                        {shipment.provider_service && (
-                          <p>
-                            <strong>Dịch Vụ:</strong> {shipment.provider_service}
-                          </p>
-                        )}
                         {shipment.estimated_delivery && (
                           <p>
                             <strong>Giao Hàng Dự Kiến:</strong>{" "}
