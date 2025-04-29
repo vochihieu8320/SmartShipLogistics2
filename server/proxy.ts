@@ -1,4 +1,4 @@
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import { createProxyMiddleware, RequestHandler } from 'http-proxy-middleware';
 import { Request, Response, NextFunction } from 'express';
 import { log } from './vite';
 
@@ -6,7 +6,7 @@ import { log } from './vite';
 const EXTERNAL_API_URL = process.env.EXTERNAL_API_URL || 'https://209.97.171.114/api/v1';
 
 // API proxy middleware for external API
-export const apiProxyMiddleware = createProxyMiddleware({
+export const apiProxyMiddleware: RequestHandler = createProxyMiddleware({
   target: EXTERNAL_API_URL,
   changeOrigin: true,
   pathRewrite: {
@@ -14,10 +14,10 @@ export const apiProxyMiddleware = createProxyMiddleware({
   },
   secure: false, // if you're using HTTPS but want to ignore certificate verification
   logLevel: 'debug',
-  onProxyRes: (proxyRes, req, res) => {
+  onProxyRes: (proxyRes: any, req: Request, res: Response) => {
     log(`Proxied request: ${req.method} ${req.url} -> ${proxyRes.statusCode}`, 'proxy');
   },
-  onError: (err, req, res) => {
+  onError: (err: Error, req: Request, res: Response) => {
     log(`Proxy error: ${err.message}`, 'proxy');
     res.writeHead(500, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ 

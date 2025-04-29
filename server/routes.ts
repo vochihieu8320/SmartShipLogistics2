@@ -49,6 +49,10 @@ export function registerRoutes(app: Express): Server {
     next();
   });
   
+  // Set up API proxy for external API calls
+  app.use('/api/external', setupApiProxy);
+  app.use('/api/external', apiProxyMiddleware);
+  
   // API Configuration endpoint - expose configuration to the client
   app.get("/api/config", (req, res) => {
     // Only expose what the client needs to know
