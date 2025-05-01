@@ -4,6 +4,7 @@ import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import BookingPage from "@/pages/booking-page";
+import AdminBookingPage from "@/pages/admin-booking-page";
 import OrdersPage from "@/pages/orders-page";
 import FinancePage from "@/pages/finance-page";
 import ReportsPage from "@/pages/reports-page";
@@ -48,7 +49,7 @@ function App() {
 
               {/* Protected admin dashboard routes */}
               <ProtectedRoute path="/admin" component={DashboardPage} />
-              <ProtectedRoute path="/admin/booking" component={BookingPage} />
+              <ProtectedRoute path="/admin/booking" component={AdminBookingPage} />
               <ProtectedRoute path="/admin/orders" component={OrdersPage} />
               <ManagerRoute path="/admin/finance" component={FinancePage} />
               <ManagerRoute path="/admin/reports" component={ReportsPage} />
