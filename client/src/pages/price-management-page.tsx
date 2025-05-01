@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,15 +25,6 @@ interface NetPrice {
   prices: string;
 }
 
-interface OtherFee {
-  id: number;
-  name: string;
-  display_name: string;
-  description: string;
-  amount: string;
-  unit: string;
-}
-
 export default function PriceManagementPage() {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [services, setServices] = useState<ProviderService[]>([]);
@@ -42,7 +32,7 @@ export default function PriceManagementPage() {
   const [selectedProvider, setSelectedProvider] = useState<string>("");
   const [selectedService, setSelectedService] = useState<string>("");
   const [selectedCountry, setSelectedCountry] = useState<string>("");
-  const [prices, setPrices] = useState<{ net_prices: NetPrice[], other_fees: OtherFee[] }>();
+  const [prices, setPrices] = useState<NetPrice[]>([]);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -72,7 +62,7 @@ export default function PriceManagementPage() {
   useEffect(() => {
     if (selectedProvider && selectedService && selectedCountry) {
       api.get(`/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}&country_id=${selectedCountry}`)
-        .then(data => setPrices(data))
+        .then(data => setPrices(data.net_prices))
         .catch(error => console.error("Error fetching prices:", error));
     }
   }, [selectedProvider, selectedService, selectedCountry]);
@@ -132,54 +122,23 @@ export default function PriceManagementPage() {
             </Select>
           </div>
 
-          {prices && (
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-medium mb-4">Net Prices</h3>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Weight (kg)</TableHead>
-                      <TableHead>Price</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {prices.net_prices.map((price, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{price.weight}</TableCell>
-                        <TableCell>{formatPrice(price.prices)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-medium mb-4">Other Fees</h3>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Display Name</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Unit</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {prices.other_fees.map((fee) => (
-                      <TableRow key={fee.id}>
-                        <TableCell>{fee.name}</TableCell>
-                        <TableCell>{fee.display_name}</TableCell>
-                        <TableCell>{fee.description}</TableCell>
-                        <TableCell>{fee.amount}</TableCell>
-                        <TableCell>{fee.unit}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
+          {prices.length > 0 && (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Weight (kg)</TableHead>
+                  <TableHead>Price</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {prices.map((price, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{price.weight}</TableCell>
+                    <TableCell>{formatPrice(price.prices)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>
