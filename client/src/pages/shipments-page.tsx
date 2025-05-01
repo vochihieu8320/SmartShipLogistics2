@@ -10,6 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertCircle, ChevronRight, Loader2, PackageOpen, Plus, Search, Truck } from "lucide-react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import Header from "@/components/Header"; // Assuming Header component is in "@/components/Header"
+
 
 interface Shipment {
   id: number;
@@ -35,7 +37,7 @@ interface Shipment {
 export default function ShipmentsPage() {
   const [, navigate] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   const { data: shipments, isLoading, error } = useQuery<Shipment[]>({
     queryKey: ["/shipments"],
     queryFn: async () => {
@@ -44,17 +46,17 @@ export default function ShipmentsPage() {
         navigate("/auth");
         return [];
       }
-      
+
       const response = await fetch(`${API_BASE_URL}/shipments`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      
+
       if (!response.ok) {
         throw new Error("Không thể tải danh sách vận chuyển");
       }
-      
+
       const data = await response.json();
       return data.shipments || [];
     },
@@ -62,23 +64,23 @@ export default function ShipmentsPage() {
 
   const filteredShipments = shipments?.filter(shipment => {
     if (!shipment) return false;
-    
+
     const trackingMatch = shipment.tracking_number 
       ? shipment.tracking_number.toLowerCase().includes(searchTerm.toLowerCase()) 
       : false;
-      
+
     const senderMatch = shipment.sender?.name 
       ? shipment.sender.name.toLowerCase().includes(searchTerm.toLowerCase()) 
       : false;
-      
+
     const receiverMatch = shipment.receiver?.name 
       ? shipment.receiver.name.toLowerCase().includes(searchTerm.toLowerCase()) 
       : false;
-      
+
     const providerMatch = shipment.provider 
       ? shipment.provider.toLowerCase().includes(searchTerm.toLowerCase()) 
       : false;
-      
+
     return trackingMatch || senderMatch || receiverMatch || providerMatch;
   });
 
@@ -125,35 +127,7 @@ export default function ShipmentsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/">
-              <a className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">VN Logistics</a>
-            </Link>
-          </div>
-          <nav className="hidden md:flex gap-8">
-            <Link href="/">
-              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
-                Trang Chủ
-              </a>
-            </Link>
-            <Link href="/shipping">
-              <a className="font-medium text-gray-600 hover:text-primary transition-colors">Vận Chuyển</a>
-            </Link>
-            <Link href="/track">
-              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
-                Theo Dõi
-              </a>
-            </Link>
-            <Link href="/shipments">
-              <a className="font-medium text-primary border-b-2 border-primary pb-1">
-                Đơn Hàng
-              </a>
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">

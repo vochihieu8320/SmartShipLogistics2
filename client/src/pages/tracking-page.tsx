@@ -93,57 +93,7 @@ export default function TrackingPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/">
-              <a className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                VN Logistics
-              </a>
-            </Link>
-          </div>
-          <nav className="hidden md:flex gap-8">
-            <Link href="/">
-              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
-                Trang Chủ
-              </a>
-            </Link>
-            <Link href="/shipping/create">
-              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
-                Vận Chuyển
-              </a>
-            </Link>
-            <Link href="/tracking">
-              <a className="font-medium text-primary border-b-2 border-primary pb-1">
-                Theo Dõi
-              </a>
-            </Link>
-            <Link href="/shipments">
-              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
-                Đơn Hàng
-              </a>
-            </Link>
-          </nav>
-          <div className="flex items-center gap-2">
-            <Link href="/auth">
-              <Button variant="outline" className="hidden md:inline-flex hover:bg-primary hover:text-white transition-colors">
-                Đăng Nhập
-              </Button>
-            </Link>
-            <Link href="/auth?register=true">
-              <Button className="hidden md:inline-flex shadow-md hover:shadow-lg transition-shadow">
-                Đăng Ký
-              </Button>
-            </Link>
-            <Button variant="ghost" className="md:hidden p-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="flex-1 bg-gray-50">
