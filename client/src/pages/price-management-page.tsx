@@ -182,7 +182,11 @@ export default function PriceManagementPage() {
                     {otherFees.map((fee, index) => (
                       <TableRow key={index}>
                         <TableCell>{fee.display_name}</TableCell>
-                        <TableCell>{formatPrice(fee.amount)}</TableCell>
+                        <TableCell>
+                          {fee.unit === 'percentage' && `${fee.amount}%`}
+                          {fee.unit === 'per_kg' && `${formatPrice(fee.amount)}/kg`}
+                          {fee.unit === 'money' && formatPrice(fee.amount)}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
