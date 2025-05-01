@@ -43,7 +43,7 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
         </div>
         <h3 className="text-xl font-semibold">{title}</h3>
       </div>
-      
+
       <div className="grid md:grid-cols-2 gap-6">
         <FormField
           control={form.control}

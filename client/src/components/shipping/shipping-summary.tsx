@@ -25,10 +25,7 @@ export default function ShippingSummary({ formData }: ShippingSummaryProps) {
   // Determine which provider is selected
   const getProviderName = (id: number) => {
     switch(id) {
-      case 1: return "FedEx";
-      case 2: return "DHL";
-      case 3: return "UPS";
-      case 4: return "SF Express";
+      case 1: return "UPS";
       default: return "Unknown";
     }
   };
@@ -36,9 +33,9 @@ export default function ShippingSummary({ formData }: ShippingSummaryProps) {
   // Determine which service is selected
   const getServiceName = (id: number) => {
     switch(id) {
-      case 1: return "Standard";
-      case 2: return "Express";
-      case 3: return "Priority";
+      case 1: return "Worldwide Saver";
+      case 2: return "Worldwide Expedited";
+      case 3: return "Worldwide Express Freight";
       default: return "Unknown";
     }
   };
@@ -131,56 +128,11 @@ export default function ShippingSummary({ formData }: ShippingSummaryProps) {
                 </div>
               </div>
             </div>
-            
-            {/* Item Details */}
-            <div>
-              <h4 className="text-md font-medium mb-2">Item Details</h4>
-              <div className="bg-muted p-3 rounded-md">
-                <p className="mb-2">
-                  <span className="font-medium">Description: </span>
-                  {firstItem.description || "N/A"}
-                </p>
-                
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-3">
-                  <div>
-                    <span className="text-sm text-muted-foreground">Weight:</span>
-                    <p className="font-medium">{firstItem.weight || "0"} kg</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-muted-foreground">Quantity:</span>
-                    <p className="font-medium">{firstItem.quantity || "0"}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-muted-foreground">Dimensions (L×W×H):</span>
-                    <p className="font-medium">{firstItem.length || "0"} × {firstItem.width || "0"} × {firstItem.height || "0"} cm</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-muted-foreground">Volumetric Weight:</span>
-                    <p className="font-medium">{volumeWeight} kg</p>
-                  </div>
-                </div>
-                
-                <div className="border-t border-border mt-3 pt-3">
-                  <div className="grid grid-cols-2 gap-x-4">
-                    <div>
-                      <span className="text-sm text-muted-foreground">Declared Value:</span>
-                      <p className="font-medium">{firstPackage.currency || "USD"} {firstItem.value || "0"}</p>
-                    </div>
-                    <div>
-                      <span className="text-sm text-muted-foreground">Origin:</span>
-                      <p className="font-medium">{firstItem.country_of_origin || "N/A"}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
             {/* Estimated Price (Placeholder) */}
             <div>
-              <h4 className="text-md font-medium mb-2">Estimated Price</h4>
+              <h4 className="text-md font-medium mb-2">Total Price</h4>
               <div className="bg-muted p-3 rounded-md">
-                <p className="text-sm text-muted-foreground mb-1">Final pricing will be calculated upon shipment creation</p>
-                <p className="font-semibold text-lg">To be determined</p>
+                <p className="text-sm text-muted-foreground mb-1">{shipment.total_price}</p>
               </div>
             </div>
           </div>

@@ -164,8 +164,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="VND">VND - Việt Nam Đồng</SelectItem>
-                      <SelectItem value="USD">USD - Đô la Mỹ</SelectItem>
+                      <SelectItem value="VND" defaultChecked={true}>VND - Việt Nam Đồng</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -261,9 +260,8 @@ export default function PackageForm({ form }: PackageFormProps) {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="box">Hộp Carton</SelectItem>
-                        <SelectItem value="envelope">Phong Bì/Bao Thư</SelectItem>
-                        <SelectItem value="pallet">Pallet</SelectItem>
-                        <SelectItem value="tube">Ống/Cuộn</SelectItem>
+                        <SelectItem value="your_packaging">Tự đóng gói</SelectItem>
+                        <SelectItem value="pak">Gói</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -601,24 +599,6 @@ export default function PackageForm({ form }: PackageFormProps) {
                           onChange={(e) => handleTempItemChange("quantity", Number(e.target.value))}
                           className="border-gray-300 focus:border-primary"
                           placeholder="1"
-                        />
-                      </div>
-                      <div className="form-item">
-                        <label className="text-sm font-medium flex items-center gap-1.5 mb-1.5">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
-                            <path d="M12 18V6"></path>
-                          </svg>
-                          Giá Trị
-                        </label>
-                        <Input 
-                          type="number"
-                          min="0"
-                          value={tempItem.value || ""}
-                          onChange={(e) => handleTempItemChange("value", Number(e.target.value))}
-                          className="border-gray-300 focus:border-primary"
-                          placeholder="0"
                         />
                       </div>
                       <div className="form-item">
