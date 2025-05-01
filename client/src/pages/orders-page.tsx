@@ -9,11 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, AlertCircle } from "lucide-react";
 
 export default function OrdersPage() {
+  const [page, setPage] = useState(1);
+  const [perPage] = useState(10);
+
   const { data: response, isLoading, error } = useQuery({
-    queryKey: ["/admin/shipments"],
+    queryKey: ["/admin/orders", page, perPage],
     queryFn: async () => {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE_URL}/admin/shipments`, {
+      const response = await fetch(`${API_BASE_URL}/admin/orders?page=${page}&per_page=${perPage}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -117,6 +120,27 @@ export default function OrdersPage() {
               </TableBody>
             </Table>
           </CardContent>
+          <div className="flex items-center justify-center space-x-2 py-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              Previous
+            </Button>
+            <div className="text-sm text-muted-foreground">
+              Page {page}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => p + 1)}
+              disabled={!response?.orders || response.orders.length < perPage}
+            >
+              Next
+            </Button>
+          </div>
         </Card>
       )}
     </DashboardLayout>

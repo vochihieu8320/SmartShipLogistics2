@@ -618,6 +618,9 @@ export function registerRoutes(app: Express): Server {
 
   app.get("/api/v1/admin/orders", async (req, res, next) => {
     try {
+      const page = parseInt(req.query.page as string) || 1;
+      const perPage = parseInt(req.query.per_page as string) || 10;
+
       // Check if we should use the external API
       if (apiConfig.useExternalApi) {
         try {
