@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,14 +9,10 @@ import { api } from "@/services/api";
 interface Provider {
   id: number;
   name: string;
+  services: ProviderService[];
 }
 
 interface ProviderService {
-  id: number;
-  name: string;
-}
-
-interface Country {
   id: number;
   name: string;
 }
@@ -27,12 +24,11 @@ interface NetPrice {
 
 export default function PriceManagementPage() {
   const [providers, setProviders] = useState<Provider[]>([]);
-  const [services, setServices] = useState<ProviderService[]>([]);
-  const [countries, setCountries] = useState<Country[]>([]);
   const [selectedProvider, setSelectedProvider] = useState<string>("");
   const [selectedService, setSelectedService] = useState<string>("");
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [prices, setPrices] = useState<NetPrice[]>([]);
+  const [countries, setCountries] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -52,14 +48,6 @@ export default function PriceManagementPage() {
   }, []);
 
   useEffect(() => {
-    if (selectedProvider) {
-      api.get(`/providers/${selectedProvider}/services`)
-        .then(data => setServices(data.services))
-        .catch(error => console.error("Error fetching services:", error));
-    }
-  }, [selectedProvider]);
-
-  useEffect(() => {
     if (selectedProvider && selectedService && selectedCountry) {
       api.get(`/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}&country_id=${selectedCountry}`)
         .then(data => setPrices(data.net_prices))
@@ -72,6 +60,11 @@ export default function PriceManagementPage() {
       style: 'currency', 
       currency: 'VND' 
     }).format(parseFloat(price));
+  };
+
+  const getServicesByProvider = (providerId: string) => {
+    const provider = providers.find(p => p.id.toString() === providerId);
+    return provider?.services || [];
   };
 
   return (
@@ -100,7 +93,7 @@ export default function PriceManagementPage() {
                 <SelectValue placeholder="Select Service" />
               </SelectTrigger>
               <SelectContent>
-                {services.map(service => (
+                {selectedProvider && getServicesByProvider(selectedProvider).map(service => (
                   <SelectItem key={service.id} value={service.id.toString()}>
                     {service.name}
                   </SelectItem>
