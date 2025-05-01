@@ -1,9 +1,21 @@
-
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/services/api";
 
@@ -24,9 +36,9 @@ interface NetPrice {
 }
 
 interface OtherFee {
-  name: string;
+  display_name: string;
   amount: string;
-  type: string;
+  unit: string;
 }
 
 export default function PriceManagementPage() {
@@ -43,7 +55,7 @@ export default function PriceManagementPage() {
       try {
         const [providersData, countriesData] = await Promise.all([
           api.get("/providers"),
-          api.get("/countries")
+          api.get("/countries"),
         ]);
         setProviders(providersData.providers);
         setCountries(countriesData.countries);
@@ -57,24 +69,27 @@ export default function PriceManagementPage() {
 
   useEffect(() => {
     if (selectedProvider && selectedService && selectedCountry) {
-      api.get(`/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}&country_id=${selectedCountry}`)
-        .then(data => {
+      api
+        .get(
+          `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}&country_id=${selectedCountry}`,
+        )
+        .then((data) => {
           setPrices(data.net_prices);
           setOtherFees(data.other_fees || []);
         })
-        .catch(error => console.error("Error fetching prices:", error));
+        .catch((error) => console.error("Error fetching prices:", error));
     }
   }, [selectedProvider, selectedService, selectedCountry]);
 
   const formatPrice = (price: string) => {
-    return new Intl.NumberFormat('vi-VN', { 
-      style: 'currency', 
-      currency: 'VND' 
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
     }).format(parseFloat(price));
   };
 
   const getServicesByProvider = (providerId: string) => {
-    const provider = providers.find(p => p.id.toString() === providerId);
+    const provider = providers.find((p) => p.id.toString() === providerId);
     return provider?.services || [];
   };
 
@@ -91,7 +106,7 @@ export default function PriceManagementPage() {
                 <SelectValue placeholder="Select Provider" />
               </SelectTrigger>
               <SelectContent>
-                {providers.map(provider => (
+                {providers.map((provider) => (
                   <SelectItem key={provider.id} value={provider.id.toString()}>
                     {provider.name}
                   </SelectItem>
@@ -104,11 +119,12 @@ export default function PriceManagementPage() {
                 <SelectValue placeholder="Select Service" />
               </SelectTrigger>
               <SelectContent>
-                {selectedProvider && getServicesByProvider(selectedProvider).map(service => (
-                  <SelectItem key={service.id} value={service.id.toString()}>
-                    {service.name}
-                  </SelectItem>
-                ))}
+                {selectedProvider &&
+                  getServicesByProvider(selectedProvider).map((service) => (
+                    <SelectItem key={service.id} value={service.id.toString()}>
+                      {service.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
 
@@ -117,7 +133,7 @@ export default function PriceManagementPage() {
                 <SelectValue placeholder="Select Country" />
               </SelectTrigger>
               <SelectContent>
-                {countries.map(country => (
+                {countries.map((country) => (
                   <SelectItem key={country.id} value={country.id.toString()}>
                     {country.name}
                   </SelectItem>
@@ -159,15 +175,13 @@ export default function PriceManagementPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Fee Name</TableHead>
-                      <TableHead>Type</TableHead>
                       <TableHead>Amount</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {otherFees.map((fee, index) => (
                       <TableRow key={index}>
-                        <TableCell>{fee.name}</TableCell>
-                        <TableCell>{fee.type}</TableCell>
+                        <TableCell>{fee.display_name}</TableCell>
                         <TableCell>{formatPrice(fee.amount)}</TableCell>
                       </TableRow>
                     ))}
