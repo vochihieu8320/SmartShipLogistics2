@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { Header } from "@/components/layout/header";
 import {
   ChevronRight,
   Package,
   Search,
-  Truck,
   Clock,
   CreditCard,
   BarChart,
@@ -14,67 +14,7 @@ import { Link } from "wouter";
 export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Truck className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">SmartShip Pro</span>
-          </div>
-          <nav className="hidden md:flex gap-8">
-            <a href="/" className="font-medium text-primary">
-              Home
-            </a>
-            <a
-              href="/shipping/create"
-              className="font-medium text-gray-600 hover:text-primary"
-            >
-              Shipping
-            </a>
-            <a
-              href="/tracking"
-              className="font-medium text-gray-600 hover:text-primary"
-            >
-              Track
-            </a>
-            <a
-              href="#services"
-              className="font-medium text-gray-600 hover:text-primary"
-            >
-              Services
-            </a>
-            <a
-              href="#contact"
-              className="font-medium text-gray-600 hover:text-primary"
-            >
-              Contact
-            </a>
-          </nav>
-          <div className="flex items-center gap-2">
-            <Link href="/auth">
-              <Button variant="outline" className="hidden md:inline-flex">
-                Log In
-              </Button>
-            </Link>
-            <Button variant="ghost" className="md:hidden p-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary/10 to-primary/5 py-16 md:py-24">
