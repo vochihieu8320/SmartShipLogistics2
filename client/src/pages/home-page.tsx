@@ -8,6 +8,7 @@ import {
   CreditCard,
   BarChart,
   Globe,
+  Truck,
 } from "lucide-react";
 import { Link } from "wouter";
 
