@@ -1,13 +1,20 @@
 import { Link, useLocation } from "wouter";
 
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+
 export function Header() {
   const [location] = useLocation();
+  const { user, logoutMutation } = useAuth();
   
-  // Kiểm tra đường dẫn hiện tại để highlight menu item phù hợp
   const isActive = (path: string) => {
     if (path === "/" && location === "/") return true;
     if (path !== "/" && location.startsWith(path)) return true;
     return false;
+  };
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
   };
 
   return (
@@ -20,7 +27,7 @@ export function Header() {
             </a>
           </Link>
         </div>
-        <nav className="hidden md:flex gap-8">
+        <nav className="hidden md:flex gap-8 items-center">
           <Link href="/">
             <a className={`font-medium ${isActive("/") && !isActive("/shipping") && !isActive("/tracking") && !isActive("/shipments")
               ? "text-primary border-b-2 border-primary pb-1" 
@@ -49,6 +56,26 @@ export function Header() {
               Đơn Hàng
             </a>
           </Link>
+          {user ? (
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">
+                Xin chào, {user.fullName}
+              </span>
+              <Button 
+                variant="outline" 
+                onClick={handleLogout}
+                className="text-sm"
+              >
+                Đăng Xuất
+              </Button>
+            </div>
+          ) : (
+            <Link href="/auth">
+              <Button variant="default" className="text-sm">
+                Đăng Nhập
+              </Button>
+            </Link>
+          )}
         </nav>
       </div>
     </header>
