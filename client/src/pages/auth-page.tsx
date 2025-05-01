@@ -108,12 +108,23 @@ function LoginForm() {
   function onSubmit(data: LoginCredentials) {
     loginMutation.mutate(data, {
       onSuccess: (user) => {
+        toast({
+          title: "Đăng nhập thành công",
+          description: "Chào mừng bạn quay trở lại!",
+        });
         // Navigate based on user role
         if (user.role === "admin" || user.role === "manager") {
           navigate("/admin");
         } else {
           navigate("/");
         }
+      },
+      onError: (error) => {
+        toast({
+          title: "Đăng nhập thất bại",
+          description: error.message || "Sai tên đăng nhập hoặc mật khẩu",
+          variant: "destructive"
+        });
       }
     });
   }
@@ -207,6 +218,13 @@ function RegisterForm({ onSuccess }: RegisterFormProps) {
         });
         form.reset();
         onSuccess();
+      },
+      onError: (error) => {
+        toast({
+          title: "Registration failed",
+          description: error.message || "An unexpected error occurred",
+          variant: "destructive",
+        });
       }
     });
   }

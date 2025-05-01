@@ -222,16 +222,17 @@ export default function PriceManagementPage() {
                                 );
                                 if (response.ok) {
                                   toast({
-                                    title: "Success",
-                                    description: "Price updated successfully"
+                                    title: "Cập nhật thành công",
+                                    description: `Đã cập nhật ${fee.display_name} thành ${formatPrice(fee.amount)}`,
+                                    variant: "default"
                                   });
                                 } else {
                                   throw new Error('Failed to update price');
                                 }
                               } catch (error) {
                                 toast({
-                                  title: "Error",
-                                  description: "Failed to update price",
+                                  title: "Lỗi cập nhật",
+                                  description: "Không thể cập nhật giá, vui lòng thử lại",
                                   variant: "destructive"
                                 });
                               }
