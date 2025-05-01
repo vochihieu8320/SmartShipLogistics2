@@ -42,17 +42,16 @@ interface Shipment {
   total_price: number | null;
   provider?: string;
   provider_service?: string;
-  estimated_delivery?: string;
 }
 
 export default function AdminShipmentsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   
-  const { data: shipments, isLoading, error } = useQuery<Shipment[]>({
+  const { data: response, isLoading, error } = useQuery({
     queryKey: ["/admin/shipments"],
     queryFn: async () => {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE_URL}/shipments`, {
+      const response = await fetch(`${API_BASE_URL}/admin/shipments`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -62,10 +61,11 @@ export default function AdminShipmentsPage() {
         throw new Error("Không thể tải danh sách vận chuyển");
       }
       
-      const data = await response.json();
-      return data.shipments || [];
+      return response.json();
     },
   });
+
+  const shipments = response?.shipments || [];
 
   const getStatusColor = (status: string | null) => {
     switch (status?.toLowerCase()) {

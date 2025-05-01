@@ -550,6 +550,72 @@ export function registerRoutes(app: Express): Server {
   });
   
   // API endpoint for admin orders
+  app.get("/api/v1/admin/shipments", async (req, res, next) => {
+    try {
+      // Check if we should use the external API
+      if (apiConfig.useExternalApi) {
+        try {
+          console.log('[API] Using external API for admin shipments');
+          
+          // Call the external API using our generic function
+          const data = await callExternalApi('/admin/shipments', 'GET');
+          return res.json(data);
+        } catch (error) {
+          console.error('[API] Error getting external admin shipments, falling back to mock data:', error);
+        }
+      }
+      
+      console.log("[DEBUG] Serving mock admin shipments data");
+      // Return mock data for shipments management
+      res.json({
+        "success": true,
+        "count": 25,
+        "shipments": [
+          {
+            "id": 1,
+            "tracking_number": "SHIPS10001",
+            "status": "delivered",
+            "created_at": "2025-04-10T00:00:00.000Z",
+            "sender": {
+              "name": "John Smith",
+              "city": "Ho Chi Minh City",
+              "country": "Vietnam"
+            },
+            "receiver": {
+              "name": "Li Wei",
+              "city": "Singapore",
+              "country": "Singapore" 
+            },
+            "total_price": 71.50,
+            "provider": "FedEx",
+            "provider_service": "Express"
+          },
+          {
+            "id": 2, 
+            "tracking_number": "SHIPS10002",
+            "status": "in_transit",
+            "created_at": "2025-04-15T00:00:00.000Z",
+            "sender": {
+              "name": "Mary Johnson",
+              "city": "Hanoi",
+              "country": "Vietnam"
+            },
+            "receiver": {
+              "name": "John Doe",
+              "city": "Bangkok",
+              "country": "Thailand"
+            },
+            "total_price": 125.00,
+            "provider": "DHL",
+            "provider_service": "Express"
+          }
+        ]
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   app.get("/api/v1/admin/orders", async (req, res, next) => {
     try {
       // Check if we should use the external API
