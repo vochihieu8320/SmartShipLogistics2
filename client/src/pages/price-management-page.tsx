@@ -4,6 +4,7 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/services/api";
 
 interface Provider {
@@ -22,12 +23,19 @@ interface NetPrice {
   prices: string;
 }
 
+interface OtherFee {
+  name: string;
+  amount: string;
+  type: string;
+}
+
 export default function PriceManagementPage() {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [selectedProvider, setSelectedProvider] = useState<string>("");
   const [selectedService, setSelectedService] = useState<string>("");
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [prices, setPrices] = useState<NetPrice[]>([]);
+  const [otherFees, setOtherFees] = useState<OtherFee[]>([]);
   const [countries, setCountries] = useState<any[]>([]);
 
   useEffect(() => {
@@ -50,7 +58,10 @@ export default function PriceManagementPage() {
   useEffect(() => {
     if (selectedProvider && selectedService && selectedCountry) {
       api.get(`/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}&country_id=${selectedCountry}`)
-        .then(data => setPrices(data.net_prices))
+        .then(data => {
+          setPrices(data.net_prices);
+          setOtherFees(data.other_fees || []);
+        })
         .catch(error => console.error("Error fetching prices:", error));
     }
   }, [selectedProvider, selectedService, selectedCountry]);
@@ -115,24 +126,56 @@ export default function PriceManagementPage() {
             </Select>
           </div>
 
-          {prices.length > 0 && (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Weight (kg)</TableHead>
-                  <TableHead>Price</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {prices.map((price, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{price.weight}</TableCell>
-                    <TableCell>{formatPrice(price.prices)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+          <Tabs defaultValue="net_prices" className="w-full">
+            <TabsList>
+              <TabsTrigger value="net_prices">Giá Gốc</TabsTrigger>
+              <TabsTrigger value="other_fees">Phụ Phí</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="net_prices">
+              {prices.length > 0 && (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Weight (kg)</TableHead>
+                      <TableHead>Price</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {prices.map((price, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{price.weight}</TableCell>
+                        <TableCell>{formatPrice(price.prices)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </TabsContent>
+
+            <TabsContent value="other_fees">
+              {otherFees.length > 0 && (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Fee Name</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Amount</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {otherFees.map((fee, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{fee.name}</TableCell>
+                        <TableCell>{fee.type}</TableCell>
+                        <TableCell>{formatPrice(fee.amount)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </DashboardLayout>
