@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertCircle, ChevronRight, Loader2, PackageOpen, Plus, Search, Truck } from "lucide-react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import Header from "@/components/Header"; // Assuming Header component is in "@/components/Header"
+import { Header } from "@/components/layout/header";
 
 
 interface Shipment {
