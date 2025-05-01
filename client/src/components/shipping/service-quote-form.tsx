@@ -253,7 +253,7 @@ export default function ServiceQuoteForm({
                         }
 
                         // Save total price to localStorage for completion page
-                        localStorage.setItem('shipment_total_price', quote.total_price.toString());
+                        localStorage.setItem('shipment_total_price', quote.prices.total_price.toString());
                         
                         onQuoteSelect(quote);
                         // Enable next tab
