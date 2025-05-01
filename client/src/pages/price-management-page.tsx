@@ -213,19 +213,11 @@ export default function PriceManagementPage() {
                             size="sm"
                             onClick={async () => {
                               try {
-                                const token = localStorage.getItem('token');
-                                const response = await fetch(
-                                  `${API_BASE_URL}/providers/${selectedProvider}/update_prices/?provider_service_id=${selectedService}&country_id=${selectedCountry}`,
+                                const response = await api.put(
+                                  `/providers/${selectedProvider}/update_prices/?provider_service_id=${selectedService}&country_id=${selectedCountry}`,
                                   {
-                                    method: 'PUT',
-                                    headers: {
-                                      'Content-Type': 'application/json',
-                                      'Authorization': `${token}`
-                                    },
-                                    body: JSON.stringify({
-                                      fee_type: fee.type,
-                                      amount: fee.amount
-                                    })
+                                    fee_type: fee.name,
+                                    amount: fee.amount
                                   }
                                 );
                                 if (response.ok) {
