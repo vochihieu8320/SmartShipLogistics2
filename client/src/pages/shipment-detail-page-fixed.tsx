@@ -2,12 +2,7 @@ import { useState } from "react";
 import { useLocation, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { API_BASE_URL } from "@/config/api";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
   CardContent,
@@ -269,55 +264,15 @@ export default function ShipmentDetailPage() {
               </Badge>
             </h1>
             <p className="text-gray-600 mt-1">
-              Tạo lúc: {new Date(shipment.created_at).toLocaleDateString("vi-VN", {
+              Tạo lúc:{" "}
+              {new Date(shipment.created_at).toLocaleDateString("vi-VN", {
                 day: "2-digit",
                 month: "2-digit",
                 year: "numeric",
                 hour: "2-digit",
-                minute: "2-digit"
+                minute: "2-digit",
               })}
             </p>
-          </div>
-
-          <div className="flex gap-3">
-            <Button variant="outline">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide mr-2"
-              >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              Tải PDF
-            </Button>
-            <Button>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide mr-2"
-              >
-                <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                <rect x="6" y="14" width="12" height="8"></rect>
-              </svg>
-              In Đơn Hàng
-            </Button>
           </div>
         </div>
 
@@ -465,7 +420,9 @@ export default function ShipmentDetailPage() {
                 {shipment.package_details && (
                   <Card>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-lg">Chi Tiết Gói Hàng</CardTitle>
+                      <CardTitle className="text-lg">
+                        Chi Tiết Gói Hàng
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
@@ -482,7 +439,9 @@ export default function ShipmentDetailPage() {
                           </p>
                         </div>
                         <div className="space-y-1">
-                          <p className="text-sm text-gray-500">Nhà Vận Chuyển</p>
+                          <p className="text-sm text-gray-500">
+                            Nhà Vận Chuyển
+                          </p>
                           <p className="font-medium">
                             {shipment.provider || "Chưa Xác Định"}
                           </p>
@@ -588,35 +547,51 @@ export default function ShipmentDetailPage() {
                               }).format(shipment.prices.net_price || 0)}
                             </span>
                           </div>
-                          
+
                           {shipment.prices.fuel_surcharge > 0 && (
                             <div className="flex justify-between text-sm">
-                              <span className="text-gray-600">Phụ phí nhiên liệu</span>
+                              <span className="text-gray-600">
+                                Phụ phí nhiên liệu
+                              </span>
                               <span className="font-medium">
                                 {new Intl.NumberFormat("vi-VN", {
                                   style: "currency",
                                   currency: "VND",
-                                }).format((shipment.prices.net_price * shipment.prices.fuel_surcharge) / 100)}
+                                }).format(
+                                  (shipment.prices.net_price *
+                                    shipment.prices.fuel_surcharge) /
+                                    100,
+                                )}
                               </span>
                             </div>
                           )}
-                          
+
                           {shipment.prices.peak_season > 0 && (
                             <div className="flex justify-between text-sm">
-                              <span className="text-gray-600">Phụ phí cao điểm</span>
+                              <span className="text-gray-600">
+                                Phụ phí cao điểm
+                              </span>
                               <span className="font-medium">
                                 {new Intl.NumberFormat("vi-VN", {
                                   style: "currency",
                                   currency: "VND",
-                                }).format((shipment.prices.net_price * shipment.prices.peak_season) / 100)}
+                                }).format(
+                                  (shipment.prices.net_price *
+                                    shipment.prices.peak_season) /
+                                    100,
+                                )}
                               </span>
                             </div>
                           )}
-                          
-                          {shipment.prices.oversize_fee.some(fee => fee.applied_fees.length > 0) && (
+
+                          {shipment.prices.oversize_fee.some(
+                            (fee) => fee.applied_fees.length > 0,
+                          ) && (
                             <div className="mt-4">
                               <div className="flex justify-between items-center mb-2">
-                                <span className="text-gray-600 font-medium">Phí bổ sung kích thước</span>
+                                <span className="text-gray-600 font-medium">
+                                  Phí bổ sung kích thước
+                                </span>
                                 <span className="font-medium">
                                   {new Intl.NumberFormat("vi-VN", {
                                     style: "currency",
@@ -626,50 +601,69 @@ export default function ShipmentDetailPage() {
                                       (sum, fee) =>
                                         sum +
                                         fee.applied_fees.reduce(
-                                          (feeSum, applied) => feeSum + parseFloat(applied.amount),
+                                          (feeSum, applied) =>
+                                            feeSum + parseFloat(applied.amount),
                                           0,
                                         ),
                                       0,
-                                    )
+                                    ),
                                   )}
                                 </span>
                               </div>
-                              
+
                               <div className="mt-2 space-y-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                {shipment.prices.oversize_fee.map((feePkg, pkgIndex) => (
-                                  feePkg.applied_fees.length > 0 && (
-                                    <div key={pkgIndex} className="border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
-                                      <p className="text-sm font-medium text-gray-700 mb-1">
-                                        Kiện hàng #{feePkg.package + 1}
-                                      </p>
-                                      <div className="space-y-1">
-                                        {feePkg.applied_fees.map((fee, feeIndex) => (
-                                          <div key={feeIndex} className="flex justify-between text-sm">
-                                            <div className="flex items-start">
-                                              <span className="text-gray-600">{fee.display_name}</span>
-                                              {fee.note && (
-                                                <span className="ml-1 text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
-                                                  {fee.note}
+                                {shipment.prices.oversize_fee.map(
+                                  (feePkg, pkgIndex) =>
+                                    feePkg.applied_fees.length > 0 && (
+                                      <div
+                                        key={pkgIndex}
+                                        className="border-b border-gray-100 pb-2 last:border-b-0 last:pb-0"
+                                      >
+                                        <p className="text-sm font-medium text-gray-700 mb-1">
+                                          Kiện hàng #{feePkg.package + 1}
+                                        </p>
+                                        <div className="space-y-1">
+                                          {feePkg.applied_fees.map(
+                                            (fee, feeIndex) => (
+                                              <div
+                                                key={feeIndex}
+                                                className="flex justify-between text-sm"
+                                              >
+                                                <div className="flex items-start">
+                                                  <span className="text-gray-600">
+                                                    {fee.display_name}
+                                                  </span>
+                                                  {fee.note && (
+                                                    <span className="ml-1 text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
+                                                      {fee.note}
+                                                    </span>
+                                                  )}
+                                                </div>
+                                                <span className="font-medium">
+                                                  {new Intl.NumberFormat(
+                                                    "vi-VN",
+                                                    {
+                                                      style: "currency",
+                                                      currency: "VND",
+                                                    },
+                                                  ).format(
+                                                    parseFloat(fee.amount),
+                                                  )}
                                                 </span>
-                                              )}
-                                            </div>
-                                            <span className="font-medium">
-                                              {new Intl.NumberFormat("vi-VN", {
-                                                style: "currency",
-                                                currency: "VND",
-                                              }).format(parseFloat(fee.amount))}
-                                            </span>
-                                          </div>
-                                        ))}
+                                              </div>
+                                            ),
+                                          )}
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-1 italic">
+                                          {feePkg.applied_fees[0]?.description}
+                                        </p>
                                       </div>
-                                      <p className="text-xs text-gray-500 mt-1 italic">{feePkg.applied_fees[0]?.description}</p>
-                                    </div>
-                                  )
-                                ))}
+                                    ),
+                                )}
                               </div>
                             </div>
                           )}
-                          
+
                           <div className="flex justify-between py-2 mt-2 font-semibold">
                             <span className="text-gray-700">Tổng tiền</span>
                             <span className="text-primary text-lg">

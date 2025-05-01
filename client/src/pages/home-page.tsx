@@ -29,7 +29,7 @@ export default function HomePage() {
               your shipping needs worldwide.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/shipping">
+              <Link href="/shipping/create">
                 <Button size="lg" className="gap-2">
                   Ship Now <ChevronRight className="h-4 w-4" />
                 </Button>
