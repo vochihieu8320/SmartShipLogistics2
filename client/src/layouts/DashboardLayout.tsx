@@ -53,6 +53,62 @@ interface DashboardLayoutProps {
   title: string;
 }
 
+//New Header Component
+const Header = ({isAdminLayout}: {isAdminLayout: boolean}) => {
+  const [showSidebar, setShowSidebar] = useState(false);
+  return (
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center">
+        {isAdminLayout && (
+          <div className="mr-4 hidden md:flex">
+            <a className="mr-6 flex items-center space-x-2" href="/admin">
+              <span className="hidden font-bold sm:inline-block">
+                Smart Ship Pro
+              </span>
+            </a>
+          </div>
+        )}
+        <Button
+          variant="ghost"
+          className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
+          onClick={() => setShowSidebar(!showSidebar)}
+        >
+          <Menu className="h-6 w-6" />
+          <span className="sr-only">Toggle Menu</span>
+        </Button>
+
+        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          <div className="w-full flex-1 md:w-auto md:flex-none">
+          </div>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Thông báo</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <HelpCircle className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Trợ giúp</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
+    </header>
+  );
+};
+
 export default function DashboardLayout({ children, title }: DashboardLayoutProps) {
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -224,56 +280,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top header */}
-        <header className="bg-white shadow-sm">
-          <div className="px-4 md:px-6 py-4 flex items-center justify-between">
-            {isMobile && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="mr-2"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-            )}
-
-            <h2 className="text-xl font-semibold text-neutral-800">{title}</h2>
-
-            <div className="flex items-center space-x-4">
-              <div className="relative hidden md:block">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Tìm kiếm..."
-                  className="w-[200px] md:w-[300px] pl-9 rounded-md"
-                />
-              </div>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
-                    <Bell className="h-5 w-5" />
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Thông báo</p>
-                </TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <HelpCircle className="h-5 w-5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Trợ giúp</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          </div>
-        </header>
+        <Header isAdminLayout={true} /> {/* Replacing old header with new component */}
 
         {/* Main content */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
