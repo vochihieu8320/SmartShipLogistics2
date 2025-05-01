@@ -164,7 +164,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="VND" defaultChecked={true}>VND - Việt Nam Đồng</SelectItem>
+                      <SelectItem value="VND">VND - Việt Nam Đồng</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
