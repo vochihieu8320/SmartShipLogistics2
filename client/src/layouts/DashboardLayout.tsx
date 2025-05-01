@@ -157,12 +157,20 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                 </li>
 
                 {user?.role === UserRole.ADMIN && (
-                  <NavItem 
-                    href="/admin/users" 
-                    icon={<Users className="h-5 w-5" />} 
-                    label="Quản Lý Người Dùng" 
-                    active={location === "/admin/users"} 
-                  />
+                  <>
+                    <NavItem 
+                      href="/admin/users" 
+                      icon={<Users className="h-5 w-5" />} 
+                      label="Quản Lý Người Dùng" 
+                      active={location === "/admin/users"} 
+                    />
+                    <NavItem 
+                      href="/admin/prices" 
+                      icon={<CreditCard className="h-5 w-5" />} 
+                      label="Quản Lý Giá" 
+                      active={location === "/admin/prices"} 
+                    />
+                  </>
                 )}
 
                 <NavItem 
