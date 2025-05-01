@@ -1,0 +1,293 @@
+{
+    "success": true,
+    "net_prices": [
+        {
+            "weight": "0.5",
+            "prices": "1033489.130435"
+        },
+        {
+            "weight": "1.0",
+            "prices": "1268233.695652"
+        },
+        {
+            "weight": "1.5",
+            "prices": "1504000.0"
+        },
+        {
+            "weight": "2.0",
+            "prices": "1742831.521739"
+        },
+        {
+            "weight": "2.5",
+            "prices": "1977576.086957"
+        },
+        {
+            "weight": "3.0",
+            "prices": "2183711.956522"
+        },
+        {
+            "weight": "3.5",
+            "prices": "2390869.565217"
+        },
+        {
+            "weight": "4.0",
+            "prices": "2597771.73913"
+        },
+        {
+            "weight": "4.5",
+            "prices": "2805951.086957"
+        },
+        {
+            "weight": "5.0",
+            "prices": "3009021.73913"
+        },
+        {
+            "weight": "5.5",
+            "prices": "3202641.304348"
+        },
+        {
+            "weight": "6.0",
+            "prices": "3396516.304348"
+        },
+        {
+            "weight": "6.5",
+            "prices": "3590135.869565"
+        },
+        {
+            "weight": "7.0",
+            "prices": "3779923.913043"
+        },
+        {
+            "weight": "7.5",
+            "prices": "3973798.913043"
+        },
+        {
+            "weight": "8.0",
+            "prices": "4167418.478261"
+        },
+        {
+            "weight": "8.5",
+            "prices": "4359250.0"
+        },
+        {
+            "weight": "9.0",
+            "prices": "4550826.086957"
+        },
+        {
+            "weight": "9.5",
+            "prices": "4747766.304348"
+        },
+        {
+            "weight": "10.0",
+            "prices": "4939597.826087"
+        },
+        {
+            "weight": "10.5",
+            "prices": "5113804.347826"
+        },
+        {
+            "weight": "11.0",
+            "prices": "5295163.043478"
+        },
+        {
+            "weight": "11.5",
+            "prices": "5469625.0"
+        },
+        {
+            "weight": "12.0",
+            "prices": "5646896.73913"
+        },
+        {
+            "weight": "12.5",
+            "prices": "5825190.217391"
+        },
+        {
+            "weight": "13.0",
+            "prices": "5972831.521739"
+        },
+        {
+            "weight": "13.5",
+            "prices": "6119451.086957"
+        },
+        {
+            "weight": "14.0",
+            "prices": "6269135.869565"
+        },
+        {
+            "weight": "14.5",
+            "prices": "6415755.434783"
+        },
+        {
+            "weight": "15.0",
+            "prices": "6558288.043478"
+        },
+        {
+            "weight": "15.5",
+            "prices": "6710016.304348"
+        },
+        {
+            "weight": "16.0",
+            "prices": "6856635.869565"
+        },
+        {
+            "weight": "16.5",
+            "prices": "7004277.173913"
+        },
+        {
+            "weight": "17.0",
+            "prices": "7148853.26087"
+        },
+        {
+            "weight": "17.5",
+            "prices": "7297516.304348"
+        },
+        {
+            "weight": "18.0",
+            "prices": "7393815.217391"
+        },
+        {
+            "weight": "18.5",
+            "prices": "7490114.130435"
+        },
+        {
+            "weight": "19.0",
+            "prices": "7589733.695652"
+        },
+        {
+            "weight": "19.5",
+            "prices": "7683989.130435"
+        },
+        {
+            "weight": "20.0",
+            "prices": "7779266.304348"
+        },
+        {
+            "weight": "21.0",
+            "prices": "369103.26087"
+        },
+        {
+            "weight": "44.0",
+            "prices": "369103.26087"
+        },
+        {
+            "weight": "45.0",
+            "prices": "369103.26087"
+        },
+        {
+            "weight": "70.0",
+            "prices": "369103.26087"
+        },
+        {
+            "weight": "71.0",
+            "prices": "349690.217391"
+        },
+        {
+            "weight": "99.0",
+            "prices": "349690.217391"
+        },
+        {
+            "weight": "100.0",
+            "prices": "349690.217391"
+        }
+    ],
+    "other_fees": [
+        {
+            "id": 11,
+            "provider_id": 1,
+            "provider_service_id": 1,
+            "name": "local_ups_freight",
+            "description": "Có một kiện hàng nặng hơn 70 kg",
+            "zone": null,
+            "amount": "3019515.0",
+            "created_at": "2025-04-28T18:14:19.332Z",
+            "updated_at": "2025-04-28T18:14:19.332Z",
+            "unit": "money",
+            "display_name": "VÙNG DÂN CƯ UPS Worldwide Express Freight",
+            "note": null
+        },
+        {
+            "id": 12,
+            "provider_id": 1,
+            "provider_service_id": 1,
+            "name": "ahc",
+            "description": "Có một kiện hàng năng hơn 25kg",
+            "zone": null,
+            "amount": "368715.0",
+            "created_at": "2025-04-28T18:14:20.605Z",
+            "updated_at": "2025-04-28T18:14:20.605Z",
+            "unit": "money",
+            "display_name": "AHC",
+            "note": null
+        },
+        {
+            "id": 13,
+            "provider_id": 1,
+            "provider_service_id": 1,
+            "name": "lps",
+            "description": "Nếu chu vi nằm trong khoảng từ 300 đến 400cm thì dù kiện hàng có nghẹ hơn hãng vấn tính 40kg",
+            "zone": null,
+            "amount": "1602700.0",
+            "created_at": "2025-04-28T18:14:22.051Z",
+            "updated_at": "2025-04-28T18:14:22.051Z",
+            "unit": "money",
+            "display_name": "LPS",
+            "note": null
+        },
+        {
+            "id": 14,
+            "provider_id": 1,
+            "provider_service_id": 1,
+            "name": "oms",
+            "description": "Trọng lượng > 70kg\n\nChu vi > 400cm\n\nChiều dài ≥ 274cm",
+            "zone": null,
+            "amount": "6580000.0",
+            "created_at": "2025-04-28T18:14:23.599Z",
+            "updated_at": "2025-04-28T18:14:23.599Z",
+            "unit": "money",
+            "display_name": "OMS",
+            "note": null
+        },
+        {
+            "id": 123,
+            "provider_id": 1,
+            "provider_service_id": 1,
+            "name": "fuel_surcharge",
+            "description": null,
+            "zone": null,
+            "amount": "27.0",
+            "created_at": "2025-04-29T14:54:10.130Z",
+            "updated_at": "2025-04-29T14:54:10.130Z",
+            "unit": "percentage",
+            "display_name": null,
+            "note": null
+        },
+        {
+            "id": 126,
+            "provider_id": 1,
+            "provider_service_id": 1,
+            "name": "vat",
+            "description": null,
+            "zone": null,
+            "amount": "8.0",
+            "created_at": "2025-05-01T09:09:51.722Z",
+            "updated_at": "2025-05-01T09:09:51.722Z",
+            "unit": "percentage",
+            "display_name": "Vat",
+            "note": null
+        },
+        {
+            "id": 121,
+            "provider_id": 1,
+            "provider_service_id": 1,
+            "name": "peak_season_surcharge",
+            "description": null,
+            "zone": "9.0",
+            "amount": "9.0",
+            "created_at": "2025-04-29T14:07:13.166Z",
+            "updated_at": "2025-04-29T14:07:13.166Z",
+            "unit": "per_kg",
+            "display_name": "Phụ Phí Mùa Cao Điểm",
+            "note": null
+        }
+    ]
+}
