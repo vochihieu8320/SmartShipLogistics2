@@ -44,6 +44,10 @@ export default function ShippingSummary({ formData }: ShippingSummaryProps) {
     <Card className="mb-6">
       <CardContent className="pt-6">
         <h3 className="text-xl font-semibold mb-4">Shipping Summary</h3>
+        <div className="mb-4">
+          <span className="font-medium">Total Price: </span>
+          <span className="text-lg">${localStorage.getItem('shipment_total_price') || '0.00'}</span>
+        </div>
         
         <div className="grid md:grid-cols-2 gap-6">
           {/* Left column - sender, receiver, service */}

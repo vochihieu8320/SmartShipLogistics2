@@ -243,6 +243,7 @@ export default function ServiceQuoteForm({
                             body: JSON.stringify({
                               provider_id: 1,
                               provider_service_id: quote.id,
+                              total_price: quote.total_price,
                             }),
                           },
                         );
@@ -251,7 +252,16 @@ export default function ServiceQuoteForm({
                           throw new Error("Không thể chọn dịch vụ");
                         }
 
+                        // Save total price to localStorage for completion page
+                        localStorage.setItem('shipment_total_price', quote.total_price.toString());
+                        
                         onQuoteSelect(quote);
+                        // Enable next tab
+                        const tabs = document.querySelector('[role="tablist"]');
+                        const nextTab = tabs?.querySelector('[data-state="inactive"]');
+                        if (nextTab) {
+                          nextTab.removeAttribute('disabled');
+                        }
                       } catch (error) {
                         console.error("Error selecting service:", error);
                       }
