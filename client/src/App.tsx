@@ -43,6 +43,7 @@ function App() {
               <ProtectedRoute path="/shipping/create" component={CreateShippingPage} />
               <ProtectedRoute path="/shipments" component={ShipmentsPage} />
               <ProtectedRoute path="/shipments/:id" component={ShipmentDetailPage} />
+              <ProtectedRoute path="/admin/shipments" component={AdminShipmentsPage} />
 
               {/* Protected admin dashboard routes */}
               <ProtectedRoute path="/admin" component={DashboardPage} />
