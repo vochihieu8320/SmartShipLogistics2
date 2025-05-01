@@ -21,7 +21,8 @@ import ShipmentsPage from "@/pages/shipments-page";
 import CreateShippingPage from "@/pages/create-shipping-page";
 import ShipmentDetailPage from "@/pages/shipment-detail-page";
 import { ThemeProvider } from "@/components/theme-provider";
-import PriceManagementPage from "@/pages/price-management-page"; // Import the new component
+import PriceManagementPage from "@/pages/price-management-page";
+import AdminShipmentsPage from "@/pages/admin-shipments-page";
 
 function App() {
   return (
