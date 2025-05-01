@@ -187,18 +187,26 @@ export default function PriceManagementPage() {
                       <TableRow key={index}>
                         <TableCell>{fee.display_name}</TableCell>
                         <TableCell>
-                          <Input
-                            type="text"
-                            value={fee.amount}
-                            onChange={(e) => {
-                              const updatedFees = [...otherFees];
-                              updatedFees[index].amount = e.target.value;
-                              setOtherFees(updatedFees);
-                            }}
-                            className="w-32"
-                          />
-                          {fee.unit === 'percentage' && '%'}
-                          {fee.unit === 'per_kg' && '/kg'}
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="text"
+                              value={fee.amount}
+                              onChange={(e) => {
+                                const updatedFees = [...otherFees];
+                                updatedFees[index].amount = e.target.value;
+                                setOtherFees(updatedFees);
+                              }}
+                              className="w-32"
+                            />
+                            <span className="text-sm text-gray-600">
+                              {fee.unit === 'percentage' && '%'}
+                              {fee.unit === 'per_kg' && `VND/kg`}
+                              {fee.unit === 'money' && 'VND'}
+                            </span>
+                          </div>
+                          <div className="text-sm text-gray-500 mt-1">
+                            {fee.unit !== 'percentage' && formatPrice(fee.amount)}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <Button 
