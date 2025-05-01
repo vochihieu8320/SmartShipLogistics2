@@ -9,7 +9,7 @@ import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
-
+import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -181,62 +181,7 @@ export default function CreateShippingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/">
-              <a className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                VN Logistics
-              </a>
-            </Link>
-          </div>
-          <nav className="hidden md:flex gap-8">
-            <Link href="/">
-              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
-                Trang Chủ
-              </a>
-            </Link>
-            <Link href="/shipping/create">
-              <a className="font-medium text-primary border-b-2 border-primary pb-1">Vận Chuyển</a>
-            </Link>
-            <Link href="/tracking">
-              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
-                Theo Dõi
-              </a>
-            </Link>
-            <Link href="/shipments">
-              <a className="font-medium text-gray-600 hover:text-primary transition-colors">
-                Đơn Hàng
-              </a>
-            </Link>
-          </nav>
-          <div className="flex items-center gap-2">
-            {user ? (
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-medium hidden md:inline-block">
-                  Xin chào, <span className="text-primary font-semibold">{user.fullName}</span>
-                </span>
-                <Link href="/admin">
-                  <Button variant="outline" className="hidden md:inline-flex hover:bg-primary hover:text-white transition-colors">
-                    Bảng Điều Khiển
-                  </Button>
-                </Link>
-              </div>
-            ) : (
-              <>
-                <Link href="/auth">
-                  <Button variant="outline" className="hidden md:inline-flex hover:bg-primary hover:text-white transition-colors">
-                    Đăng Nhập
-                  </Button>
-                </Link>
-                <Link href="/auth?register=true">
-                  <Button className="hidden md:inline-flex shadow-md hover:shadow-lg transition-shadow">Đăng Ký</Button>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4">
