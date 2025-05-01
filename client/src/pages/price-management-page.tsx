@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { toast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -176,6 +178,7 @@ export default function PriceManagementPage() {
                     <TableRow>
                       <TableHead>Fee Name</TableHead>
                       <TableHead>Amount</TableHead>
+                      <TableHead>Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -183,9 +186,58 @@ export default function PriceManagementPage() {
                       <TableRow key={index}>
                         <TableCell>{fee.display_name}</TableCell>
                         <TableCell>
-                          {fee.unit === 'percentage' && `${fee.amount}%`}
-                          {fee.unit === 'per_kg' && `${formatPrice(fee.amount)}/kg`}
-                          {fee.unit === 'money' && formatPrice(fee.amount)}
+                          <Input
+                            type="text"
+                            value={fee.amount}
+                            onChange={(e) => {
+                              const updatedFees = [...otherFees];
+                              updatedFees[index].amount = e.target.value;
+                              setOtherFees(updatedFees);
+                            }}
+                            className="w-32"
+                          />
+                          {fee.unit === 'percentage' && '%'}
+                          {fee.unit === 'per_kg' && '/kg'}
+                        </TableCell>
+                        <TableCell>
+                          <Button 
+                            size="sm"
+                            onClick={async () => {
+                              try {
+                                const token = localStorage.getItem('token');
+                                const response = await fetch(
+                                  `${API_BASE_URL}/providers/${selectedProvider}/update_prices/?provider_service_id=${selectedService}&country_id=${selectedCountry}`,
+                                  {
+                                    method: 'PUT',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                      'Authorization': `${token}`
+                                    },
+                                    body: JSON.stringify({
+                                      fee_type: fee.type,
+                                      amount: fee.amount
+                                    })
+                                  }
+                                );
+                                if (response.ok) {
+                                  toast({
+                                    title: "Success",
+                                    description: "Price updated successfully"
+                                  });
+                                } else {
+                                  throw new Error('Failed to update price');
+                                }
+                              } catch (error) {
+                                toast({
+                                  title: "Error",
+                                  description: "Failed to update price",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                          >
+                            Save
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
