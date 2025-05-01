@@ -32,7 +32,10 @@ interface AddressFormProps {
 
 export default function AddressForm({ form, type, title }: AddressFormProps) {
   const [countries, setCountries] = useState<Country[]>([]);
-  const baseField = type === "sender" ? "shipment.sender_address_attributes" : "shipment.receiver_address_attributes";
+  const baseField =
+    type === "sender"
+      ? "shipment.sender_address_attributes"
+      : "shipment.receiver_address_attributes";
   const isReceiver = type === "receiver";
 
   useEffect(() => {
@@ -45,10 +48,12 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
     if (isReceiver) {
       const fetchCountries = async () => {
         try {
-          const response = await api.get<{countries: Country[]}>('/v1/countries');
+          const response = await api.get<{ countries: Country[] }>(
+            "/countries",
+          );
           setCountries(response.countries);
         } catch (error) {
-          console.error('Error fetching countries:', error);
+          console.error("Error fetching countries:", error);
         }
       };
       fetchCountries();
@@ -58,7 +63,9 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
   return (
     <div className="space-y-5">
       <div className="flex items-center mb-2">
-        <div className={`w-10 h-10 rounded-full ${isReceiver ? 'bg-blue-100 text-blue-600' : 'bg-primary/20 text-primary'} flex items-center justify-center mr-3`}>
+        <div
+          className={`w-10 h-10 rounded-full ${isReceiver ? "bg-blue-100 text-blue-600" : "bg-primary/20 text-primary"} flex items-center justify-center mr-3`}
+        >
           {isReceiver ? <MapPin size={20} /> : <User size={20} />}
         </div>
         <h3 className="text-xl font-semibold">{title}</h3>
@@ -86,7 +93,11 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="email@example.com" {...field} />
+                <Input
+                  type="email"
+                  placeholder="email@example.com"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -192,15 +203,21 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
                   <Input value="Vietnam" disabled />
                 </FormControl>
               ) : (
-                <Select onValueChange={field.onChange} value={field.value?.toString()}>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value?.toString()}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select country" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {countries.map(country => (
-                      <SelectItem key={country.id} value={country.id.toString()}>
+                    {countries.map((country) => (
+                      <SelectItem
+                        key={country.id}
+                        value={country.id.toString()}
+                      >
                         {country.name}
                       </SelectItem>
                     ))}
