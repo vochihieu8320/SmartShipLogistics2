@@ -1,7 +1,16 @@
-import { Link, useLocation } from "wouter";
 
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Header() {
   const [location] = useLocation();
@@ -17,16 +26,55 @@ export function Header() {
     logoutMutation.mutate();
   };
 
+  const getInitials = (name?: string) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map(word => word[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <Link href="/">
             <a className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
               VN Logistics
             </a>
           </Link>
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>{getInitials(user.fullName)}</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <span className="text-sm text-gray-600">
+                    {user.fullName}
+                  </span>
+                </DropdownMenuItem>
+                {user.role === 'admin' && (
+                  <DropdownMenuItem>
+                    <Link href="/admin">
+                      <a className="w-full">Quản trị viên</a>
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={handleLogout}>
+                  Đăng xuất
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
+        
         <nav className="hidden md:flex gap-8 items-center">
           <Link href="/">
             <a className={`font-medium ${isActive("/") && !isActive("/shipping") && !isActive("/tracking") && !isActive("/shipments")
@@ -56,20 +104,7 @@ export function Header() {
               Đơn Hàng
             </a>
           </Link>
-          {user ? (
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">
-                Xin chào, {user.fullName}
-              </span>
-              <Button 
-                variant="outline" 
-                onClick={handleLogout}
-                className="text-sm"
-              >
-                Đăng Xuất
-              </Button>
-            </div>
-          ) : (
+          {!user && (
             <Link href="/auth">
               <Button variant="default" className="text-sm">
                 Đăng Nhập
