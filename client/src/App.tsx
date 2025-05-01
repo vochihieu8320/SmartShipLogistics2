@@ -21,6 +21,7 @@ import ShipmentsPage from "@/pages/shipments-page";
 import CreateShippingPage from "@/pages/create-shipping-page";
 import ShipmentDetailPage from "@/pages/shipment-detail-page";
 import { ThemeProvider } from "@/components/theme-provider";
+import PriceManagementPage from "@/pages/price-management-page"; // Import the new component
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
               <ManagerRoute path="/admin/reports" component={ReportsPage} />
               <AdminRoute path="/admin/users" component={UsersPage} />
               <ProtectedRoute path="/admin/settings" component={SettingsPage} />
+              <ProtectedRoute path="/admin/prices" component={PriceManagementPage} /> {/* Added price management route */}
 
               <Route component={NotFound} />
             </Switch>
