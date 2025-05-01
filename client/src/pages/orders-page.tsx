@@ -13,10 +13,10 @@ export default function OrdersPage() {
   const [perPage] = useState(10);
 
   const { data: response, isLoading, error } = useQuery({
-    queryKey: ["/admin/orders", page, perPage],
+    queryKey: ["/admin/shipments", page, perPage],
     queryFn: async () => {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE_URL}/admin/orders?page=${page}&per_page=${perPage}`, {
+      const response = await fetch(`${API_BASE_URL}/admin/shipments?page=${page}&per_page=${perPage}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
