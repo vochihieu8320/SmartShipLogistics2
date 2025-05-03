@@ -350,8 +350,16 @@ export default function CreateShippingPage() {
                         </div>
                       </div>
                     </TabsContent>
-
-                    <TabsContent value="service" className="mt-6">
+                  </Tabs>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    </div>
+  );
+}
                       <div className="space-y-6">
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                           <div className="mb-4 flex items-center">
