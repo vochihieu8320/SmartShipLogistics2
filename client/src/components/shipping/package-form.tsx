@@ -432,9 +432,6 @@ export default function PackageForm({ form }: PackageFormProps) {
                     Thể Tích
                   </TableHead>
                   <TableHead className="text-center py-3 font-semibold">
-                    Số Lượng
-                  </TableHead>
-                  <TableHead className="text-center py-3 font-semibold">
                     Thao Tác
                   </TableHead>
                 </TableRow>
@@ -553,9 +550,6 @@ export default function PackageForm({ form }: PackageFormProps) {
                           </div>
                         </TableCell>
                         <TableCell className="text-center">
-                          <div className="w-[80px] mx-auto text-sm font-medium">1</div>
-                        </TableCell>
-                        <TableCell className="text-center">
                           <Button
                             type="button"
                             variant="ghost"
@@ -581,17 +575,23 @@ export default function PackageForm({ form }: PackageFormProps) {
               <p className="text-sm text-gray-500">
                 Tổng số sản phẩm:{" "}
                 <span className="font-medium text-primary">
-                  {fields.reduce((sum, field) => sum + ((field as any).quantity || 1), 0)} cái
+                  {fields.reduce(
+                    (sum, field) => sum + ((field as any).quantity || 1),
+                    0,
+                  )}{" "}
+                  cái
                 </span>
               </p>
               <p className="text-sm text-gray-500">
                 Tổng khối lượng:{" "}
                 <span className="font-medium text-primary">
-                  {fields.reduce((sum, field) => {
-                    const item = field as any;
-                    const volumetricWeight = ((item.length || 0) * (item.width || 0) * (item.height || 0)) / 5000;
-                    return sum + volumetricWeight;
-                  }, 0).toFixed(2)} kg
+                  {fields
+                    .reduce((sum, field) => {
+                      const item = field as any;
+                      return sum + item.weight;
+                    }, 0)
+                    .toFixed(2)}{" "}
+                  kg
                 </span>
               </p>
             </div>
