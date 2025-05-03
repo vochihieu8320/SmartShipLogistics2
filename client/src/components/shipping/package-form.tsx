@@ -588,11 +588,25 @@ export default function PackageForm({ form }: PackageFormProps) {
         </div>
 
         {fields.length > 0 && (
-          <div className="mt-4 text-right">
-            <p className="text-sm text-gray-500">
-              Tổng số sản phẩm:{" "}
-              <span className="font-medium text-primary">{fields.length}</span>
-            </p>
+          <div className="mt-4 space-y-1">
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-gray-500">
+                Tổng số sản phẩm:{" "}
+                <span className="font-medium text-primary">
+                  {fields.reduce((sum, field) => sum + ((field as any).quantity || 1), 0)} cái
+                </span>
+              </p>
+              <p className="text-sm text-gray-500">
+                Tổng khối lượng:{" "}
+                <span className="font-medium text-primary">
+                  {fields.reduce((sum, field) => {
+                    const item = field as any;
+                    const volumetricWeight = ((item.length || 0) * (item.width || 0) * (item.height || 0)) / 5000;
+                    return sum + volumetricWeight;
+                  }, 0).toFixed(2)} kg
+                </span>
+              </p>
+            </div>
           </div>
         )}
 
