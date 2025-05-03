@@ -314,7 +314,6 @@ export default function PackageForm({ form }: PackageFormProps) {
                   <TableHead className="text-center py-3 font-semibold">Cân Nặng</TableHead>
                   <TableHead className="text-center py-3 font-semibold">Thể Tích (kg)</TableHead>
                   <TableHead className="text-center py-3 font-semibold">Số Lượng</TableHead>
-                  <TableHead className="text-center py-3 font-semibold">Xuất Xứ</TableHead>
                   <TableHead className="text-center py-3 font-semibold">Thao Tác</TableHead>
                 </TableRow>
               </TableHeader>
@@ -412,24 +411,6 @@ export default function PackageForm({ form }: PackageFormProps) {
                             min={1}
                             placeholder="SL"
                           />
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Select 
-                            value={item.country_of_origin || "VN"}
-                            onValueChange={(value) => update(index, { ...field, country_of_origin: value } as any)}
-                          >
-                            <SelectTrigger className="w-[80px] mx-auto border-gray-300 focus:border-primary">
-                              <SelectValue placeholder="Quốc gia" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="VN">Việt Nam</SelectItem>
-                              <SelectItem value="CN">Trung Quốc</SelectItem>
-                              <SelectItem value="JP">Nhật Bản</SelectItem>
-                              <SelectItem value="KR">Hàn Quốc</SelectItem>
-                              <SelectItem value="US">Hoa Kỳ</SelectItem>
-                              <SelectItem value="TH">Thái Lan</SelectItem>
-                            </SelectContent>
-                          </Select>
                         </TableCell>
                         <TableCell className="text-center">
                           <Button
