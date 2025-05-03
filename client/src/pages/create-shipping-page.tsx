@@ -83,7 +83,7 @@ type CreateShipmentFormValues = z.infer<typeof createShipmentSchema>;
 export default function CreateShippingPage() {
   const { user, isLoading } = useAuth();
   const [, navigate] = useLocation();
-  const [activeTab, setActiveTab] = useState("address");
+  const [activeTab, setActiveTab] = useState("info");
   const [shipmentId, setShipmentId] = useState<number | null>(null);
   const { toast } = useToast();
 
