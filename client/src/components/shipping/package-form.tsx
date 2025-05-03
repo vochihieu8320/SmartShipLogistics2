@@ -101,7 +101,14 @@ export default function PackageForm({ form }: PackageFormProps) {
   const addNewItem = () => {
     const newItem = createNewItem();
     append(newItem as any);
-    //startEditItem(fields.length -1); //Start editing the newly added item. This line is optional depending on the desired behavior.
+    // Use setTimeout to allow the DOM to update before focusing
+    setTimeout(() => {
+      const inputs = document.querySelectorAll('input[placeholder="Nhập mô tả"]');
+      const lastInput = inputs[inputs.length - 1] as HTMLInputElement;
+      if (lastInput) {
+        lastInput.focus();
+      }
+    }, 0);
   };
 
   return (
