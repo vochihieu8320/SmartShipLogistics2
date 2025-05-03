@@ -205,7 +205,7 @@ export default function CreateShippingPage() {
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="space-y-6"
                 >
-                  <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
+                  <Tabs defaultValue="info" value={activeTab} onValueChange={setActiveTab} className="mt-2">
                     <TabsList className="grid w-full grid-cols-3 p-1 rounded-xl bg-gray-100">
                       <TabsTrigger 
                         value="info" 
@@ -237,7 +237,7 @@ export default function CreateShippingPage() {
                     </TabsList>
 
                     <TabsContent value="info" className="mt-6">
-                      <div className="space-y-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                           <AddressForm
                             form={form}
