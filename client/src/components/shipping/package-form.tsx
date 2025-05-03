@@ -570,7 +570,7 @@ export default function PackageForm({ form }: PackageFormProps) {
         </div>
 
         {fields.length > 0 && (
-          <div className="mt-4 space-y-1">
+          <div className="mt-4 space-y-4">
             <div className="flex justify-between items-center">
               <p className="text-sm text-gray-500">
                 Tổng số sản phẩm:{" "}
@@ -594,6 +594,45 @@ export default function PackageForm({ form }: PackageFormProps) {
                   kg
                 </span>
               </p>
+            </div>
+            
+            <div className="flex justify-center">
+              <Button
+                type="button"
+                onClick={async () => {
+                  try {
+                    // First create shipment
+                    const response = await fetch(`${API_BASE_URL}/shipments`, {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                      },
+                      body: JSON.stringify(form.getValues()),
+                    });
+
+                    if (!response.ok) {
+                      throw new Error("Không thể tạo đơn hàng");
+                    }
+
+                    const result = await response.json();
+                    const shipmentId = result.id;
+
+                    // Then get quotes
+                    window.location.href = `/shipping/create?tab=service&shipmentId=${shipmentId}`;
+                    
+                  } catch (error) {
+                    toast({
+                      title: "Lỗi",
+                      description: "Không thể lấy báo giá. Vui lòng thử lại",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                className="w-full md:w-auto px-6 py-2 bg-primary text-white hover:bg-primary/90"
+              >
+                Kiểm Tra Giá
+              </Button>
             </div>
           </div>
         )}
