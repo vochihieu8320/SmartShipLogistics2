@@ -237,20 +237,22 @@ export default function CreateShippingPage() {
                     </TabsList>
 
                     <TabsContent value="info" className="mt-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                          <AddressForm
-                            form={form}
-                            type="sender"
-                            title="Thông Tin Người Gửi"
-                          />
-                        </div>
-                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                          <AddressForm
-                            form={form}
-                            type="receiver"
-                            title="Thông Tin Người Nhận"
-                          />
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                            <AddressForm
+                              form={form}
+                              type="sender"
+                              title="Thông Tin Người Gửi"
+                            />
+                          </div>
+                          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                            <AddressForm
+                              form={form}
+                              type="receiver"
+                              title="Thông Tin Người Nhận"
+                            />
+                          </div>
                         </div>
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                           <PackageForm form={form} />
