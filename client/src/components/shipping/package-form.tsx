@@ -101,7 +101,7 @@ export default function PackageForm({ form }: PackageFormProps) {
   const addNewItem = () => {
     const newItem = createNewItem();
     append(newItem as any);
-    startEditItem(fields.length);
+    //startEditItem(fields.length -1); //Start editing the newly added item. This line is optional depending on the desired behavior.
   };
 
   return (
@@ -301,18 +301,20 @@ export default function PackageForm({ form }: PackageFormProps) {
             <Table>
               <TableHeader className="bg-gray-50">
                 <TableRow className="border-b border-gray-200">
+                  <TableHead className="py-3 font-semibold">STT</TableHead>
                   <TableHead className="py-3 font-semibold">Mô Tả Sản Phẩm</TableHead>
-                  <TableHead className="text-center font-semibold">Kích Thước (D×R×C)</TableHead>
-                  <TableHead className="text-center font-semibold">Cân Nặng</TableHead>
-                  <TableHead className="text-center font-semibold">Số Lượng</TableHead>
-                  <TableHead className="text-center font-semibold">Xuất Xứ</TableHead>
-                  <TableHead className="text-center font-semibold">Thao Tác</TableHead>
+                  <TableHead className="text-center py-3 font-semibold">Kích Thước (D×R×C)</TableHead>
+                  <TableHead className="text-center py-3 font-semibold">Cân Nặng</TableHead>
+                  <TableHead className="text-center py-3 font-semibold">Thể Tích (kg)</TableHead>
+                  <TableHead className="text-center py-3 font-semibold">Số Lượng</TableHead>
+                  <TableHead className="text-center py-3 font-semibold">Xuất Xứ</TableHead>
+                  <TableHead className="text-center py-3 font-semibold">Thao Tác</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {fields.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-10 text-muted-foreground bg-gray-50/30">
+                    <TableCell colSpan={8} className="text-center py-10 text-muted-foreground bg-gray-50/30">
                       <div className="flex flex-col items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-gray-300 mb-3">
                           <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
@@ -334,8 +336,12 @@ export default function PackageForm({ form }: PackageFormProps) {
                 ) : (
                   fields.map((field, index) => {
                     const item = field as unknown as ShipmentItem;
+                    const volumetricWeight = (item.length || 0) * (item.width || 0) * (item.height || 0) / 5000;
                     return (
                       <TableRow key={field.id} className="hover:bg-gray-50">
+                        <TableCell className="font-medium text-center">
+                          {index + 1}/{fields.length}
+                        </TableCell>
                         <TableCell>
                           <Input
                             value={item.description || ""}
@@ -383,6 +389,11 @@ export default function PackageForm({ form }: PackageFormProps) {
                             placeholder="Kg"
                             min={0}
                           />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="text-sm font-medium">
+                            {volumetricWeight.toFixed(2)} kg
+                          </div>
                         </TableCell>
                         <TableCell className="text-center">
                           <Input
@@ -439,237 +450,9 @@ export default function PackageForm({ form }: PackageFormProps) {
             </p>
           </div>
         )}
-          
+
         {/* Edit Item Dialog */}
-        {editingItemIndex !== null && tempItem && (
-          <Dialog open={editingItemIndex !== null} onOpenChange={() => cancelEditItem()}>
-            <DialogContent className="max-w-3xl">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                      </svg>
-                    </div>
-                    <h3 className="text-xl font-semibold">
-                      {editingItemIndex < fields.length ? "Chỉnh Sửa Sản Phẩm" : "Thêm Sản Phẩm Mới"}
-                    </h3>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={cancelEditItem}
-                    className="hover:bg-gray-100"
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-
-                <div className="space-y-5">
-                  <div className="bg-primary/5 p-4 rounded-lg mb-2">
-                    <div className="grid grid-cols-1 gap-4">
-                      <div className="form-item">
-                        <label className="flex items-center gap-1.5 text-base font-medium mb-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
-                            <path d="M5 3a2 2 0 0 0-2 2"></path>
-                            <path d="M19 3a2 2 0 0 1 2 2"></path>
-                            <path d="M21 19a2 2 0 0 1-2 2"></path>
-                            <path d="M5 21a2 2 0 0 1-2-2"></path>
-                            <path d="M9 3h6"></path>
-                            <path d="M9 21h6"></path>
-                            <path d="M3 9v6"></path>
-                            <path d="M21 9v6"></path>
-                            <rect width="10" height="10" x="7" y="7" rx="1"></rect>
-                          </svg>
-                          Mô Tả Chi Tiết Sản Phẩm
-                        </label>
-                        <Input 
-                          value={tempItem.description || ""} 
-                          onChange={(e) => handleTempItemChange("description", e.target.value)}
-                          className="border-gray-300 focus:border-primary py-6"
-                          placeholder="Nhập tên và mô tả sản phẩm"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                    <h5 className="font-medium mb-3 text-gray-700">Kích Thước & Trọng Lượng</h5>
-                    <div className="grid grid-cols-4 gap-4">
-                      <div className="form-item">
-                        <label className="text-sm font-medium flex items-center gap-1.5 mb-1.5">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
-                            <path d="M3 3v18h18"></path>
-                            <path d="m21 3-9 9"></path>
-                          </svg>
-                          Dài (cm)
-                        </label>
-                        <Input 
-                          type="number"
-                          min="0"
-                          value={tempItem.length || ""}
-                          onChange={(e) => handleTempItemChange("length", Number(e.target.value))}
-                          className="border-gray-300 focus:border-primary"
-                          placeholder="0.0"
-                        />
-                      </div>
-                      <div className="form-item">
-                        <label className="text-sm font-medium flex items-center gap-1.5 mb-1.5">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
-                            <path d="M3 3v18h18"></path>
-                            <path d="M15 9H9v6"></path>
-                          </svg>
-                          Rộng (cm)
-                        </label>
-                        <Input 
-                          type="number"
-                          min="0"
-                          value={tempItem.width || ""}
-                          onChange={(e) => handleTempItemChange("width", Number(e.target.value))}
-                          className="border-gray-300 focus:border-primary"
-                          placeholder="0.0"
-                        />
-                      </div>
-                      <div className="form-item">
-                        <label className="text-sm font-medium flex items-center gap-1.5 mb-1.5">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
-                            <path d="M21 3v18"></path>
-                            <path d="M7 19h10"></path>
-                            <path d="M10 7v4"></path>
-                            <path d="M14 7v4"></path>
-                            <path d="M17 11h-4"></path>
-                            <path d="M8 15h8"></path>
-                          </svg>
-                          Cao (cm)
-                        </label>
-                        <Input 
-                          type="number"
-                          min="0"
-                          value={tempItem.height || ""}
-                          onChange={(e) => handleTempItemChange("height", Number(e.target.value))}
-                          className="border-gray-300 focus:border-primary"
-                          placeholder="0.0"
-                        />
-                      </div>
-                      <div className="form-item">
-                        <label className="text-sm font-medium flex items-center gap-1.5 mb-1.5">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
-                            <path d="M12 3v3"></path>
-                            <path d="M18.5 14.4c-.15 0-.26.07-.35.2l-.54.76a.5.5 0 0 1-.46.26H7.9a.6.6 0 0 1-.49-.24l-.7-1.1a.41.41 0 0 0-.35-.2c-.31 0-.65.35-.45.71l2.55 4.88a.5.5 0 0 0 .45.28h7.13c.19 0 .36-.1.45-.28l2.55-4.88c.2-.36-.14-.71-.45-.71Z"></path>
-                            <path d="M10 13h4"></path>
-                            <path d="M13 10V7"></path>
-                            <path d="M12 7H9.62a1 1 0 0 0-.97.68l-.74 2.68A1 1 0 0 0 8.88 12h6.62"></path>
-                          </svg>
-                          Cân Nặng (kg)
-                        </label>
-                        <Input 
-                          type="number"
-                          min="0"
-                          step="0.1"
-                          value={tempItem.weight || ""}
-                          onChange={(e) => handleTempItemChange("weight", Number(e.target.value))}
-                          className="border-gray-300 focus:border-primary"
-                          placeholder="0.0"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                    <h5 className="font-medium mb-3 text-gray-700">Thông Tin Bổ Sung</h5>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="form-item">
-                        <label className="text-sm font-medium flex items-center gap-1.5 mb-1.5">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
-                            <path d="M6 10h12"></path>
-                            <path d="M6 6h7"></path>
-                            <path d="M6 14h7"></path>
-                            <path d="M14 18h1"></path>
-                            <rect width="20" height="16" x="2" y="2" rx="2"></rect>
-                          </svg>
-                          Số Lượng
-                        </label>
-                        <Input 
-                          type="number"
-                          min="1"
-                          value={tempItem.quantity || ""}
-                          onChange={(e) => handleTempItemChange("quantity", Number(e.target.value))}
-                          className="border-gray-300 focus:border-primary"
-                          placeholder="1"
-                        />
-                      </div>
-                      <div className="form-item">
-                        <label className="text-sm font-medium flex items-center gap-1.5 mb-1.5">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M8 12s1.5 2 4 2 4-2 4-2"></path>
-                            <path d="M9 9h.01"></path>
-                            <path d="M15 9h.01"></path>
-                          </svg>
-                          Xuất Xứ
-                        </label>
-                        <Select 
-                          value={tempItem.country_of_origin || "VN"}
-                          onValueChange={(value) => handleTempItemChange("country_of_origin", value)}
-                        >
-                          <SelectTrigger className="border-gray-300 focus:border-primary">
-                            <SelectValue placeholder="Quốc gia" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="VN">Việt Nam</SelectItem>
-                            <SelectItem value="CN">Trung Quốc</SelectItem>
-                            <SelectItem value="JP">Nhật Bản</SelectItem>
-                            <SelectItem value="KR">Hàn Quốc</SelectItem>
-                            <SelectItem value="US">Hoa Kỳ</SelectItem>
-                            <SelectItem value="TH">Thái Lan</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4">
-                    <div className="form-item">
-                      <label className="text-sm font-medium flex items-center gap-1.5 mb-1.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
-                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                          <line x1="9" y1="3" x2="9" y2="21"></line>
-                        </svg>
-                        Mã HS (Không bắt buộc)
-                      </label>
-                      <Input 
-                        placeholder="Mã HS Code"
-                        value={tempItem.hs_code || ""}
-                        onChange={(e) => handleTempItemChange("hs_code", e.target.value)}
-                        className="border-gray-300 focus:border-primary"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={cancelEditItem}
-                    >
-                      Huỷ Bỏ
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={saveItemChanges}
-                      className="flex items-center gap-1"
-                    >
-                      <Save className="h-4 w-4" /> Lưu Lại
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
+        {/* Removed the edit item dialog as per the user request */}
       </CardContent>
     </Card>
   );
