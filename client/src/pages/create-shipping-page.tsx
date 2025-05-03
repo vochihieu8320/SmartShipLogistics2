@@ -206,23 +206,14 @@ export default function CreateShippingPage() {
                   className="space-y-6"
                 >
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
-                    <TabsList className="grid w-full grid-cols-4 p-1 rounded-xl bg-gray-100">
+                    <TabsList className="grid w-full grid-cols-3 p-1 rounded-xl bg-gray-100">
                       <TabsTrigger 
-                        value="address" 
-                        className={`rounded-lg ${activeTab === "address" ? "bg-white shadow-md" : ""} transition-all`}
+                        value="info" 
+                        className={`rounded-lg ${activeTab === "info" ? "bg-white shadow-md" : ""} transition-all`}
                       >
                         <div className="flex flex-col items-center gap-1.5 py-1">
-                          <span className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "address" ? "bg-primary text-white" : "bg-gray-200"}`}>1</span>
-                          <span>Thông Tin Địa Chỉ</span>
-                        </div>
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="package"
-                        className={`rounded-lg ${activeTab === "package" ? "bg-white shadow-md" : ""} transition-all`}
-                      >
-                        <div className="flex flex-col items-center gap-1.5 py-1">
-                          <span className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "package" ? "bg-primary text-white" : "bg-gray-200"}`}>2</span>
-                          <span>Thông Tin Hàng Hóa</span>
+                          <span className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "info" ? "bg-primary text-white" : "bg-gray-200"}`}>1</span>
+                          <span>Thông Tin Đơn Hàng</span>
                         </div>
                       </TabsTrigger>
                       <TabsTrigger 
@@ -230,7 +221,7 @@ export default function CreateShippingPage() {
                         className={`rounded-lg ${activeTab === "service" ? "bg-white shadow-md" : ""} transition-all`}
                       >
                         <div className="flex flex-col items-center gap-1.5 py-1">
-                          <span className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "service" ? "bg-primary text-white" : "bg-gray-200"}`}>3</span>
+                          <span className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "service" ? "bg-primary text-white" : "bg-gray-200"}`}>2</span>
                           <span>Chọn Dịch Vụ</span>
                         </div>
                       </TabsTrigger>
@@ -239,13 +230,13 @@ export default function CreateShippingPage() {
                         className={`rounded-lg ${activeTab === "review" ? "bg-white shadow-md" : ""} transition-all`}
                       >
                         <div className="flex flex-col items-center gap-1.5 py-1">
-                          <span className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "review" ? "bg-primary text-white" : "bg-gray-200"}`}>4</span>
+                          <span className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "review" ? "bg-primary text-white" : "bg-gray-200"}`}>3</span>
                           <span>Xác Nhận</span>
                         </div>
                       </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="address" className="mt-6">
+                    <TabsContent value="info" className="mt-6">
                       <div className="space-y-8">
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                           <AddressForm
@@ -261,10 +252,13 @@ export default function CreateShippingPage() {
                             title="Thông Tin Người Nhận"
                           />
                         </div>
+                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                          <PackageForm form={form} />
+                        </div>
                         <div className="flex justify-end mt-6">
                           <Button
                             type="button"
-                            onClick={() => setActiveTab("package")}
+                            onClick={() => setActiveTab("service")}
                             className="px-6 py-5 rounded-lg gap-2 shadow-md hover:shadow-lg transition-all"
                           >
                             Tiếp Theo
@@ -273,17 +267,29 @@ export default function CreateShippingPage() {
                         </div>
                       </div>
                     </TabsContent>
-
-                    <TabsContent value="package" className="mt-6">
                       <div className="space-y-6">
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                          <PackageForm form={form} />
+                          <ServiceQuoteForm
+                            key={`quote-form-${shipmentId}`}
+                            shipmentId={shipmentId}
+                            onQuoteSelect={(quote) => {
+                              form.setValue(
+                                "shipment.provider_service_id",
+                                quote.id,
+                              );
+                              toast({
+                                title: "Đã chọn dịch vụ",
+                                description: `Đã chọn ${quote.provider_name} - ${quote.service_name}`,
+                              });
+                              setActiveTab("review");
+                            }}
+                          />
                         </div>
                         <div className="flex justify-between mt-6">
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() => setActiveTab("address")}
+                            onClick={() => setActiveTab("info")}
                             className="px-6 py-5 rounded-lg gap-2"
                           >
                             <span className="inline-block mr-1">←</span>
