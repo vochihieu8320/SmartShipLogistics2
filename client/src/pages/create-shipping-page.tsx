@@ -238,6 +238,35 @@ export default function CreateShippingPage() {
 
                     <TabsContent value="info" className="mt-6">
                       <div className="space-y-6">
+                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                          <div className="mb-4 flex items-center">
+                            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
+                              <span className="text-xl font-bold">$</span>
+                            </div>
+                            <h3 className="text-xl font-semibold">Chọn Dịch Vụ Vận Chuyển</h3>
+                          </div>
+
+                          {shipmentId && (
+                            <div className="py-3">
+                              <ServiceQuoteForm
+                                key={`quote-form-${shipmentId}`}
+                                shipmentId={shipmentId}
+                                onQuoteSelect={(quote) => {
+                                  form.setValue(
+                                    "shipment.provider_service_id",
+                                    quote.id,
+                                  );
+                                  toast({
+                                    title: "Đã chọn dịch vụ",
+                                    description: `Đã chọn ${quote.provider_name} - ${quote.service_name}`,
+                                  });
+                                }}
+                                gridColumns={3}
+                              />
+                            </div>
+                          )}
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                             <AddressForm
@@ -261,6 +290,7 @@ export default function CreateShippingPage() {
                           <Button
                             type="button"
                             onClick={() => setActiveTab("service")}
+                            disabled={!form.getValues().shipment.provider_service_id || !form.getValues().shipment.packages_attributes[0].items_attributes?.length}
                             className="px-6 py-5 rounded-lg gap-2 shadow-md hover:shadow-lg transition-all"
                           >
                             Tiếp Theo

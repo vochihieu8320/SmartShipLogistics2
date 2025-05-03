@@ -37,6 +37,7 @@ interface Quote {
 interface ServiceQuoteFormProps {
   shipmentId: number;
   onQuoteSelect: (quote: Quote) => void;
+  gridColumns?: number; // Added gridColumns prop
 }
 
 function formatCurrency(amount: number) {
@@ -49,6 +50,7 @@ function formatCurrency(amount: number) {
 export default function ServiceQuoteForm({
   shipmentId,
   onQuoteSelect,
+  gridColumns,
 }: ServiceQuoteFormProps) {
   const { data: quoteResponse, isLoading } = useQuery({
     queryKey: ["shipmentQuotes", shipmentId],
@@ -121,7 +123,7 @@ export default function ServiceQuoteForm({
                 </div>
 
                 <div className="mb-6 pb-5 border-b border-gray-100">
-                  <div className="grid md:grid-cols-4 gap-5 text-sm">
+                  <div className={`grid md:grid-cols-${gridColumns || 4} gap-5 text-sm`}> {/* Applied the change here */}
                     <div className="bg-gray-50 rounded-lg p-3">
                       <p className="text-gray-500 text-xs uppercase font-medium mb-1">
                         Giá Gốc
