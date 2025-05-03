@@ -361,8 +361,8 @@ export default function PackageForm({ form }: PackageFormProps) {
                           <div className="flex items-center gap-1 justify-center">
                             <Input
                               type="number"
-                              value={item.length || 0}
-                              onChange={(e) => update(index, { ...field, length: Number(e.target.value) } as any)}
+                              defaultValue={item.length || 0}
+                              onBlur={(e) => update(index, { ...field, length: Number(e.target.value) } as any)}
                               className="w-[60px] border-gray-300 focus:border-primary"
                               placeholder="D"
                               min={0}
@@ -370,8 +370,8 @@ export default function PackageForm({ form }: PackageFormProps) {
                             ×
                             <Input
                               type="number"
-                              value={item.width || 0}
-                              onChange={(e) => update(index, { ...field, width: Number(e.target.value) } as any)}
+                              defaultValue={item.width || 0}
+                              onBlur={(e) => update(index, { ...field, width: Number(e.target.value) } as any)}
                               className="w-[60px] border-gray-300 focus:border-primary"
                               placeholder="R"
                               min={0}
@@ -379,8 +379,8 @@ export default function PackageForm({ form }: PackageFormProps) {
                             ×
                             <Input
                               type="number"
-                              value={item.height || 0}
-                              onChange={(e) => update(index, { ...field, height: Number(e.target.value) } as any)}
+                              defaultValue={item.height || 0}
+                              onBlur={(e) => update(index, { ...field, height: Number(e.target.value) } as any)}
                               className="w-[60px] border-gray-300 focus:border-primary"
                               placeholder="C"
                               min={0}
@@ -390,8 +390,8 @@ export default function PackageForm({ form }: PackageFormProps) {
                         <TableCell className="text-center">
                           <Input
                             type="number"
-                            value={item.weight || 0}
-                            onChange={(e) => update(index, { ...field, weight: Number(e.target.value) } as any)}
+                            defaultValue={item.weight || 0}
+                            onBlur={(e) => update(index, { ...field, weight: Number(e.target.value) } as any)}
                             className="w-[80px] mx-auto border-gray-300 focus:border-primary"
                             placeholder="Kg"
                             min={0}
@@ -405,8 +405,8 @@ export default function PackageForm({ form }: PackageFormProps) {
                         <TableCell className="text-center">
                           <Input
                             type="number"
-                            value={item.quantity || 1}
-                            onChange={(e) => update(index, { ...field, quantity: Number(e.target.value) } as any)}
+                            defaultValue={item.quantity || 1}
+                            onBlur={(e) => update(index, { ...field, quantity: Number(e.target.value) } as any)}
                             className="w-[80px] mx-auto border-gray-300 focus:border-primary"
                             min={1}
                             placeholder="SL"
