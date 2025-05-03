@@ -107,22 +107,31 @@ function LoginForm() {
 
   function onSubmit(data: LoginCredentials) {
     loginMutation.mutate(data, {
-      onSuccess: (user) => {
-        toast({
-          title: "Đăng nhập thành công",
-          description: "Chào mừng bạn quay trở lại!",
-        });
-        // Navigate based on user role
-        if (user.role === "admin" || user.role === "manager") {
-          navigate("/admin");
+      onSuccess: (response) => {
+        if (response.success) {
+          toast({
+            title: "Đăng nhập thành công",
+            description: "Chào mừng bạn quay trở lại!",
+            variant: "default"
+          });
+          // Navigate based on user role
+          if (response.user.role === "admin" || response.user.role === "manager") {
+            navigate("/admin");
+          } else {
+            navigate("/");
+          }
         } else {
-          navigate("/");
+          toast({
+            title: "Đăng nhập thất bại",
+            description: "Tài khoản hoặc mật khẩu không chính xác",
+            variant: "destructive"
+          });
         }
       },
       onError: (error) => {
         toast({
-          title: "Đăng nhập thất bại",
-          description: error.message || "Sai tên đăng nhập hoặc mật khẩu",
+          title: "Lỗi",
+          description: error.message || "Không thể kết nối đến máy chủ",
           variant: "destructive"
         });
       }

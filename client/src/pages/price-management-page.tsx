@@ -216,11 +216,12 @@ export default function PriceManagementPage() {
                                 const response = await api.put(
                                   `/providers/${selectedProvider}/update_prices/?provider_service_id=${selectedService}&country_id=${selectedCountry}`,
                                   {
-                                    fee_type: fee.name,
+                                    fee_type: fee.type,
                                     amount: fee.amount
                                   }
                                 );
-                                if (response.ok) {
+                                
+                                if (response.status === 200) {
                                   toast({
                                     title: "Cập nhật thành công",
                                     description: `Đã cập nhật ${fee.display_name} thành ${formatPrice(fee.amount)}`,
