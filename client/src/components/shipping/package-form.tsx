@@ -63,7 +63,7 @@ export default function PackageForm({ form }: PackageFormProps) {
       length: 0,
       width: 0,
       height: 0,
-      quantity: 1,
+      quantity: 1, // Fixed quantity that cannot be changed
       description: "",
       value: 0,
       country_of_origin: "VN",
@@ -553,19 +553,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                           </div>
                         </TableCell>
                         <TableCell className="text-center">
-                          <Input
-                            type="number"
-                            defaultValue={item.quantity || 1}
-                            onBlur={(e) =>
-                              update(index, {
-                                ...field,
-                                quantity: Number(e.target.value),
-                              } as any)
-                            }
-                            className="w-[80px] mx-auto border-gray-300 focus:border-primary"
-                            min={1}
-                            placeholder="SL"
-                          />
+                          <div className="w-[80px] mx-auto text-sm font-medium">1</div>
                         </TableCell>
                         <TableCell className="text-center">
                           <Button
