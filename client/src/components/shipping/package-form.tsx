@@ -351,8 +351,9 @@ export default function PackageForm({ form }: PackageFormProps) {
                         </TableCell>
                         <TableCell>
                           <Input
-                            value={item.description || ""}
-                            onChange={(e) => update(index, { ...field, description: e.target.value } as any)}
+                            key={`description-${field.id}`}
+                            defaultValue={item.description || ""}
+                            onBlur={(e) => update(index, { ...field, description: e.target.value } as any)}
                             className="border-gray-300 focus:border-primary"
                             placeholder="Nhập mô tả"
                           />
