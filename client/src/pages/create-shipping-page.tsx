@@ -267,99 +267,7 @@ export default function CreateShippingPage() {
                         </div>
                       </div>
                     </TabsContent>
-                      <div className="space-y-6">
-                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                          <ServiceQuoteForm
-                            key={`quote-form-${shipmentId}`}
-                            shipmentId={shipmentId}
-                            onQuoteSelect={(quote) => {
-                              form.setValue(
-                                "shipment.provider_service_id",
-                                quote.id,
-                              );
-                              toast({
-                                title: "Đã chọn dịch vụ",
-                                description: `Đã chọn ${quote.provider_name} - ${quote.service_name}`,
-                              });
-                              setActiveTab("review");
-                            }}
-                          />
-                        </div>
-                        <div className="flex justify-between mt-6">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => setActiveTab("info")}
-                            className="px-6 py-5 rounded-lg gap-2"
-                          >
-                            <span className="inline-block mr-1">←</span>
-                            Quay Lại
-                          </Button>
-                          <Button
-                            type="button"
-                            disabled={createShipmentMutation.isPending}
-                            className="px-6 py-5 rounded-lg gap-2 shadow-md hover:shadow-lg transition-all"
-                            onClick={async () => {
-                              try {
-                                const response = await fetch(
-                                  `${API_BASE_URL}/shipments`,
-                                  {
-                                    method: "POST",
-                                    headers: {
-                                      "Content-Type": "application/json",
-                                      Authorization: `${localStorage.getItem("token")}`,
-                                    },
-                                    body: JSON.stringify(form.getValues()),
-                                  },
-                                );
-
-                                if (!response.ok) {
-                                  throw new Error("Không thể tạo đơn hàng");
-                                }
-
-                                const data = await response.json();
-                                if (data) {
-                                  setShipmentId(data.id);
-                                  toast({
-                                    title: "Đã lưu thông tin",
-                                    description: "Đang tìm báo giá từ các nhà vận chuyển",
-                                  });
-                                  setActiveTab("service");
-                                }
-                              } catch (error) {
-                                toast({
-                                  title: "Lỗi",
-                                  description: "Không thể tạo đơn hàng, vui lòng thử lại",
-                                  variant: "destructive",
-                                });
-                              }
-                            }}
-                          >
-                            {createShipmentMutation.isPending ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Đang xử lý...
-                              </>
-                            ) : (
-                              <>
-                                Tiếp Theo
-                                <span className="inline-block ml-1">→</span>
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    </div>
-  );
-}
+                    <TabsContent value="service" className="mt-6">
                       <div className="space-y-6">
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                           <div className="mb-4 flex items-center">
@@ -368,7 +276,7 @@ export default function CreateShippingPage() {
                             </div>
                             <h3 className="text-xl font-semibold">Chọn Dịch Vụ Vận Chuyển</h3>
                           </div>
-                          
+
                           {shipmentId && activeTab === "service" ? (
                             <div className="py-3">
                               <ServiceQuoteForm
@@ -399,7 +307,7 @@ export default function CreateShippingPage() {
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() => setActiveTab("package")}
+                            onClick={() => setActiveTab("info")}
                             className="px-6 py-5 rounded-lg gap-2"
                           >
                             <span className="inline-block mr-1">←</span>
@@ -426,7 +334,6 @@ export default function CreateShippingPage() {
                         </div>
                       </div>
                     </TabsContent>
-
                     <TabsContent value="review" className="mt-6">
                       <div className="space-y-6">
                         {shipmentId && (
