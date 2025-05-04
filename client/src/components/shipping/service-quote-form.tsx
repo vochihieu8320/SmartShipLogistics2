@@ -73,16 +73,24 @@ export default function ServiceQuoteForm({
                         <div className="font-medium">{formatCurrency(quote.prices.peak_season)}</div>
                       </div>
 
-                      <div className="flex justify-between items-center">
-                        <div className="text-gray-600">Phụ phí Quá Khổ</div>
-                        <div className="font-medium">
-                          {formatCurrency(
-                            quote.prices.oversize_fee.reduce((total: number, fee: any) => 
-                              total + fee.applied_fees.reduce((feeTotal: number, applied: any) => 
-                                feeTotal + parseFloat(applied.amount), 0), 0)
-                          )}
-                        </div>
-                      </div>
+                      {quote.prices.oversize_fee.map((fee, index) => (
+                        fee.applied_fees.length > 0 && (
+                          <div key={index} className="space-y-2">
+                            <div className="flex justify-between items-center text-sm">
+                              <div className="text-gray-600">
+                                Phụ phí Quá Khổ - Kiện {index + 1}/{quote.prices.oversize_fee.length}
+                                {fee.item_id && ` - Lô #${fee.item_id}`}
+                              </div>
+                              <div className="font-medium">
+                                {formatCurrency(
+                                  fee.applied_fees.reduce((total: number, applied: any) => 
+                                    total + parseFloat(applied.amount), 0)
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      ))}
                       
                       <div className="pt-2 mt-2 border-t border-gray-200">
                         <div className="flex justify-between items-center">
