@@ -14,6 +14,7 @@ import {
 
 interface ServiceQuoteFormProps {
   shipmentId: number;
+  quotes: any[];
   onQuoteSelect: (quote: any) => void;
 }
 
