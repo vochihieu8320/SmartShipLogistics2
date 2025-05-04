@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { API_BASE_URL } from "@/config/api";
 import { Card, CardContent } from "@/components/ui/card";
@@ -58,7 +59,7 @@ export default function ServiceQuoteForm({
   shipmentId,
   onQuoteSelect,
 }: ServiceQuoteFormProps) {
-  const { data: quotes, isLoading } = useQuery({
+  const { data: shipmentData, isLoading } = useQuery({
     queryKey: ["shipment", shipmentId],
     queryFn: async () => {
       const response = await fetch(
@@ -83,6 +84,9 @@ export default function ServiceQuoteForm({
       </div>
     );
   }
+
+  // Extract quotes from shipment data
+  const quotes = shipmentData?.data?.quotes || [];
 
   return (
     <div className="space-y-6">
