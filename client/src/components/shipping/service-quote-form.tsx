@@ -17,6 +17,8 @@ interface ServiceQuoteFormProps {
 }
 
 function formatCurrency(amount: number) {
+  if (amount == null || amount == undefined) return 0;
+
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
@@ -65,46 +67,36 @@ export default function ServiceQuoteForm({
                     
                     <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
                       <div className="flex justify-between items-center">
-                        <div className="text-gray-600">Giá cơ bản</div>
+                        <div className="text-gray-600">Giá Net</div>
                         <div className="font-medium">{formatCurrency(quote.prices.net_price)}</div>
                       </div>
                       
-                      {quote.prices.fuel_surcharge > 0 && (
                         <div className="flex justify-between items-center">
-                          <div className="text-gray-600">Phụ phí nhiên liệu</div>
-                          <div className="font-medium">{formatCurrency(quote.prices.fuel_surcharge)}</div>
+                          <div className="text-gray-600">Phụ phí nhiên liệu({quote.prices.fuel_rate}%)</div>
+                          <div className="font-medium">{formatCurrency(quote.prices.fuel_surcharge)}<div>
                         </div>
-                      )}
                       
-                      {quote.prices.peak_season > 0 && (
                         <div className="flex justify-between items-center">
                           <div className="text-gray-600">Phụ phí mùa cao điểm</div>
                           <div className="font-medium">{formatCurrency(quote.prices.peak_season)}</div>
                         </div>
-                      )}
-                      
-                      <div className="pt-2 mt-2 border-t border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <div className="font-medium text-gray-900">Tổng cộng</div>
-                          <div className="text-lg font-bold text-primary">
-                            {formatCurrency(quote.prices.total_price)}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
-                  <div className="mb-6 pb-5 border-b border-gray-100">
-                    <div className="space-y-4">
-                      <div className="bg-gray-50 rounded-lg p-3">
                         <div className="flex justify-between items-center">
-                          <div className="font-medium">Phí kích thước</div>
-                          <div className="text-right font-medium">
+                          <div className="text-gray-600">Phụ phí Quá Khổ</div>
+                          <div className="font-medium">
                             {formatCurrency(
                               quote.prices.oversize_fee.reduce((total: number, fee: any) => 
                                 total + fee.applied_fees.reduce((feeTotal: number, applied: any) => 
                                   feeTotal + parseFloat(applied.amount), 0), 0)
                             )}
+                          </div>
+                        </div>
+                      
+                        <div className="pt-2 mt-2 border-t border-gray-200">
+                        <div className="flex justify-between items-center">
+                          <div className="font-medium text-gray-900">Tổng cộng</div>
+                          <div className="text-lg font-bold text-primary">
+                            {formatCurrency(quote.prices.total_price)}
                           </div>
                         </div>
                       </div>
