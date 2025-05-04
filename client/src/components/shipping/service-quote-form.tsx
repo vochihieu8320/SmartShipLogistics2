@@ -31,14 +31,11 @@ export default function ServiceQuoteForm({
   const { data: shipmentData, isLoading } = useQuery({
     queryKey: ["shipment", shipmentId],
     queryFn: async () => {
-      const response = await fetch(
-        `${API_BASE_URL}/shipments/${shipmentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+      const response = await fetch(`${API_BASE_URL}/shipments/${shipmentId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-      );
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch quotes");
       }
@@ -55,6 +52,7 @@ export default function ServiceQuoteForm({
     );
   }
 
+  console.log("shipmentData", shipmentData);
   const quotes = shipmentData?.data?.quotes || [];
 
   return (
@@ -64,7 +62,9 @@ export default function ServiceQuoteForm({
           <div className="text-center py-10 bg-gray-50 rounded-xl border border-gray-200">
             <div className="flex flex-col items-center">
               <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-              <h3 className="text-lg font-medium mb-2">Không tìm thấy báo giá</h3>
+              <h3 className="text-lg font-medium mb-2">
+                Không tìm thấy báo giá
+              </h3>
               <p className="text-gray-500 max-w-md">
                 Rất tiếc, không có báo giá nào có sẵn cho lô hàng này. Vui lòng
                 thử thay đổi thông tin hoặc liên hệ hỗ trợ.
@@ -102,39 +102,50 @@ export default function ServiceQuoteForm({
 
                   <div className="mb-6 pb-5 border-b border-gray-100">
                     <div className="space-y-4">
-                      {quote.prices.oversize_fee.map((fee: any, feeIndex: number) => (
-                        fee.applied_fees.length > 0 && (
-                          <div key={feeIndex} className="bg-gray-50 rounded-lg p-3">
-                            <Table>
-                              <TableHeader>
-                                <TableRow>
-                                  <TableHead>Chi tiết</TableHead>
-                                  <TableHead>Phí</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {fee.applied_fees.map((appliedFee: any, appliedFeeIndex: number) => (
-                                  <TableRow key={appliedFeeIndex}>
-                                    <TableCell>
-                                      <div className="font-medium">
-                                        {appliedFee.item_id === null
-                                          ? "Áp dụng cho tất cả kiện hàng"
-                                          : `Kiện ${feeIndex + 1}`}
-                                      </div>
-                                      <div className="text-sm text-gray-500">
-                                        {appliedFee.description}
-                                      </div>
-                                    </TableCell>
-                                    <TableCell className="text-right font-medium">
-                                      {formatCurrency(parseFloat(appliedFee.amount))}
-                                    </TableCell>
+                      {quote.prices.oversize_fee.map(
+                        (fee: any, feeIndex: number) =>
+                          fee.applied_fees.length > 0 && (
+                            <div
+                              key={feeIndex}
+                              className="bg-gray-50 rounded-lg p-3"
+                            >
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead>Chi tiết</TableHead>
+                                    <TableHead>Phí</TableHead>
                                   </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </div>
-                        )
-                      ))}
+                                </TableHeader>
+                                <TableBody>
+                                  {fee.applied_fees.map(
+                                    (
+                                      appliedFee: any,
+                                      appliedFeeIndex: number,
+                                    ) => (
+                                      <TableRow key={appliedFeeIndex}>
+                                        <TableCell>
+                                          <div className="font-medium">
+                                            {appliedFee.item_id === null
+                                              ? "Áp dụng cho tất cả kiện hàng"
+                                              : `Kiện ${feeIndex + 1}`}
+                                          </div>
+                                          <div className="text-sm text-gray-500">
+                                            {appliedFee.description}
+                                          </div>
+                                        </TableCell>
+                                        <TableCell className="text-right font-medium">
+                                          {formatCurrency(
+                                            parseFloat(appliedFee.amount),
+                                          )}
+                                        </TableCell>
+                                      </TableRow>
+                                    ),
+                                  )}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          ),
+                      )}
                     </div>
                   </div>
 
@@ -144,7 +155,7 @@ export default function ServiceQuoteForm({
                       onClick={() => {
                         localStorage.setItem(
                           "shipment_total_price",
-                          quote.prices.total_price.toString()
+                          quote.prices.total_price.toString(),
                         );
                         onQuoteSelect(quote);
                       }}
