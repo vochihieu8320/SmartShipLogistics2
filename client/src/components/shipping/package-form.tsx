@@ -625,7 +625,13 @@ export default function PackageForm({ form }: PackageFormProps) {
                       }
 
                       const result = await response.json();
-                      setShipmentId(result.id);
+                      if (result && result.id) {
+                        setShipmentId(result.id);
+                        // Set shipmentId in form data
+                        form.setValue("shipment.id", result.id);
+                      } else {
+                        throw new Error("Invalid response from server");
+                      }
                     } catch (error) {
                       toast({
                         title: "Lỗi",
