@@ -124,154 +124,71 @@ export default function ServiceQuoteForm({
                 </div>
 
                 <div className="mb-6 pb-5 border-b border-gray-100">
-                  <div className={`grid md:grid-cols-${gridColumns || 4} gap-5 text-sm`}> {/* Applied the change here */}
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-gray-500 text-xs uppercase font-medium mb-1">
-                        Giá Gốc
-                      </p>
-                      <p className="font-semibold text-base">
-                        {formatCurrency(quote.prices.net_price)}
-                      </p>
-                    </div>
-
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-gray-500 text-xs uppercase font-medium mb-1">
-                        Phụ Phí Nhiên Liệu ({quote.prices.fuel_rate}%)
-                      </p>
-                      <p className="font-semibold text-base">
-                        {formatCurrency(quote.prices.fuel_surcharge)}
-                      </p>
-                    </div>
-
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-gray-500 text-xs uppercase font-medium mb-1">
-                        VAT({quote.prices.vat_rate}%)
-                      </p>
-                      <p className="font-semibold text-base">
-                        {formatCurrency(quote.prices.vat)}
-                      </p>
-                    </div>
-
-                    {quote.prices.peak_season > 0 && (
+                    <div className="grid grid-cols-1 gap-3 text-sm">
                       <div className="bg-gray-50 rounded-lg p-3">
                         <p className="text-gray-500 text-xs uppercase font-medium mb-1">
-                          Phụ Phí Cao Điểm
+                          Giá Gốc
                         </p>
                         <p className="font-semibold text-base">
-                          {formatCurrency(quote.prices.peak_season)}
+                          {formatCurrency(quote.prices.net_price)}
                         </p>
                       </div>
-                    )}
 
-                    {quote.prices.oversize_fee.some(
-                      (fee) => fee.applied_fees.length > 0,
-                    ) && (
-                      <div className="bg-gray-50 rounded-lg p-3 md:col-span-4">
-                        <div className="flex justify-between items-center mb-2">
-                          <p className="text-gray-500 text-xs uppercase font-medium">
-                            Phí Bổ Sung Kích Thước
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-gray-500 text-xs uppercase font-medium mb-1">
+                          Phụ Phí Nhiên Liệu ({quote.prices.fuel_rate}%)
+                        </p>
+                        <p className="font-semibold text-base">
+                          {formatCurrency(quote.prices.fuel_surcharge)}
+                        </p>
+                      </div>
+
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-gray-500 text-xs uppercase font-medium mb-1">
+                          VAT ({quote.prices.vat_rate}%)
+                        </p>
+                        <p className="font-semibold text-base">
+                          {formatCurrency(quote.prices.vat)}
+                        </p>
+                      </div>
+
+                      {quote.prices.peak_season > 0 && (
+                        <div className="bg-gray-50 rounded-lg p-3">
+                          <p className="text-gray-500 text-xs uppercase font-medium mb-1">
+                            Phụ Phí Cao Điểm
                           </p>
                           <p className="font-semibold text-base">
-                            {formatCurrency(
-                              quote.prices.oversize_fee.reduce(
-                                (sum, fee) =>
-                                  sum +
-                                  fee.applied_fees.reduce(
-                                    (feeSum, applied) =>
-                                      feeSum + parseFloat(applied.amount),
-                                    0,
-                                  ),
-                                0,
-                              ),
-                            )}
+                            {formatCurrency(quote.prices.peak_season)}
                           </p>
                         </div>
+                      )}
 
-                        <div className="mt-2 space-y-3 bg-white p-3 rounded-lg border border-gray-100">
-                          {quote.prices.oversize_fee.map((feePkg, pkgIndex) => {
-                            // Group fees by item_id
-                            const feesByItemId = feePkg.applied_fees.reduce(
-                              (acc, fee) => {
-                                const key = fee.item_id || "shipment"; // Use "shipment" for fees without an item_id
-                                if (!acc[key]) {
-                                  acc[key] = [];
-                                }
-                                acc[key].push(fee);
-                                return acc;
-                              },
-                              {} as Record<string, typeof feePkg.applied_fees>,
-                            );
-
-                            return (
-                              feePkg.applied_fees.length > 0 && (
-                                <div
-                                  key={pkgIndex}
-                                  className="border-b border-gray-100 pb-2 last:border-b-0 last:pb-0"
-                                >
-                                  {Object.entries(feesByItemId).map(
-                                    ([itemId, fees]) => (
-                                      <div
-                                        key={itemId}
-                                        className="mb-4 p-3 rounded-lg bg-gray-50 border border-gray-200"
-                                      >
-                                        {itemId === "shipment" ? (
-                                          <p className="text-xs font-medium text-gray-500 uppercase mb-2">
-                                            Phí áp dụng cho lô hàng
-                                          </p>
-                                        ) : (
-                                          <div className="mb-2">
-                                            <p className="text-xs font-medium text-gray-500 uppercase">
-                                              Phí áp dụng cho kiện hàng:{" "}
-                                              {fees[0]?.item_description}
-                                            </p>
-                                            <span className="text-xs text-gray-500">
-                                              Trọng lượng:{" "}
-                                              {fees[0]?.item_weight}kg, Trọng
-                                              lượng thể tích:{" "}
-                                              {fees[0]?.item_volume_weight}kg
-                                            </span>
-                                          </div>
-                                        )}
-                                        <div className="space-y-1">
-                                          {fees.map((fee, feeIndex) => (
-                                            <div
-                                              key={feeIndex}
-                                              className="flex justify-between text-sm"
-                                            >
-                                              <div className="flex flex-col">
-                                                <span className="text-gray-600">
-                                                  {fee.display_name}
-                                                </span>
-                                                {fee.note && (
-                                                  <span className="mt-1 text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
-                                                    {fee.note}
-                                                  </span>
-                                                )}
-                                              </div>
-                                              <span className="font-medium">
-                                                {formatCurrency(
-                                                  parseFloat(fee.amount),
-                                                )}
-                                              </span>
-                                            </div>
-                                          ))}
-                                        </div>
-                                        {fees[0]?.description && (
-                                          <p className="text-xs text-gray-500 mt-1 italic">
-                                            {fees[0].description}
-                                          </p>
-                                        )}
-                                      </div>
+                      {quote.prices.oversize_fee.some(
+                        (fee) => fee.applied_fees.length > 0,
+                      ) && (
+                        <div className="bg-gray-50 rounded-lg p-3">
+                          <div className="flex justify-between items-center">
+                            <p className="text-gray-500 text-xs uppercase font-medium">
+                              Phí Bổ Sung Kích Thước
+                            </p>
+                            <p className="font-semibold text-base">
+                              {formatCurrency(
+                                quote.prices.oversize_fee.reduce(
+                                  (sum, fee) =>
+                                    sum +
+                                    fee.applied_fees.reduce(
+                                      (feeSum, applied) =>
+                                        feeSum + parseFloat(applied.amount),
+                                      0,
                                     ),
-                                  )}
-                                </div>
-                              )
-                            );
-                          })}
+                                  0,
+                                ),
+                              )}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
                 </div>
 
                 <div className="flex justify-between items-center">

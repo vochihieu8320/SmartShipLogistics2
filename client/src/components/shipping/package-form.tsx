@@ -671,13 +671,50 @@ export default function PackageForm({ form }: PackageFormProps) {
                 </Button>
               </div>
 
-              {shipmentId && (
-                <div className="border-t pt-6">
-                  <ServiceQuoteForm
-                    key={`quote-form-${shipmentId}`}
-                    shipmentId={shipmentId}
-                    quotes={quotes} // Pass quotes to ServiceQuoteForm
-                    onQuoteSelect={(quote) => {
+              {quotes.length > 0 && (
+                <div className="mt-6 space-y-4">
+                  <div className="bg-primary/5 p-4 rounded-lg">
+                    <h4 className="text-base font-medium mb-4">Chi Tiết Phí Bổ Sung Kích Thước</h4>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Kiện Hàng</TableHead>
+                            <TableHead>Loại Phí</TableHead>
+                            <TableHead>Ghi Chú</TableHead>
+                            <TableHead className="text-right">Số Tiền</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {quotes[0].prices.oversize_fee.map((fee, pkgIndex) => (
+                            fee.applied_fees.map((appliedFee, feeIndex) => (
+                              <TableRow key={`${pkgIndex}-${feeIndex}`}>
+                                <TableCell>Kiện #{fee.package + 1}</TableCell>
+                                <TableCell>{appliedFee.display_name}</TableCell>
+                                <TableCell>
+                                  {appliedFee.note && (
+                                    <span className="text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
+                                      {appliedFee.note}
+                                    </span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-right font-medium">
+                                  {formatCurrency(parseFloat(appliedFee.amount))}
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+
+                  <div className="border-t pt-6">
+                    <ServiceQuoteForm
+                      key={`quote-form-${shipmentId}`}
+                      shipmentId={shipmentId}
+                      quotes={quotes}
+                      onQuoteSelect={(quote) => {
                       form.setValue("shipment.provider_service_id", quote.id);
                       toast({
                         title: "Đã chọn dịch vụ",
