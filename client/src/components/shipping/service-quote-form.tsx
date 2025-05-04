@@ -88,20 +88,16 @@ export default function ServiceQuoteForm({
                         (fee, index) =>
                           fee.applied_fees.length > 0 && (
                             <div key={index} className="space-y-2">
-                              <div className="flex justify-between items-center text-sm">
-                                <div className="text-gray-600">
-                                  Phụ phí Quá Khổ
+                              {fee.applied_fees.map((appliedFee: any, feeIndex: number) => (
+                                <div key={feeIndex} className="flex justify-between items-center text-sm">
+                                  <div className="text-gray-600">
+                                    {appliedFee.item_id ? `Phụ phí Quá Khổ (Kiện ${index + 1})` : 'Phụ phí Quá Khổ (Tất cả kiện hàng)'}
+                                  </div>
+                                  <div className="font-medium">
+                                    {formatCurrency(parseFloat(appliedFee.amount))}
+                                  </div>
                                 </div>
-                                <div className="font-medium">
-                                  {formatCurrency(
-                                    fee.applied_fees.reduce(
-                                      (total: number, applied: any) =>
-                                        total + parseFloat(applied.amount),
-                                      0,
-                                    ),
-                                  )}
-                                </div>
-                              </div>
+                              ))}
                             </div>
                           ),
                       )}
