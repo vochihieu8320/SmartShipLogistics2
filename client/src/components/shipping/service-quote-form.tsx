@@ -117,7 +117,7 @@ export default function ServiceQuoteForm({
                     <div className="text-xs uppercase text-gray-500 font-medium mb-1">
                       Tổng Cộng
                     </div>
-                    <div className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                    <div className="text-lg font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
                       {formatCurrency(quote.prices.total_price)}
                     </div>
                   </div>
