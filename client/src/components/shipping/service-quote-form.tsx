@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { API_BASE_URL } from "@/config/api";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,39 +12,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface Quote {
-  id: number;
-  name: string;
-  provider_name: string;
-  service_name: string;
-  prices: {
-    net_price: number;
-    fuel_surcharge: number;
-    peak_season: number;
-    oversize_fee: Array<{
-      package: number;
-      applied_fees: Array<{
-        item_id: string | null;
-        item_weight: number;
-        item_volume_weight: number;
-        item_description: string;
-        name: string;
-        display_name: string;
-        amount: string;
-        description: string;
-        note: string | null;
-      }>;
-    }>;
-    fuel_rate: number;
-    total_price: number;
-    vat_rate: number;
-    vat: number;
-  };
-}
-
 interface ServiceQuoteFormProps {
   shipmentId: number;
-  onQuoteSelect: (quote: Quote) => void;
+  onQuoteSelect: (quote: any) => void;
 }
 
 function formatCurrency(amount: number) {
@@ -85,7 +54,6 @@ export default function ServiceQuoteForm({
     );
   }
 
-  // Extract quotes from shipment data
   const quotes = shipmentData?.data?.quotes || [];
 
   return (
@@ -103,7 +71,7 @@ export default function ServiceQuoteForm({
             </div>
           </div>
         ) : (
-          quotes.map((quote: Quote) => (
+          quotes.map((quote: any) => (
             <Card
               key={quote.id}
               className="overflow-hidden border-gray-200 transition-all duration-200 hover:shadow-md"
@@ -133,7 +101,7 @@ export default function ServiceQuoteForm({
 
                   <div className="mb-6 pb-5 border-b border-gray-100">
                     <div className="space-y-4">
-                      {quote.prices.oversize_fee.map((fee, index) => (
+                      {quote.prices.oversize_fee.map((fee: any, index: number) => (
                         fee.applied_fees.length > 0 && (
                           <div key={index} className="bg-gray-50 rounded-lg p-3">
                             <Table>
@@ -144,7 +112,7 @@ export default function ServiceQuoteForm({
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
-                                {fee.applied_fees.map((appliedFee, feeIndex) => (
+                                {fee.applied_fees.map((appliedFee: any, feeIndex: number) => (
                                   <TableRow key={feeIndex}>
                                     <TableCell>
                                       <div className="font-medium">
