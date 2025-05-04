@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/table";
 import { Plus, Trash2, Edit, Save, X } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog"; // Import Dialog and DialogContent
+import { API_BASE_URL } from "../../config/api";
+import { Toast } from "@/components/ui/toast";
 
 // Define the interface for an item
 interface ShipmentItem {
@@ -595,7 +597,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                 </span>
               </p>
             </div>
-            
+
             <div className="flex justify-center">
               <Button
                 type="button"
@@ -620,13 +622,8 @@ export default function PackageForm({ form }: PackageFormProps) {
 
                     // Then get quotes
                     window.location.href = `/shipping/create?tab=service&shipmentId=${shipmentId}`;
-                    
                   } catch (error) {
-                    toast({
-                      title: "Lỗi",
-                      description: "Không thể lấy báo giá. Vui lòng thử lại",
-                      variant: "destructive",
-                    });
+                    console.log("error", error);
                   }
                 }}
                 className="w-full md:w-auto px-6 py-2 bg-primary text-white hover:bg-primary/90"
