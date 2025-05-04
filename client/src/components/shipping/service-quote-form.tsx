@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -56,18 +55,18 @@ export default function ServiceQuoteForm({
                       </div>
                       <h3 className="font-bold text-xl">{quote.name}</h3>
                     </div>
-                    
+
                     <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
                       <div className="flex justify-between items-center">
                         <div className="text-gray-600">Giá Net</div>
                         <div className="font-medium">{formatCurrency(quote.prices.net_price)}</div>
                       </div>
-                      
+
                       <div className="flex justify-between items-center">
                         <div className="text-gray-600">Phụ phí nhiên liệu({quote.prices.fuel_rate}%)</div>
                         <div className="font-medium">{formatCurrency(quote.prices.fuel_surcharge)}</div>
                       </div>
-                      
+
                       <div className="flex justify-between items-center">
                         <div className="text-gray-600">Phụ phí mùa cao điểm</div>
                         <div className="font-medium">{formatCurrency(quote.prices.peak_season)}</div>
@@ -83,15 +82,15 @@ export default function ServiceQuoteForm({
                               </div>
                               <div className="font-medium">
                                 {formatCurrency(
-                                  fee.applied_fees.reduce((total: number, applied: any) => 
-                                    total + parseFloat(applied.amount), 0)
+                                  fee.applied_fees.reduce((total: number, applied: any) =>
+                                    total + parseFloat(applied.amount), 0
                                 )}
                               </div>
                             </div>
                           </div>
                         )
                       ))}
-                      
+
                       <div className="pt-2 mt-2 border-t border-gray-200">
                         <div className="flex justify-between items-center">
                           <div className="font-medium text-gray-900">Tổng cộng</div>
