@@ -1,5 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { API_BASE_URL } from "@/config/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -14,6 +12,7 @@ import {
 
 interface ServiceQuoteFormProps {
   shipmentId: number;
+  quotes: any[];
   onQuoteSelect: (quote: any) => void;
 }
 
@@ -26,36 +25,9 @@ function formatCurrency(amount: number) {
 
 export default function ServiceQuoteForm({
   shipmentId,
+  quotes,
   onQuoteSelect,
 }: ServiceQuoteFormProps) {
-  const { data: shipmentData, isLoading } = useQuery({
-    queryKey: ["shipment", shipmentId],
-    queryFn: async () => {
-      const response = await fetch(
-        `${API_BASE_URL}/shipments/${shipmentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        },
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch quotes");
-      }
-      const data = await response.json();
-      return data.data; // Access the data property from the response
-    },
-  });
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
-  const quotes = shipmentData?.data?.quotes || [];
 
   return (
     <div className="space-y-6">
@@ -72,7 +44,7 @@ export default function ServiceQuoteForm({
             </div>
           </div>
         ) : (
-          quotes.map((quote: any, index: number) => (
+          quotes.map((quote: any) => (
             <Card
               key={quote.id}
               className="overflow-hidden border-gray-200 transition-all duration-200 hover:shadow-md"
