@@ -611,33 +611,31 @@ export default function PackageForm({ form }: PackageFormProps) {
                     setIsLoading(true);
                     try {
                       // First create shipment
-                      const response = await fetch(`${API_BASE_URL}/shipments`, {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                          Authorization: `Bearer ${localStorage.getItem("token")}`,
+                      const response = await fetch(
+                        `${API_BASE_URL}/shipments`,
+                        {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                          },
+                          body: JSON.stringify(form.getValues()),
                         },
-                        body: JSON.stringify(form.getValues()),
-                      });
+                      );
 
                       if (!response.ok) {
                         throw new Error("Không thể tạo đơn hàng");
                       }
 
                       const result = await response.json();
-                      if (result && result.id) {
+                      if (result && result["shipment"]["id"]) {
                         setShipmentId(result.id);
                         // Set shipmentId in form data
-                        form.setValue("shipment.id", result.id);
+                        form.setValue("shipment.id",  result["shipment"]["id"]);
                       } else {
                         throw new Error("Invalid response from server");
                       }
                     } catch (error) {
-                      toast({
-                        title: "Lỗi",
-                        description: "Không thể tạo đơn hàng. Vui lòng thử lại",
-                        variant: "destructive",
-                      });
                       console.log("error", error);
                     } finally {
                       setIsLoading(false);
