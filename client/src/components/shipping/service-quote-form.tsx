@@ -1,14 +1,7 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 interface ServiceQuoteFormProps {
   shipmentId: number;
@@ -30,7 +23,6 @@ export default function ServiceQuoteForm({
   quotes,
   onQuoteSelect,
 }: ServiceQuoteFormProps) {
-
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -71,28 +63,28 @@ export default function ServiceQuoteForm({
                         <div className="font-medium">{formatCurrency(quote.prices.net_price)}</div>
                       </div>
                       
-                        <div className="flex justify-between items-center">
-                          <div className="text-gray-600">Phụ phí nhiên liệu({quote.prices.fuel_rate}%)</div>
-                          <div className="font-medium">{formatCurrency(quote.prices.fuel_surcharge)}<div>
-                        </div>
+                      <div className="flex justify-between items-center">
+                        <div className="text-gray-600">Phụ phí nhiên liệu({quote.prices.fuel_rate}%)</div>
+                        <div className="font-medium">{formatCurrency(quote.prices.fuel_surcharge)}</div>
+                      </div>
                       
-                        <div className="flex justify-between items-center">
-                          <div className="text-gray-600">Phụ phí mùa cao điểm</div>
-                          <div className="font-medium">{formatCurrency(quote.prices.peak_season)}</div>
-                        </div>
+                      <div className="flex justify-between items-center">
+                        <div className="text-gray-600">Phụ phí mùa cao điểm</div>
+                        <div className="font-medium">{formatCurrency(quote.prices.peak_season)}</div>
+                      </div>
 
-                        <div className="flex justify-between items-center">
-                          <div className="text-gray-600">Phụ phí Quá Khổ</div>
-                          <div className="font-medium">
-                            {formatCurrency(
-                              quote.prices.oversize_fee.reduce((total: number, fee: any) => 
-                                total + fee.applied_fees.reduce((feeTotal: number, applied: any) => 
-                                  feeTotal + parseFloat(applied.amount), 0), 0)
-                            )}
-                          </div>
+                      <div className="flex justify-between items-center">
+                        <div className="text-gray-600">Phụ phí Quá Khổ</div>
+                        <div className="font-medium">
+                          {formatCurrency(
+                            quote.prices.oversize_fee.reduce((total: number, fee: any) => 
+                              total + fee.applied_fees.reduce((feeTotal: number, applied: any) => 
+                                feeTotal + parseFloat(applied.amount), 0), 0)
+                          )}
                         </div>
+                      </div>
                       
-                        <div className="pt-2 mt-2 border-t border-gray-200">
+                      <div className="pt-2 mt-2 border-t border-gray-200">
                         <div className="flex justify-between items-center">
                           <div className="font-medium text-gray-900">Tổng cộng</div>
                           <div className="text-lg font-bold text-primary">
@@ -101,21 +93,21 @@ export default function ServiceQuoteForm({
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="flex justify-between items-center">
-                    <Button
-                      className="px-6 py-5 rounded-lg"
-                      onClick={() => {
-                        localStorage.setItem(
-                          "shipment_total_price",
-                          quote.prices.total_price.toString()
-                        );
-                        onQuoteSelect(quote);
-                      }}
-                    >
-                      Chọn Dịch Vụ Này
-                    </Button>
+                    <div className="flex justify-between items-center">
+                      <Button
+                        className="px-6 py-5 rounded-lg"
+                        onClick={() => {
+                          localStorage.setItem(
+                            "shipment_total_price",
+                            quote.prices.total_price.toString()
+                          );
+                          onQuoteSelect(quote);
+                        }}
+                      >
+                        Chọn Dịch Vụ Này
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </div>
