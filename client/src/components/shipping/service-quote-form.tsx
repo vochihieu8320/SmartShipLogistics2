@@ -42,7 +42,8 @@ export default function ServiceQuoteForm({
       if (!response.ok) {
         throw new Error("Failed to fetch quotes");
       }
-      return response.json();
+      const data = await response.json();
+      return data.data; // Access the data property from the response
     },
   });
 
