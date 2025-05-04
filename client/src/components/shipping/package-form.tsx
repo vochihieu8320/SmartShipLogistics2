@@ -143,26 +143,27 @@ export default function PackageForm({ form }: PackageFormProps) {
   return (
     <Card className="mb-6">
       <CardContent className="pt-6">
-        <div className="flex items-center mb-6">
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-              <path d="M3.27 6.96L12 12.01l8.73-5.05"></path>
-              <path d="M12 22.08V12"></path>
-            </svg>
+        <>
+          <div className="flex items-center mb-6">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <path d="M3.27 6.96L12 12.01l8.73-5.05"></path>
+                <path d="M12 22.08V12"></path>
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold">Thông Tin Hàng Hoá</h3>
           </div>
-          <h3 className="text-xl font-semibold">Thông Tin Hàng Hoá</h3>
-        </div>
 
         {/* Package-level attributes */}
         <div className="space-y-6 mb-6">
