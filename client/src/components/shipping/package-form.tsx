@@ -703,16 +703,14 @@ export default function PackageForm({ form }: PackageFormProps) {
                               (fee, pkgIndex) =>
                                 fee.applied_fees.map((appliedFee, feeIndex) => (
                                   <TableRow key={`${pkgIndex}-${feeIndex}`}>
-                                    <TableCell>
-                                      Kiện #{fee.package + 1}
-                                    </TableCell>
+                                    <TableCell>Kiện #{pkgIndex + 1}</TableCell>
                                     <TableCell>
                                       {appliedFee.display_name}
                                     </TableCell>
                                     <TableCell>
                                       {appliedFee.note && (
                                         <span className="text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
-                                          {appliedFee.note}
+                                          {appliedFee.description}
                                         </span>
                                       )}
                                     </TableCell>

@@ -29,7 +29,9 @@ export default function ServiceQuoteForm({
           <div className="text-center py-10 bg-gray-50 rounded-xl border border-gray-200">
             <div className="flex flex-col items-center">
               <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-              <h3 className="text-lg font-medium mb-2">Không tìm thấy báo giá</h3>
+              <h3 className="text-lg font-medium mb-2">
+                Không tìm thấy báo giá
+              </h3>
               <p className="text-gray-500 max-w-md">
                 Rất tiếc, không có báo giá nào có sẵn cho lô hàng này. Vui lòng
                 thử thay đổi thông tin hoặc liên hệ hỗ trợ.
@@ -59,41 +61,56 @@ export default function ServiceQuoteForm({
                     <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
                       <div className="flex justify-between items-center">
                         <div className="text-gray-600">Giá Net</div>
-                        <div className="font-medium">{formatCurrency(quote.prices.net_price)}</div>
+                        <div className="font-medium">
+                          {formatCurrency(quote.prices.net_price)}
+                        </div>
                       </div>
 
                       <div className="flex justify-between items-center">
-                        <div className="text-gray-600">Phụ phí nhiên liệu({quote.prices.fuel_rate}%)</div>
-                        <div className="font-medium">{formatCurrency(quote.prices.fuel_surcharge)}</div>
+                        <div className="text-gray-600">
+                          Phụ phí nhiên liệu({quote.prices.fuel_rate}%)
+                        </div>
+                        <div className="font-medium">
+                          {formatCurrency(quote.prices.fuel_surcharge)}
+                        </div>
                       </div>
 
                       <div className="flex justify-between items-center">
-                        <div className="text-gray-600">Phụ phí mùa cao điểm</div>
-                        <div className="font-medium">{formatCurrency(quote.prices.peak_season)}</div>
+                        <div className="text-gray-600">
+                          Phụ phí mùa cao điểm
+                        </div>
+                        <div className="font-medium">
+                          {formatCurrency(quote.prices.peak_season)}
+                        </div>
                       </div>
 
-                      {quote.prices.oversize_fee.map((fee, index) => (
-                        fee.applied_fees.length > 0 && (
-                          <div key={index} className="space-y-2">
-                            <div className="flex justify-between items-center text-sm">
-                              <div className="text-gray-600">
-                                Phụ phí Quá Khổ - Kiện {index + 1}/{quote.prices.oversize_fee.length}
-                                {fee.item_id && ` - Lô #${fee.item_id}`}
-                              </div>
-                              <div className="font-medium">
-                                {formatCurrency(
-                                  fee.applied_fees.reduce((total: number, applied: any) =>
-                                    total + parseFloat(applied.amount), 0)
-                                )}
+                      {quote.prices.oversize_fee.map(
+                        (fee, index) =>
+                          fee.applied_fees.length > 0 && (
+                            <div key={index} className="space-y-2">
+                              <div className="flex justify-between items-center text-sm">
+                                <div className="text-gray-600">
+                                  Phụ phí Quá Khổ
+                                </div>
+                                <div className="font-medium">
+                                  {formatCurrency(
+                                    fee.applied_fees.reduce(
+                                      (total: number, applied: any) =>
+                                        total + parseFloat(applied.amount),
+                                      0,
+                                    ),
+                                  )}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        )
-                      ))}
+                          ),
+                      )}
 
                       <div className="pt-2 mt-2 border-t border-gray-200">
                         <div className="flex justify-between items-center">
-                          <div className="font-medium text-gray-900">Tổng cộng</div>
+                          <div className="font-medium text-gray-900">
+                            Tổng cộng
+                          </div>
                           <div className="text-lg font-bold text-primary">
                             {formatCurrency(quote.prices.total_price)}
                           </div>
@@ -107,7 +124,7 @@ export default function ServiceQuoteForm({
                         onClick={() => {
                           localStorage.setItem(
                             "shipment_total_price",
-                            quote.prices.total_price.toString()
+                            quote.prices.total_price.toString(),
                           );
                           onQuoteSelect(quote);
                         }}
