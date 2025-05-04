@@ -28,6 +28,7 @@ function formatCurrency(amount: number) {
 export default function ServiceQuoteForm({
   shipmentId,
   onQuoteSelect,
+  quotes,
 }: ServiceQuoteFormProps) {
   const { data: shipmentData, isLoading } = useQuery({
     queryKey: ["shipment", shipmentId],
@@ -53,9 +54,7 @@ export default function ServiceQuoteForm({
     );
   }
 
-  console.log("shipmentData", shipmentData);
-  const quotes = shipmentData?.data?.quotes || [];
-
+  console.log("quotes", quotes);
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
