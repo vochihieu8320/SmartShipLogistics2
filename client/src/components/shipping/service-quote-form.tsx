@@ -82,6 +82,7 @@ export default function ServiceQuoteForm({
 
   return (
     <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {quotes.length === 0 ? (
         <div className="text-center py-10 bg-gray-50 rounded-xl border border-gray-200">
           <div className="flex flex-col items-center">
@@ -327,6 +328,7 @@ export default function ServiceQuoteForm({
           </Card>
         ))
       )}
+      </div>
     </div>
   );
 }
