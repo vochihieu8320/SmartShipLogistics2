@@ -29,7 +29,9 @@ import {
 import { Plus, Trash2, Edit, Save, X } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog"; // Import Dialog and DialogContent
 import { API_BASE_URL } from "../../config/api";
-import { Toast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
+import ServiceQuoteForm from "./service-quote-form";
 
 // Define the interface for an item
 interface ShipmentItem {
@@ -51,6 +53,9 @@ interface PackageFormProps {
 export default function PackageForm({ form }: PackageFormProps) {
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
   const [tempItem, setTempItem] = useState<ShipmentItem | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [shipmentId, setShipmentId] = useState<number | null>(null);
+  const { toast } = useToast();
 
   // Use field array to handle dynamic item list
   const { fields, append, remove, update } = useFieldArray({
@@ -598,38 +603,71 @@ export default function PackageForm({ form }: PackageFormProps) {
               </p>
             </div>
 
-            <div className="flex justify-center">
-              <Button
-                type="button"
-                onClick={async () => {
-                  try {
-                    // First create shipment
-                    const response = await fetch(`${API_BASE_URL}/shipments`, {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                      },
-                      body: JSON.stringify(form.getValues()),
-                    });
+            <div className="space-y-6">
+              <div className="flex justify-center">
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    setIsLoading(true);
+                    try {
+                      // First create shipment
+                      const response = await fetch(`${API_BASE_URL}/shipments`, {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                        body: JSON.stringify(form.getValues()),
+                      });
 
-                    if (!response.ok) {
-                      throw new Error("Không thể tạo đơn hàng");
+                      if (!response.ok) {
+                        throw new Error("Không thể tạo đơn hàng");
+                      }
+
+                      const result = await response.json();
+                      setShipmentId(result.id);
+                    } catch (error) {
+                      toast({
+                        title: "Lỗi",
+                        description: "Không thể tạo đơn hàng. Vui lòng thử lại",
+                        variant: "destructive",
+                      });
+                      console.log("error", error);
+                    } finally {
+                      setIsLoading(false);
                     }
+                  }}
+                  disabled={isLoading}
+                  className="w-full md:w-auto px-6 py-2 bg-primary text-white hover:bg-primary/90"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Đang tải...
+                    </>
+                  ) : (
+                    "Kiểm Tra Giá"
+                  )}
+                </Button>
+              </div>
 
-                    const result = await response.json();
-                    const shipmentId = result.id;
-
-                    // Then get quotes
-                    window.location.href = `/shipping/create?tab=service&shipmentId=${shipmentId}`;
-                  } catch (error) {
-                    console.log("error", error);
-                  }
-                }}
-                className="w-full md:w-auto px-6 py-2 bg-primary text-white hover:bg-primary/90"
-              >
-                Kiểm Tra Giá
-              </Button>
+              {shipmentId && (
+                <div className="border-t pt-6">
+                  <ServiceQuoteForm
+                    key={`quote-form-${shipmentId}`}
+                    shipmentId={shipmentId}
+                    onQuoteSelect={(quote) => {
+                      form.setValue("shipment.provider_service_id", quote.id);
+                      toast({
+                        title: "Đã chọn dịch vụ",
+                        description: `Đã chọn ${quote.provider_name} - ${quote.service_name}`,
+                      });
+                      window.location.href = `/shipping/create?tab=review&shipmentId=${shipmentId}`;
+                    }}
+                    gridColumns={3}
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}
