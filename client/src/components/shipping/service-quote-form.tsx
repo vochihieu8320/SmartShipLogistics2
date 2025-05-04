@@ -51,7 +51,7 @@ export default function ServiceQuoteForm({
             >
               <div className="border-l-4 border-primary h-full">
                 <CardContent className="p-6">
-                  <div className="flex justify-between items-start mb-5">
+                  <div className="space-y-4">
                     <div>
                       <div className="flex items-center mb-1">
                         <div className="font-medium text-lg">
@@ -62,12 +62,34 @@ export default function ServiceQuoteForm({
                       </div>
                       <h3 className="font-bold text-xl">{quote.name}</h3>
                     </div>
-                    <div className="text-right bg-primary/5 px-4 py-3 rounded-lg">
-                      <div className="text-xs uppercase text-gray-500 font-medium mb-1">
-                        Tổng Cộng
+                    
+                    <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <div className="text-gray-600">Giá cơ bản</div>
+                        <div className="font-medium">{formatCurrency(quote.prices.net_price)}</div>
                       </div>
-                      <div className="text-lg font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                        {formatCurrency(quote.prices.total_price)}
+                      
+                      {quote.prices.fuel_surcharge > 0 && (
+                        <div className="flex justify-between items-center">
+                          <div className="text-gray-600">Phụ phí nhiên liệu</div>
+                          <div className="font-medium">{formatCurrency(quote.prices.fuel_surcharge)}</div>
+                        </div>
+                      )}
+                      
+                      {quote.prices.peak_season > 0 && (
+                        <div className="flex justify-between items-center">
+                          <div className="text-gray-600">Phụ phí mùa cao điểm</div>
+                          <div className="font-medium">{formatCurrency(quote.prices.peak_season)}</div>
+                        </div>
+                      )}
+                      
+                      <div className="pt-2 mt-2 border-t border-gray-200">
+                        <div className="flex justify-between items-center">
+                          <div className="font-medium text-gray-900">Tổng cộng</div>
+                          <div className="text-lg font-bold text-primary">
+                            {formatCurrency(quote.prices.total_price)}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
