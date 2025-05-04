@@ -140,6 +140,13 @@ export default function PackageForm({ form }: PackageFormProps) {
     }, 0);
   };
 
+  function formatCurrency(amount: number) {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  }
+
   return (
     <Card className="mb-6">
       <CardContent className="pt-6">
