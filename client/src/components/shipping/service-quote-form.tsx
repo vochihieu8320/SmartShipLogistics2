@@ -84,23 +84,39 @@ export default function ServiceQuoteForm({
                         </div>
                       </div>
 
-                      {quote.prices.oversize_fee.map(
-                        (fee, index) =>
-                          fee.applied_fees.length > 0 && (
-                            <div key={index} className="space-y-2">
-                              {fee.applied_fees.map((appliedFee: any, feeIndex: number) => (
-                                <div key={feeIndex} className="flex justify-between items-center text-sm">
+                      {(() => {
+                        const itemIds = [...new Set(
+                          quote.prices.oversize_fee
+                            .flatMap((fee) => fee.applied_fees)
+                            .map((fee) => fee.item_id)
+                            .filter((id) => id)
+                        )];
+
+                        return [...itemIds, null].map((itemId) => (
+                          quote.prices.oversize_fee.map((fee, pkgIndex) =>
+                            fee.applied_fees
+                              .filter((appliedFee) =>
+                                itemId === null
+                                  ? !appliedFee.item_id
+                                  : appliedFee.item_id === itemId
+                              )
+                              .map((appliedFee, feeIndex) => (
+                                <div key={`${itemId}-${pkgIndex}-${feeIndex}`} className="flex justify-between items-center text-sm">
                                   <div className="text-gray-600">
-                                    {appliedFee.item_id ? `Phụ phí Quá Khổ (Kiện ${index + 1})` : 'Phụ phí Quá Khổ (Tất cả kiện hàng)'}
+                                    {itemId
+                                      ? `Phụ phí Quá Khổ (Kiện ${pkgIndex + 1})`
+                                      : "Phụ phí Quá Khổ (Tất cả kiện hàng)"}
                                   </div>
                                   <div className="font-medium">
-                                    {formatCurrency(parseFloat(appliedFee.amount))}
+                                    {formatCurrency(
+                                      parseFloat(appliedFee.amount)
+                                    )}
                                   </div>
                                 </div>
-                              ))}
-                            </div>
-                          ),
-                      )}
+                              ))
+                          )
+                        )).flat(2);
+                      })()}
 
                       <div className="pt-2 mt-2 border-t border-gray-200">
                         <div className="flex justify-between items-center">
@@ -120,7 +136,7 @@ export default function ServiceQuoteForm({
                         onClick={() => {
                           localStorage.setItem(
                             "shipment_total_price",
-                            quote.prices.total_price.toString(),
+                            quote.prices.total_price.toString()
                           );
                           onQuoteSelect(quote);
                         }}
