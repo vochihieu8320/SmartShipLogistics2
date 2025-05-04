@@ -186,8 +186,13 @@ export default function CreateShippingPage() {
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Tạo Đơn Vận Chuyển</h1>
-            <p className="text-gray-600 max-w-2xl mx-auto">Điền thông tin chi tiết để tạo đơn vận chuyển mới và so sánh báo giá từ các đối tác vận chuyển hàng đầu Việt Nam và Quốc tế.</p>
+            <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+              Tạo Đơn Vận Chuyển
+            </h1>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Điền thông tin chi tiết để tạo đơn vận chuyển mới và so sánh báo
+              giá từ các đối tác vận chuyển hàng đầu Việt Nam và Quốc tế.
+            </p>
           </div>
 
           <Card className="shadow-lg border-0 overflow-hidden">
@@ -205,32 +210,49 @@ export default function CreateShippingPage() {
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="space-y-6"
                 >
-                  <Tabs defaultValue="info" value={activeTab} onValueChange={setActiveTab} className="mt-2">
+                  <Tabs
+                    defaultValue="info"
+                    value={activeTab}
+                    onValueChange={setActiveTab}
+                    className="mt-2"
+                  >
                     <TabsList className="grid w-full grid-cols-3 p-1 rounded-xl bg-gray-100">
-                      <TabsTrigger 
-                        value="info" 
+                      <TabsTrigger
+                        value="info"
                         className={`rounded-lg ${activeTab === "info" ? "bg-white shadow-md" : ""} transition-all`}
                       >
                         <div className="flex flex-col items-center gap-1.5 py-1">
-                          <span className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "info" ? "bg-primary text-white" : "bg-gray-200"}`}>1</span>
+                          <span
+                            className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "info" ? "bg-primary text-white" : "bg-gray-200"}`}
+                          >
+                            1
+                          </span>
                           <span>Thông Tin Đơn Hàng</span>
                         </div>
                       </TabsTrigger>
-                      <TabsTrigger 
+                      <TabsTrigger
                         value="service"
                         className={`rounded-lg ${activeTab === "service" ? "bg-white shadow-md" : ""} transition-all`}
                       >
                         <div className="flex flex-col items-center gap-1.5 py-1">
-                          <span className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "service" ? "bg-primary text-white" : "bg-gray-200"}`}>2</span>
+                          <span
+                            className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "service" ? "bg-primary text-white" : "bg-gray-200"}`}
+                          >
+                            2
+                          </span>
                           <span>Chọn Dịch Vụ</span>
                         </div>
                       </TabsTrigger>
-                      <TabsTrigger 
+                      <TabsTrigger
                         value="review"
                         className={`rounded-lg ${activeTab === "review" ? "bg-white shadow-md" : ""} transition-all`}
                       >
                         <div className="flex flex-col items-center gap-1.5 py-1">
-                          <span className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "review" ? "bg-primary text-white" : "bg-gray-200"}`}>3</span>
+                          <span
+                            className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "review" ? "bg-primary text-white" : "bg-gray-200"}`}
+                          >
+                            3
+                          </span>
                           <span>Xác Nhận</span>
                         </div>
                       </TabsTrigger>
@@ -243,7 +265,9 @@ export default function CreateShippingPage() {
                             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
                               <span className="text-xl font-bold">$</span>
                             </div>
-                            <h3 className="text-xl font-semibold">Chọn Dịch Vụ Vận Chuyển</h3>
+                            <h3 className="text-xl font-semibold">
+                              Chọn Dịch Vụ Vận Chuyển
+                            </h3>
                           </div>
 
                           {shipmentId && (
@@ -290,7 +314,11 @@ export default function CreateShippingPage() {
                           <Button
                             type="button"
                             onClick={() => setActiveTab("service")}
-                            disabled={!form.getValues().shipment.provider_service_id || !form.getValues().shipment.packages_attributes[0].items_attributes?.length}
+                            disabled={
+                              !form.getValues().shipment.provider_service_id ||
+                              !form.getValues().shipment.packages_attributes[0]
+                                .items_attributes?.length
+                            }
                             className="px-6 py-5 rounded-lg gap-2 shadow-md hover:shadow-lg transition-all"
                           >
                             Tiếp Theo
@@ -306,7 +334,9 @@ export default function CreateShippingPage() {
                             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
                               <span className="text-xl font-bold">$</span>
                             </div>
-                            <h3 className="text-xl font-semibold">Chọn Dịch Vụ Vận Chuyển</h3>
+                            <h3 className="text-xl font-semibold">
+                              Chọn Dịch Vụ Vận Chuyển
+                            </h3>
                           </div>
 
                           {shipmentId && activeTab === "service" ? (
@@ -330,8 +360,12 @@ export default function CreateShippingPage() {
                           ) : (
                             <div className="flex flex-col items-center justify-center py-12 text-center">
                               <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-                              <p className="text-lg">Đang tải báo giá từ các nhà vận chuyển...</p>
-                              <p className="text-gray-500 mt-2">Vui lòng đợi trong giây lát</p>
+                              <p className="text-lg">
+                                Đang tải báo giá từ các nhà vận chuyển...
+                              </p>
+                              <p className="text-gray-500 mt-2">
+                                Vui lòng đợi trong giây lát
+                              </p>
                             </div>
                           )}
                         </div>
@@ -348,12 +382,15 @@ export default function CreateShippingPage() {
                           <Button
                             type="button"
                             onClick={() => {
-                              if (form.getValues().shipment.provider_service_id) {
+                              if (
+                                form.getValues().shipment.provider_service_id
+                              ) {
                                 setActiveTab("review");
                               } else {
                                 toast({
                                   title: "Chưa chọn dịch vụ",
-                                  description: "Vui lòng chọn một dịch vụ vận chuyển trước khi tiếp tục",
+                                  description:
+                                    "Vui lòng chọn một dịch vụ vận chuyển trước khi tiếp tục",
                                   variant: "destructive",
                                 });
                               }
@@ -374,7 +411,9 @@ export default function CreateShippingPage() {
                               <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3">
                                 <span className="text-xl font-bold">✓</span>
                               </div>
-                              <h3 className="text-xl font-semibold">Chi Tiết Đơn Hàng</h3>
+                              <h3 className="text-xl font-semibold">
+                                Chi Tiết Đơn Hàng
+                              </h3>
                             </div>
                             <div className="space-y-6">
                               <ShippingSummary formData={form.getValues()} />

@@ -55,7 +55,6 @@ export default function PackageForm({ form }: PackageFormProps) {
   const [tempItem, setTempItem] = useState<ShipmentItem | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [shipmentId, setShipmentId] = useState<number | null>(null);
-  const [quotes, setQuotes] = useState<any[]>([]);
   const { toast } = useToast();
 
   // Use field array to handle dynamic item list
@@ -629,23 +628,15 @@ export default function PackageForm({ form }: PackageFormProps) {
                       }
 
                       const result = await response.json();
-                      if (result?.shipment?.id) {
-                        setShipmentId(result.shipment.id);
+                      if (result && result["shipment"]["id"]) {
+                        setShipmentId(result.id);
                         // Set shipmentId in form data
-                        form.setValue("shipment.id", result.shipment.id);
-                        
-                        // Pass quotes directly to ServiceQuoteForm
-                        setQuotes(result.quote || []);
+                        form.setValue("shipment.id",  result["shipment"]["id"]);
                       } else {
                         throw new Error("Invalid response from server");
                       }
                     } catch (error) {
                       console.log("error", error);
-                      toast({
-                        title: "Lỗi",
-                        description: "Không thể tạo đơn hàng. Vui lòng thử lại",
-                        variant: "destructive",
-                      });
                     } finally {
                       setIsLoading(false);
                     }
@@ -664,12 +655,11 @@ export default function PackageForm({ form }: PackageFormProps) {
                 </Button>
               </div>
 
-              {shipmentId && quotes && (
+              {shipmentId && (
                 <div className="border-t pt-6">
                   <ServiceQuoteForm
                     key={`quote-form-${shipmentId}`}
                     shipmentId={shipmentId}
-                    quotes={quotes}
                     onQuoteSelect={(quote) => {
                       form.setValue("shipment.provider_service_id", quote.id);
                       toast({
