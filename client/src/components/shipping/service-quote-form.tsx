@@ -74,39 +74,18 @@ export default function ServiceQuoteForm({
 
                   <div className="mb-6 pb-5 border-b border-gray-100">
                     <div className="space-y-4">
-                      {quote.prices.oversize_fee.map((fee: any, feeIndex: number) => (
-                        fee.applied_fees.length > 0 && (
-                          <div key={feeIndex} className="bg-gray-50 rounded-lg p-3">
-                            <Table>
-                              <TableHeader>
-                                <TableRow>
-                                  <TableHead>Chi tiết</TableHead>
-                                  <TableHead>Phí</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {fee.applied_fees.map((appliedFee: any, appliedFeeIndex: number) => (
-                                  <TableRow key={appliedFeeIndex}>
-                                    <TableCell>
-                                      <div className="font-medium">
-                                        {appliedFee.item_id === null
-                                          ? "Áp dụng cho tất cả kiện hàng"
-                                          : `Kiện ${feeIndex + 1}`}
-                                      </div>
-                                      <div className="text-sm text-gray-500">
-                                        {appliedFee.description}
-                                      </div>
-                                    </TableCell>
-                                    <TableCell className="text-right font-medium">
-                                      {formatCurrency(parseFloat(appliedFee.amount))}
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <div className="flex justify-between items-center">
+                          <div className="font-medium">Phí kích thước</div>
+                          <div className="text-right font-medium">
+                            {formatCurrency(
+                              quote.prices.oversize_fee.reduce((total: number, fee: any) => 
+                                total + fee.applied_fees.reduce((feeTotal: number, applied: any) => 
+                                  feeTotal + parseFloat(applied.amount), 0), 0)
+                            )}
                           </div>
-                        )
-                      ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
