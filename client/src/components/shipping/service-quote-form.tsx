@@ -83,7 +83,7 @@ export default function ServiceQuoteForm({
                               <div className="font-medium">
                                 {formatCurrency(
                                   fee.applied_fees.reduce((total: number, applied: any) =>
-                                    total + parseFloat(applied.amount), 0
+                                    total + parseFloat(applied.amount), 0)
                                 )}
                               </div>
                             </div>
