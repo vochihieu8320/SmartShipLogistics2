@@ -84,39 +84,47 @@ export default function ServiceQuoteForm({
                         </div>
                       </div>
 
-                      {(() => {
-                        const itemIds = [...new Set(
-                          quote.prices.oversize_fee
-                            .flatMap((fee) => fee.applied_fees)
-                            .map((fee) => fee.item_id)
-                            .filter((id) => id)
-                        )];
-
-                        return [...itemIds, null].map((itemId) => (
-                          quote.prices.oversize_fee.map((fee, pkgIndex) =>
-                            fee.applied_fees
-                              .filter((appliedFee) =>
-                                itemId === null
-                                  ? !appliedFee.item_id
-                                  : appliedFee.item_id === itemId
-                              )
-                              .map((appliedFee, feeIndex) => (
-                                <div key={`${itemId}-${pkgIndex}-${feeIndex}`} className="flex justify-between items-center text-sm">
-                                  <div className="text-gray-600">
-                                    {itemId
-                                      ? `Phụ phí Quá Khổ (Kiện ${pkgIndex + 1})`
-                                      : "Phụ phí Quá Khổ (Tất cả kiện hàng)"}
-                                  </div>
-                                  <div className="font-medium">
-                                    {formatCurrency(
-                                      parseFloat(appliedFee.amount)
-                                    )}
-                                  </div>
+                      {quote.prices.oversize_fee.some(fee => fee.applied_fees.length > 0) && (
+                        <>
+                          {quote.prices.oversize_fee.map((fee, pkgIndex) =>
+                            fee.applied_fees.length > 0 && (
+                              <div key={pkgIndex} className="flex justify-between items-center text-sm">
+                                <div className="text-gray-600">
+                                  Phụ phí Quá Khổ (Kiện {pkgIndex + 1})
                                 </div>
-                              ))
-                          )
-                        )).flat(2);
-                      })()}
+                                <div className="font-medium">
+                                  {formatCurrency(
+                                    fee.applied_fees.reduce((sum, fee) => sum + parseFloat(fee.amount), 0)
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          )}
+
+                          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                            <div className="grid grid-cols-3 gap-4 text-sm">
+                              <div>
+                                <div className="text-gray-500">Số kiện</div>
+                                <div className="font-medium">{quote.prices.oversize_fee.length}</div>
+                              </div>
+                              <div>
+                                <div className="text-gray-500">Tổng khối lượng</div>
+                                <div className="font-medium">{quote.prices.oversize_fee.reduce((sum, pkg) => sum + pkg.weight, 0)} kg</div>
+                              </div>
+                              <div>
+                                <div className="text-gray-500">Tổng phí quá khổ</div>
+                                <div className="font-medium">
+                                  {formatCurrency(
+                                    quote.prices.oversize_fee.reduce((sum, pkg) => 
+                                      sum + pkg.applied_fees.reduce((feeSum, fee) => feeSum + parseFloat(fee.amount), 0), 0
+                                    )
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
 
                       <div className="pt-2 mt-2 border-t border-gray-200">
                         <div className="flex justify-between items-center">
