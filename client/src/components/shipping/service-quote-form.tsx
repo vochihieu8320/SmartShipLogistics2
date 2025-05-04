@@ -71,7 +71,7 @@ export default function ServiceQuoteForm({
             </div>
           </div>
         ) : (
-          quotes.map((quote: any) => (
+          quotes.map((quote: any, index: number) => (
             <Card
               key={quote.id}
               className="overflow-hidden border-gray-200 transition-all duration-200 hover:shadow-md"
@@ -101,9 +101,9 @@ export default function ServiceQuoteForm({
 
                   <div className="mb-6 pb-5 border-b border-gray-100">
                     <div className="space-y-4">
-                      {quote.prices.oversize_fee.map((fee: any, index: number) => (
+                      {quote.prices.oversize_fee.map((fee: any, feeIndex: number) => (
                         fee.applied_fees.length > 0 && (
-                          <div key={index} className="bg-gray-50 rounded-lg p-3">
+                          <div key={feeIndex} className="bg-gray-50 rounded-lg p-3">
                             <Table>
                               <TableHeader>
                                 <TableRow>
@@ -112,13 +112,13 @@ export default function ServiceQuoteForm({
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
-                                {fee.applied_fees.map((appliedFee: any, feeIndex: number) => (
-                                  <TableRow key={feeIndex}>
+                                {fee.applied_fees.map((appliedFee: any, appliedFeeIndex: number) => (
+                                  <TableRow key={appliedFeeIndex}>
                                     <TableCell>
                                       <div className="font-medium">
                                         {appliedFee.item_id === null
-                                          ? 'Áp dụng cho tất cả kiện hàng'
-                                          : `Kiện ${index + 1}`}
+                                          ? "Áp dụng cho tất cả kiện hàng"
+                                          : `Kiện ${feeIndex + 1}`}
                                       </div>
                                       <div className="text-sm text-gray-500">
                                         {appliedFee.description}
@@ -140,38 +140,12 @@ export default function ServiceQuoteForm({
                   <div className="flex justify-between items-center">
                     <Button
                       className="px-6 py-5 rounded-lg"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        try {
-                          const response = await fetch(
-                            `${API_BASE_URL}/shipments/${shipmentId}/select_service`,
-                            {
-                              method: "PATCH",
-                              headers: {
-                                "Content-Type": "application/json",
-                                Authorization: `Bearer ${localStorage.getItem("token")}`,
-                              },
-                              body: JSON.stringify({
-                                provider_id: 1,
-                                provider_service_id: quote.id,
-                                total_price: quote.prices.total_price,
-                              }),
-                            },
-                          );
-
-                          if (!response.ok) {
-                            throw new Error("Không thể chọn dịch vụ");
-                          }
-
-                          localStorage.setItem(
-                            "shipment_total_price",
-                            quote.prices.total_price.toString(),
-                          );
-
-                          onQuoteSelect(quote);
-                        } catch (error) {
-                          console.error("Error selecting service:", error);
-                        }
+                      onClick={() => {
+                        localStorage.setItem(
+                          "shipment_total_price",
+                          quote.prices.total_price.toString()
+                        );
+                        onQuoteSelect(quote);
                       }}
                     >
                       Chọn Dịch Vụ Này
