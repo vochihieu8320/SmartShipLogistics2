@@ -55,6 +55,7 @@ export default function PackageForm({ form }: PackageFormProps) {
   const [tempItem, setTempItem] = useState<ShipmentItem | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [shipmentId, setShipmentId] = useState<number | null>(null);
+  const [quotes, setQuotes] = useState([]); //Added state for quotes
   const { toast } = useToast();
 
   // Use field array to handle dynamic item list
@@ -628,15 +629,30 @@ export default function PackageForm({ form }: PackageFormProps) {
                       }
 
                       const result = await response.json();
-                      if (result && result["shipment"]["id"]) {
-                        setShipmentId(result.id);
+                      if (result?.success && result?.shipment?.id) {
+                        setShipmentId(result.shipment.id);
                         // Set shipmentId in form data
-                        form.setValue("shipment.id",  result["shipment"]["id"]);
+                        form.setValue("shipment.id", result.shipment.id);
+
+                        // Store quotes in state
+                        if (result.quote) {
+                          setQuotes(result.quote);
+                        }
+
+                        toast({
+                          title: "Thành công",
+                          description: "Đã tạo đơn hàng thành công",
+                        });
                       } else {
                         throw new Error("Invalid response from server");
                       }
                     } catch (error) {
                       console.log("error", error);
+                      toast({
+                        title: "Lỗi",
+                        description: "Không thể tạo đơn hàng. Vui lòng thử lại",
+                        variant: "destructive",
+                      });
                     } finally {
                       setIsLoading(false);
                     }
@@ -660,6 +676,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                   <ServiceQuoteForm
                     key={`quote-form-${shipmentId}`}
                     shipmentId={shipmentId}
+                    quotes={quotes} // Pass quotes to ServiceQuoteForm
                     onQuoteSelect={(quote) => {
                       form.setValue("shipment.provider_service_id", quote.id);
                       toast({
