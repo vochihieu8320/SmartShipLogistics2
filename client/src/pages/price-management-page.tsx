@@ -611,8 +611,7 @@ export default function PriceManagementPage() {
                     </TableBody>
                   </Table>
                 </div>
-              )}
-            </TabsContent>
+              </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
