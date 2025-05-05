@@ -9,6 +9,7 @@ import {
   BarChart,
   Globe,
   Truck,
+  Calculator,
 } from "lucide-react";
 import { Link } from "wouter";
 
