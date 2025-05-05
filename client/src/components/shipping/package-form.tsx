@@ -147,6 +147,14 @@ export default function PackageForm({ form }: PackageFormProps) {
     }).format(amount);
   }
 
+  const uniqueItemIds = Array.from(
+    new Set(
+      quotes[0]?.prices?.oversize_fee[0]?.applied_fees
+        ?.map((fee: any) => fee.item_id)
+        ?.filter((id: any) => id !== null),
+    ),
+  );
+
   return (
     <Card className="mb-6">
       <CardContent className="pt-6">
@@ -703,7 +711,11 @@ export default function PackageForm({ form }: PackageFormProps) {
                               (fee, pkgIndex) =>
                                 fee.applied_fees.map((appliedFee, feeIndex) => (
                                   <TableRow key={`${pkgIndex}-${feeIndex}`}>
-                                    <TableCell>Kiện #{pkgIndex + 1}</TableCell>
+                                    <TableCell>
+                                      {appliedFee.item_id == null
+                                        ? "Áp dụng cho lô hàng"
+                                        : `Kiện ${uniqueItemIds.indexOf(appliedFee.item_id)}`}{" "}
+                                    </TableCell>
                                     <TableCell>
                                       {appliedFee.display_name}
                                     </TableCell>

@@ -68,7 +68,7 @@ export default function ServiceQuoteForm({
 
                       <div className="flex justify-between items-center">
                         <div className="text-gray-600">
-                          Phụ phí nhiên liệu({quote.prices.fuel_rate}%)
+                          PP Nhiên liệu
                         </div>
                         <div className="font-medium">
                           {formatCurrency(quote.prices.fuel_surcharge)}
@@ -77,52 +77,39 @@ export default function ServiceQuoteForm({
 
                       <div className="flex justify-between items-center">
                         <div className="text-gray-600">
-                          Phụ phí mùa cao điểm
+                          PP Cao điểm
                         </div>
                         <div className="font-medium">
                           {formatCurrency(quote.prices.peak_season)}
                         </div>
                       </div>
 
-                      {quote.prices.oversize_fee.some(fee => fee.applied_fees.length > 0) && (
+                      {quote.prices.oversize_fee.some(
+                        (fee) => fee.applied_fees.length > 0,
+                      ) && (
                         <>
-                          {quote.prices.oversize_fee.map((fee, pkgIndex) =>
-                            fee.applied_fees.length > 0 && (
-                              <div key={pkgIndex} className="flex justify-between items-center text-sm">
-                                <div className="text-gray-600">
-                                  Phụ phí Quá Khổ (Kiện {pkgIndex + 1})
+                          {quote.prices.oversize_fee.map(
+                            (fee, pkgIndex) =>
+                              fee.applied_fees.length > 0 && (
+                                <div
+                                  key={pkgIndex}
+                                  className="flex justify-between items-center text-sm"
+                                >
+                                  <div className="text-gray-600">
+                                    PP Quá Khổ
+                                  </div>
+                                  <div className="font-medium">
+                                    {formatCurrency(
+                                      fee.applied_fees.reduce(
+                                        (sum, fee) =>
+                                          sum + parseFloat(fee.amount),
+                                        0,
+                                      ),
+                                    )}
+                                  </div>
                                 </div>
-                                <div className="font-medium">
-                                  {formatCurrency(
-                                    fee.applied_fees.reduce((sum, fee) => sum + parseFloat(fee.amount), 0)
-                                  )}
-                                </div>
-                              </div>
-                            )
+                              ),
                           )}
-
-                          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                            <div className="grid grid-cols-3 gap-4 text-sm">
-                              <div>
-                                <div className="text-gray-500">Số kiện</div>
-                                <div className="font-medium">{quote.prices.oversize_fee.length}</div>
-                              </div>
-                              <div>
-                                <div className="text-gray-500">Tổng khối lượng</div>
-                                <div className="font-medium">{quote.prices.oversize_fee.reduce((sum, pkg) => sum + pkg.weight, 0)} kg</div>
-                              </div>
-                              <div>
-                                <div className="text-gray-500">Tổng phí quá khổ</div>
-                                <div className="font-medium">
-                                  {formatCurrency(
-                                    quote.prices.oversize_fee.reduce((sum, pkg) => 
-                                      sum + pkg.applied_fees.reduce((feeSum, fee) => feeSum + parseFloat(fee.amount), 0), 0
-                                    )
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
                         </>
                       )}
 
@@ -144,7 +131,7 @@ export default function ServiceQuoteForm({
                         onClick={() => {
                           localStorage.setItem(
                             "shipment_total_price",
-                            quote.prices.total_price.toString()
+                            quote.prices.total_price.toString(),
                           );
                           onQuoteSelect(quote);
                         }}
