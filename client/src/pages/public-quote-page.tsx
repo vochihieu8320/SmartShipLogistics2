@@ -148,7 +148,7 @@ function PublicQuotePageContent() {
       });
       const result = await response.json();
       console.log("result", result);
-      setQuotes(result.quotes || []);
+      setQuotes(result.quote || []);
     } catch (error) {
       console.error("Error fetching quotes:", error);
     } finally {
