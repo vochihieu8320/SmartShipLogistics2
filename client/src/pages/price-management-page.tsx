@@ -142,7 +142,7 @@ export default function PriceManagementPage() {
     formData.append("provider_service_id", selectedService);
 
     try {
-      const response = await api.post("/api/v1/seed_prices", formData);
+      const response = await api.post("/seed_prices", formData);
       if (response.status === 200) {
         toast({
           title: "Upload Success",
@@ -209,19 +209,16 @@ export default function PriceManagementPage() {
       );
       if (!updatedAmount) return;
 
-      await api.put(
-        `/providers/${selectedProvider}/update_prices`,
-        {
-          provider_service_id: selectedService,
-          fee_type: "peak_season_surcharge",
-          fees: [
-            {
-              zone: charge.zone,
-              other_fee: updatedAmount
-            }
-          ]
-        },
-      );
+      await api.put(`/providers/${selectedProvider}/update_prices`, {
+        provider_service_id: selectedService,
+        fee_type: "peak_season_surcharge",
+        fees: [
+          {
+            zone: charge.zone,
+            other_fee: updatedAmount,
+          },
+        ],
+      });
 
       toast({
         title: "Success",
