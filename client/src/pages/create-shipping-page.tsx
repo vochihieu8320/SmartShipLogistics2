@@ -25,14 +25,18 @@ const createShipmentSchema = z.object({
     provider_id: z.number().default(1),
     provider_service_id: z.number().default(1),
     status: z.string().default("created"),
-    products: z.array(z.object({
-      description: z.string(),
-      quantity: z.number(),
-      origin: z.string(),
-      unit: z.string(),
-      unit_price: z.number(),
-      sub_total: z.number(),
-    })).default([]),
+    products: z
+      .array(
+        z.object({
+          description: z.string(),
+          quantity: z.number(),
+          origin: z.string(),
+          unit: z.string(),
+          unit_price: z.number(),
+          sub_total: z.number(),
+        }),
+      )
+      .default([]),
     sender_address_attributes: z.object({
       name: z.string().min(1, "Tên là bắt buộc"),
       company: z.string().optional(),
@@ -447,7 +451,8 @@ export default function CreateShippingPage() {
                             className="px-6 py-5 rounded-lg bg-gradient-to-r from-primary to-blue-600 hover:opacity-90 text-white shadow-md hover:shadow-lg transition-all"
                             onClick={async () => {
                               try {
-                                const currentShipmentId = form.getValues("shipment.id");
+                                const currentShipmentId =
+                                  form.getValues("shipment.id");
                                 if (!currentShipmentId) {
                                   toast({
                                     title: "Lỗi",
@@ -458,7 +463,7 @@ export default function CreateShippingPage() {
                                 }
 
                                 const response = await fetch(
-                                  `${API_BASE_URL}/api/v1/shipments/${currentShipmentId}/complete`,
+                                  `${API_BASE_URL}/shipments/${currentShipmentId}/complete`,
                                   {
                                     method: "POST",
                                     headers: {
