@@ -11,9 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function Header() {
+const Header = ({ hideAuth = false }: { hideAuth?: boolean }) => {
+  const auth = !hideAuth ? useAuth() : { user: null, logout: () => {} };
+  const { user, logout } = auth;
   const [location] = useLocation();
-  const { user, logoutMutation } = useAuth();
+
 
   const isActive = (path: string) => {
     if (path === "/" && location === "/") return true;
@@ -22,7 +24,7 @@ export function Header() {
   };
 
   const handleLogout = () => {
-    logoutMutation.mutate();
+    logout();
   };
 
   const getInitials = (name?: string) => {
@@ -116,4 +118,6 @@ export function Header() {
       </div>
     </header>
   );
-}
+};
+
+export default Header;
