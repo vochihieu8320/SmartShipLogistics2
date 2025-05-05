@@ -153,6 +153,9 @@ export default function PriceManagementPage() {
     try {
       const response = await api.post("/seed_prices", formData, {
         headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
