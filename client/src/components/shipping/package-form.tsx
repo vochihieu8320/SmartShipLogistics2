@@ -625,6 +625,11 @@ export default function PackageForm({ form, setActiveTab }: PackageFormProps) {
                 <div className="flex justify-center">
                   <Button
                     type="button"
+                    disabled={fields.some(field => {
+                      const item = field as any;
+                      return !item.length || !item.width || !item.height || !item.weight || 
+                             item.length <= 0 || item.width <= 0 || item.height <= 0 || item.weight <= 0;
+                    }) || fields.length === 0 || isLoading}
                     onClick={async () => {
                       setIsLoading(true);
                       try {

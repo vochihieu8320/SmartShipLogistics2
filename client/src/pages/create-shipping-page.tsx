@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
 import AddressForm from "@/components/shipping/address-form";
 import PackageForm from "@/components/shipping/package-form";
+import ProductForm from "@/components/shipping/product-form";
 
 const createShipmentSchema = z.object({
   shipment: z.object({
@@ -216,7 +217,7 @@ export default function CreateShippingPage() {
                     onValueChange={setActiveTab}
                     className="mt-2"
                   >
-                    <TabsList className="grid w-full grid-cols-4 p-1 rounded-xl bg-gray-100">
+                    <TabsList className="grid w-full grid-cols-3 p-1 rounded-xl bg-gray-100">
                       <TabsTrigger
                         value="info"
                         className={`rounded-lg ${activeTab === "info" ? "bg-white shadow-md" : ""} transition-all`}
@@ -384,7 +385,7 @@ export default function CreateShippingPage() {
                               Thông Tin Hoá Đơn
                             </h3>
                           </div>
-                          {shipmentId && <ProductForm form={form} />}
+                          <ProductForm form={form} />
                         </div>
                       </div>
                       <div className="flex justify-between mt-6">
