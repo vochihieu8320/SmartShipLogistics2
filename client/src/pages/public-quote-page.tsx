@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -28,6 +27,7 @@ export default function PublicQuotePage() {
   const [quotes, setQuotes] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [countries, setCountries] = useState<any[]>([]);
+  const [bearerToken, setBearerToken] = useState<string | null>(null); // Added state for bearer token
 
   const form = useForm({
     resolver: zodResolver(quoteFormSchema),
@@ -43,23 +43,37 @@ export default function PublicQuotePage() {
   });
 
   useEffect(() => {
-    // Fetch countries
-    fetch(`${API_BASE_URL}/countries`)
-      .then(res => res.json())
-      .then(data => setCountries(data.countries || []));
+    // Fetch countries -  Bearer token needs to be added here,  replace 'YOUR_BEARER_TOKEN'
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/countries`, {
+          headers: {
+            Authorization: `Bearer YOUR_BEARER_TOKEN` // Replace with actual token retrieval
+          }
+        });
+        const data = await response.json();
+        setCountries(data.countries || []);
+      } catch (error) {
+        console.error("Error fetching countries:", error);
+      }
+    };
+    fetchCountries();
+
   }, []);
 
   const onSubmit = async (data: z.infer<typeof quoteFormSchema>) => {
     setLoading(true);
     try {
+      //Added Bearer token to the request header. Replace 'YOUR_BEARER_TOKEN' with the actual token.
       const response = await fetch(`${API_BASE_URL}/shipments/quote`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer YOUR_BEARER_TOKEN` // Replace with actual token retrieval
         },
         body: JSON.stringify({
           country_id: data.country_id,
-          packages: data.packages
+          packages: data.packages.map(p => ({...p, volume: (p.length * p.width * p.height) / 1000000})) //Added volume calculation to the request
         }),
       });
       const result = await response.json();
@@ -118,81 +132,88 @@ export default function PublicQuotePage() {
                   />
 
                   <div className="space-y-4">
-                    {fields.map((field, index) => (
-                      <div key={field.id} className="p-4 border rounded-lg">
-                        <div className="flex justify-between items-center mb-4">
-                          <h3 className="font-medium">Package #{index + 1}</h3>
-                          {fields.length > 1 && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => remove(index)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
+                    {fields.map((field, index) => {
+                      const packageItem = form.getValues(`packages.${index}`);
+                      return(
+                        <div key={field.id} className="p-4 border rounded-lg">
+                          <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-medium">Package #{index + 1}</h3>
+                            {fields.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => remove(index)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={form.control}
-                            name={`packages.${index}.weight`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Weight (kg)</FormLabel>
-                                <FormControl>
-                                  <Input type="number" step="0.1" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name={`packages.${index}.weight`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Weight (kg)</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" step="0.1" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
 
-                        <div className="grid grid-cols-3 gap-4 mt-4">
-                          <FormField
-                            control={form.control}
-                            name={`packages.${index}.length`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Length (cm)</FormLabel>
-                                <FormControl>
-                                  <Input type="number" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name={`packages.${index}.width`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Width (cm)</FormLabel>
-                                <FormControl>
-                                  <Input type="number" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name={`packages.${index}.height`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Height (cm)</FormLabel>
-                                <FormControl>
-                                  <Input type="number" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                          <div className="grid grid-cols-3 gap-4 mt-4">
+                            <FormField
+                              control={form.control}
+                              name={`packages.${index}.length`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Length (cm)</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`packages.${index}.width`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Width (cm)</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`packages.${index}.height`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Height (cm)</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          {/* Display volume */}
+                          <div className="mt-2 text-sm text-gray-600">
+                            Volume: {((packageItem.length || 0) * (packageItem.width || 0) * (packageItem.height || 0) / 1000000).toFixed(2)} m³
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
 
                     <Button
                       type="button"
