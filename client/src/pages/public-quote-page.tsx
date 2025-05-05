@@ -1,7 +1,7 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { API_BASE_URL } from "@/config/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,41 +10,57 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Package, Calculator } from "lucide-react";
+import { Package, Calculator, Plus, Trash2 } from "lucide-react";
 
-const quoteFormSchema = z.object({
+const packageSchema = z.object({
   weight: z.coerce.number().min(0.1, "Weight must be greater than 0"),
-  country_id: z.string().min(1, "Please select a destination country"),
   length: z.coerce.number().min(1, "Length must be greater than 0"),
   width: z.coerce.number().min(1, "Width must be greater than 0"),
   height: z.coerce.number().min(1, "Height must be greater than 0")
 });
 
+const quoteFormSchema = z.object({
+  country_id: z.string().min(1, "Please select a destination country"),
+  packages: z.array(packageSchema).min(1, "At least one package is required")
+});
+
 export default function PublicQuotePage() {
   const [quotes, setQuotes] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [countries, setCountries] = useState([]);
+  const [countries, setCountries] = useState<any[]>([]);
 
   const form = useForm({
     resolver: zodResolver(quoteFormSchema),
     defaultValues: {
-      weight: 1,
-      length: 10,
-      width: 10,
-      height: 10,
-      country_id: ""
+      country_id: "",
+      packages: [{ weight: 1, length: 10, width: 10, height: 10 }]
     }
   });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "packages"
+  });
+
+  useEffect(() => {
+    // Fetch countries
+    fetch(`${API_BASE_URL}/countries`)
+      .then(res => res.json())
+      .then(data => setCountries(data.countries || []));
+  }, []);
 
   const onSubmit = async (data: z.infer<typeof quoteFormSchema>) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/public/quotes`, {
+      const response = await fetch(`${API_BASE_URL}/shipments/quote`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          country_id: data.country_id,
+          packages: data.packages
+        }),
       });
       const result = await response.json();
       setQuotes(result.quotes || []);
@@ -54,13 +70,6 @@ export default function PublicQuotePage() {
       setLoading(false);
     }
   };
-
-  // Fetch countries on mount
-  useState(() => {
-    fetch(`${API_BASE_URL}/countries`)
-      .then(res => res.json())
-      .then(data => setCountries(data.countries || []));
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -96,7 +105,7 @@ export default function PublicQuotePage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {countries.map((country: any) => (
+                            {countries.map((country) => (
                               <SelectItem key={country.id} value={country.id.toString()}>
                                 {country.name}
                               </SelectItem>
@@ -108,62 +117,92 @@ export default function PublicQuotePage() {
                     )}
                   />
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="weight"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Weight (kg)</FormLabel>
-                          <FormControl>
-                            <Input type="number" step="0.1" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <div className="space-y-4">
+                    {fields.map((field, index) => (
+                      <div key={field.id} className="p-4 border rounded-lg">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="font-medium">Package #{index + 1}</h3>
+                          {fields.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => remove(index)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
 
-                  <div className="grid grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="length"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Length (cm)</FormLabel>
-                          <FormControl>
-                            <Input type="number" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="width"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Width (cm)</FormLabel>
-                          <FormControl>
-                            <Input type="number" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="height"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Height (cm)</FormLabel>
-                          <FormControl>
-                            <Input type="number" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name={`packages.${index}.weight`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Weight (kg)</FormLabel>
+                                <FormControl>
+                                  <Input type="number" step="0.1" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4 mt-4">
+                          <FormField
+                            control={form.control}
+                            name={`packages.${index}.length`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Length (cm)</FormLabel>
+                                <FormControl>
+                                  <Input type="number" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name={`packages.${index}.width`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Width (cm)</FormLabel>
+                                <FormControl>
+                                  <Input type="number" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name={`packages.${index}.height`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Height (cm)</FormLabel>
+                                <FormControl>
+                                  <Input type="number" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                    ))}
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => append({ weight: 1, length: 10, width: 10, height: 10 })}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Another Package
+                    </Button>
                   </div>
 
                   <Button type="submit" className="w-full" disabled={loading}>
