@@ -216,7 +216,7 @@ export default function CreateShippingPage() {
                     onValueChange={setActiveTab}
                     className="mt-2"
                   >
-                    <TabsList className="grid w-full grid-cols-3 p-1 rounded-xl bg-gray-100">
+                    <TabsList className="grid w-full grid-cols-4 p-1 rounded-xl bg-gray-100">
                       <TabsTrigger
                         value="info"
                         className={`rounded-lg ${activeTab === "info" ? "bg-white shadow-md" : ""} transition-all`}
