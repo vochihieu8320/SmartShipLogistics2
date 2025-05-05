@@ -549,6 +549,43 @@ export function registerRoutes(app: Express): Server {
     }
   });
   
+  // Price update endpoints
+  app.put("/api/v1/providers/:providerId/update_prices", async (req, res, next) => {
+    try {
+      const providerId = req.params.providerId;
+      const { provider_service_id, fee_type, fees, amount } = req.body;
+
+      // Check if we should use the external API
+      if (apiConfig.useExternalApi) {
+        try {
+          console.log('[API] Updating prices via external API');
+          const data = await callExternalApi(`/providers/${providerId}/update_prices`, 'PUT', req.body);
+          return res.json(data);
+        } catch (error) {
+          console.error('[API] Error updating prices:', error);
+          return res.status(500).json({ error: "Failed to update prices" });
+        }
+      }
+
+      // Mock response for testing
+      if (fee_type === "peak_season_surcharge") {
+        return res.json({
+          success: true,
+          message: "Peak season surcharges updated successfully",
+          fees: fees
+        });
+      } else {
+        return res.json({
+          success: true,
+          message: `${fee_type} fee updated successfully`,
+          amount: amount
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
+
   // API endpoint for admin orders
   app.get("/api/v1/admin/shipments", async (req, res, next) => {
     try {
