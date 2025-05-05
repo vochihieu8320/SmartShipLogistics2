@@ -24,6 +24,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Package, Calculator, Plus, Trash2 } from "lucide-react";
 import ServiceQuoteForm from "@/components/shipping/service-quote-form";
+import Header from "@/components/layout/header"; //Corrected import
 
 const packageSchema = z.object({
   weight: z.coerce.number().min(0.1, "Weight must be greater than 0"),
