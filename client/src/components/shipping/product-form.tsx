@@ -1,18 +1,12 @@
-
 import { useState } from "react";
+import { UseFormReturn } from "react-hook-form";
+import { X, Plus, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash2 } from "lucide-react";
-import { api } from "@/services/api";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { API_BASE_URL } from "@/config/api";
 
 interface Product {
   description: string;
@@ -23,62 +17,60 @@ interface Product {
   sub_total: number;
 }
 
-export default function ProductForm({ shipmentId, onSave }: { shipmentId: number; onSave: () => void }) {
+export default function ProductForm({ form }: { form: UseFormReturn }) {
   const [products, setProducts] = useState<Product[]>([]);
   const { toast } = useToast();
 
-  const addProduct = () => {
-    setProducts([
-      ...products,
-      {
-        description: "",
-        quantity: 1,
-        origin: "VN",
-        unit: "PCS",
-        unit_price: 0,
-        sub_total: 0,
-      },
-    ]);
+  const handleAddProduct = () => {
+    setProducts([...products, {
+      description: '',
+      quantity: 1,
+      origin: 'VN',
+      unit: 'pcs',
+      unit_price: 0,
+      sub_total: 0
+    }]);
   };
 
-  const removeProduct = (index: number) => {
-    setProducts(products.filter((_, i) => i !== index));
+  const handleRemoveProduct = (index: number) => {
+    const newProducts = products.filter((_, i) => i !== index);
+    setProducts(newProducts);
   };
 
-  const updateProduct = (index: number, field: keyof Product, value: any) => {
-    const updatedProducts = [...products];
-    updatedProducts[index] = {
-      ...updatedProducts[index],
+  const handleProductChange = (index: number, field: string, value: any) => {
+    const newProducts = [...products];
+    newProducts[index] = {
+      ...newProducts[index],
       [field]: value,
-      sub_total:
-        field === "quantity" || field === "unit_price"
-          ? (field === "quantity" ? value : updatedProducts[index].quantity) *
-            (field === "unit_price" ? value : updatedProducts[index].unit_price)
-          : updatedProducts[index].sub_total,
+      sub_total: field === 'quantity' || field === 'unit_price'
+        ? (field === 'quantity' ? value : newProducts[index].quantity) *
+          (field === 'unit_price' ? value : newProducts[index].unit_price)
+        : newProducts[index].sub_total
     };
-    setProducts(updatedProducts);
+    setProducts(newProducts);
   };
 
   const handleSave = async () => {
     try {
-      await api.post(`/shipments/${shipmentId}/create_products`, {
-        products: products.map(({ description, quantity, origin, unit, unit_price }) => ({
-          description,
-          quantity,
-          origin,
-          unit,
-          unit_price,
-        })),
+      const response = await fetch(`${API_BASE_URL}/shipments/${form.getValues().shipment.id}/create_products`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ products })
       });
+
+      if (!response.ok) throw new Error('Failed to save products');
+
       toast({
-        title: "Thành công",
-        description: "Đã lưu thông tin sản phẩm",
+        title: "Success",
+        description: "Products saved successfully",
       });
-      onSave();
     } catch (error) {
       toast({
-        title: "Lỗi",
-        description: "Không thể lưu thông tin sản phẩm",
+        title: "Error",
+        description: "Failed to save products",
         variant: "destructive",
       });
     }
@@ -86,84 +78,110 @@ export default function ProductForm({ shipmentId, onSave }: { shipmentId: number
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Danh sách sản phẩm</h3>
-        <Button onClick={addProduct} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Thêm sản phẩm
-        </Button>
+      <div className="rounded-lg border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Description</TableHead>
+              <TableHead>Quantity</TableHead>
+              <TableHead>Origin</TableHead>
+              <TableHead>Unit</TableHead>
+              <TableHead>Unit Price</TableHead>
+              <TableHead>Sub Total</TableHead>
+              <TableHead className="w-[50px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {products.map((product, index) => (
+              <TableRow key={index}>
+                <TableCell>
+                  <Input
+                    value={product.description}
+                    onChange={(e) => handleProductChange(index, 'description', e.target.value)}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Input
+                    type="number"
+                    value={product.quantity}
+                    onChange={(e) => handleProductChange(index, 'quantity', parseInt(e.target.value))}
+                    min={1}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Select
+                    value={product.origin}
+                    onValueChange={(value) => handleProductChange(index, 'origin', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="VN">Vietnam</SelectItem>
+                      <SelectItem value="US">United States</SelectItem>
+                      <SelectItem value="CN">China</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell>
+                  <Select
+                    value={product.unit}
+                    onValueChange={(value) => handleProductChange(index, 'unit', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pcs">PCS</SelectItem>
+                      <SelectItem value="kg">KG</SelectItem>
+                      <SelectItem value="box">Box</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell>
+                  <Input
+                    type="number"
+                    value={product.unit_price}
+                    onChange={(e) => handleProductChange(index, 'unit_price', parseFloat(e.target.value))}
+                    min={0}
+                    step={0.01}
+                  />
+                </TableCell>
+                <TableCell>{product.sub_total.toFixed(2)}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleRemoveProduct(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Mô tả</TableHead>
-            <TableHead>Số lượng</TableHead>
-            <TableHead>Xuất xứ</TableHead>
-            <TableHead>Đơn vị</TableHead>
-            <TableHead>Đơn giá</TableHead>
-            <TableHead>Thành tiền</TableHead>
-            <TableHead></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {products.map((product, index) => (
-            <TableRow key={index}>
-              <TableCell>
-                <Input
-                  value={product.description}
-                  onChange={(e) => updateProduct(index, "description", e.target.value)}
-                />
-              </TableCell>
-              <TableCell>
-                <Input
-                  type="number"
-                  min="1"
-                  value={product.quantity}
-                  onChange={(e) => updateProduct(index, "quantity", parseInt(e.target.value))}
-                />
-              </TableCell>
-              <TableCell>
-                <Input
-                  value={product.origin}
-                  onChange={(e) => updateProduct(index, "origin", e.target.value)}
-                />
-              </TableCell>
-              <TableCell>
-                <Input
-                  value={product.unit}
-                  onChange={(e) => updateProduct(index, "unit", e.target.value)}
-                />
-              </TableCell>
-              <TableCell>
-                <Input
-                  type="number"
-                  min="0"
-                  value={product.unit_price}
-                  onChange={(e) => updateProduct(index, "unit_price", parseFloat(e.target.value))}
-                />
-              </TableCell>
-              <TableCell>{product.sub_total.toLocaleString()}</TableCell>
-              <TableCell>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeProduct(index)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <div className="flex justify-between">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleAddProduct}
+          className="gap-2"
+        >
+          <Plus className="h-4 w-4" />
+          Add Product
+        </Button>
 
-      <div className="flex justify-between items-center pt-4">
-        <div className="text-lg font-medium">
-          Tổng cộng: {products.reduce((sum, p) => sum + p.sub_total, 0).toLocaleString()} VND
-        </div>
-        <Button onClick={handleSave} className="px-6">
-          Lưu thông tin
+        <Button
+          type="button"
+          onClick={handleSave}
+          className="gap-2"
+          disabled={products.length === 0}
+        >
+          <Save className="h-4 w-4" />
+          Save Products
         </Button>
       </div>
     </div>
