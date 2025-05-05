@@ -22,6 +22,26 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/services/api";
 import { Loader2 } from "@/components/ui/loader";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+
 
 interface Provider {
   id: number;
@@ -58,6 +78,49 @@ export default function PriceManagementPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>("");
+
+  const form = useForm({
+    defaultValues: {
+      user_id: '',
+      min_weight: '',
+      max_weight: '',
+      discount_percentage: ''
+    }
+  });
+
+  const onSubmit = (data: any) => {
+    if (!data.user_id) {
+      toast({
+        title: "Error",
+        description: "Please select a user first",
+        variant: "destructive"
+      });
+      return;
+    }
+    api.post("/weight_discounts", {
+      weight_discount: {
+        user_id: parseInt(data.user_id),
+        min_weight: parseFloat(data.min_weight),
+        max_weight: parseFloat(data.max_weight),
+        discount_percentage: parseFloat(data.discount_percentage)
+      }
+    }).then(() => {
+      // Refresh the weight discounts list
+      api.get("/weight_discounts").then((response) => {
+        setWeightDiscounts(response.weight_discounts || []);
+      });
+      toast({
+        title: "Success",
+        description: "Weight discount added successfully"
+      });
+    }).catch(() => {
+      toast({
+        title: "Error",
+        description: "Failed to add weight discount",
+        variant: "destructive"
+      });
+    });
+  };
 
   // Fetch users
   useEffect(() => {
@@ -194,7 +257,7 @@ export default function PriceManagementPage() {
           description: "Prices uploaded successfully",
           variant: "default",
         });
-        
+
         // Refetch prices after successful upload
         try {
           const { net_prices, other_fees } = await api.get(
@@ -513,142 +576,166 @@ export default function PriceManagementPage() {
 
             <TabsContent value="weight_discounts">
               <div className="overflow-x-auto">
-                  <div className="flex justify-between items-center mb-4">
-                    <Select onValueChange={setSelectedUser} value={selectedUser}>
-                      <SelectTrigger className="w-[200px]">
-                        <SelectValue placeholder="Select User" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {users.map((user) => (
-                          <SelectItem key={user.id} value={user.id.toString()}>
-                            {user.name || user.email}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      onClick={() => {
-                        const minWeight = prompt("Enter minimum weight (kg)");
-                        const maxWeight = prompt("Enter maximum weight (kg)");
-                        const discountPercentage = prompt("Enter discount percentage");
-                        
-                        if (!selectedUser) {
-                          toast({
-                            title: "Error",
-                            description: "Please select a user first",
-                            variant: "destructive"
-                          });
-                          return;
-                        }
-                        if (minWeight && maxWeight && discountPercentage) {
-                          api.post("/weight_discounts", {
-                            weight_discount: {
-                              user_id: parseInt(selectedUser),
-                              min_weight: parseFloat(minWeight),
-                              max_weight: parseFloat(maxWeight),
-                              discount_percentage: parseFloat(discountPercentage)
-                            }
-                          }).then(() => {
-                            // Refresh the weight discounts list
-                            api.get("/weight_discounts").then((response) => {
-                              setWeightDiscounts(response.weight_discounts || []);
-                            });
-                            toast({
-                              title: "Success",
-                              description: "Weight discount added successfully"
-                            });
-                          }).catch(() => {
-                            toast({
-                              title: "Error",
-                              description: "Failed to add weight discount",
-                              variant: "destructive"
-                            });
-                          });
-                        }
-                      }}
-                    >
-                      Add Weight Discount
-                    </Button>
-                  </div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Min Weight (kg)</TableHead>
-                        <TableHead>Max Weight (kg)</TableHead>
-                        <TableHead>Discount (%)</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {weightDiscounts?.map((discount) => (
-                        <TableRow key={discount.id}>
-                          <TableCell>{discount.min_weight}</TableCell>
-                          <TableCell>{discount.max_weight}</TableCell>
-                          <TableCell>{discount.discount_percentage}%</TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  const minWeight = prompt("Enter minimum weight (kg)", discount.min_weight.toString());
-                                  const maxWeight = prompt("Enter maximum weight (kg)", discount.max_weight.toString());
-                                  const discountPercentage = prompt("Enter discount percentage", discount.discount_percentage.toString());
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button>Add Weight Discount</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add Weight Discount</DialogTitle>
+                      <DialogDescription>Add a new weight-based discount for a user</DialogDescription>
+                    </DialogHeader>
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <FormField
+                          control={form.control}
+                          name="user_id"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>User</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select User" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {users.map((user) => (
+                                    <SelectItem key={user.id} value={user.id.toString()}>
+                                      {user.name || user.email}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="min_weight"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Minimum Weight (kg)</FormLabel>
+                              <FormControl>
+                                <Input type="number" step="0.1" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="max_weight"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Maximum Weight (kg)</FormLabel>
+                              <FormControl>
+                                <Input type="number" step="0.1" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="discount_percentage"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Discount Percentage</FormLabel>
+                              <FormControl>
+                                <Input type="number" step="1" min="0" max="100" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <DialogFooter>
+                          <Button type="submit">Add Discount</Button>
+                        </DialogFooter>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Min Weight (kg)</TableHead>
+                      <TableHead>Max Weight (kg)</TableHead>
+                      <TableHead>Discount (%)</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {weightDiscounts?.map((discount) => (
+                      <TableRow key={discount.id}>
+                        <TableCell>{discount.min_weight}</TableCell>
+                        <TableCell>{discount.max_weight}</TableCell>
+                        <TableCell>{discount.discount_percentage}%</TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const minWeight = prompt("Enter minimum weight (kg)", discount.min_weight.toString());
+                                const maxWeight = prompt("Enter maximum weight (kg)", discount.max_weight.toString());
+                                const discountPercentage = prompt("Enter discount percentage", discount.discount_percentage.toString());
 
-                                  if (minWeight && maxWeight && discountPercentage) {
-                                    api.put(`/weight_discounts/${discount.id}`, {
-                                      weight_discount: {
-                                        min_weight: parseFloat(minWeight),
-                                        max_weight: parseFloat(maxWeight),
-                                        discount_percentage: parseFloat(discountPercentage)
-                                      }
-                                    }).then(() => {
-                                      toast({
-                                        title: "Success",
-                                        description: "Weight discount updated successfully"
-                                      });
-                                    }).catch(() => {
-                                      toast({
-                                        title: "Error",
-                                        description: "Failed to update weight discount",
-                                        variant: "destructive"
-                                      });
+                                if (minWeight && maxWeight && discountPercentage) {
+                                  api.put(`/weight_discounts/${discount.id}`, {
+                                    weight_discount: {
+                                      min_weight: parseFloat(minWeight),
+                                      max_weight: parseFloat(maxWeight),
+                                      discount_percentage: parseFloat(discountPercentage)
+                                    }
+                                  }).then(() => {
+                                    toast({
+                                      title: "Success",
+                                      description: "Weight discount updated successfully"
                                     });
-                                  }
-                                }}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => {
-                                  if (confirm("Are you sure you want to delete this weight discount?")) {
-                                    api.delete(`/weight_discounts/${discount.id}`).then(() => {
-                                      toast({
-                                        title: "Success",
-                                        description: "Weight discount deleted successfully"
-                                      });
-                                    }).catch(() => {
-                                      toast({
-                                        title: "Error",
-                                        description: "Failed to delete weight discount",
-                                        variant: "destructive"
-                                      });
+                                  }).catch(() => {
+                                    toast({
+                                      title: "Error",
+                                      description: "Failed to update weight discount",
+                                      variant: "destructive"
                                     });
-                                  }
-                                }}
-                              >
-                                Delete
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </TabsContent>
+                                  });
+                                }
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => {
+                                if (confirm("Are you sure you want to delete this weight discount?")) {
+                                  api.delete(`/weight_discounts/${discount.id}`).then(() => {
+                                    toast({
+                                      title: "Success",
+                                      description: "Weight discount deleted successfully"
+                                    });
+                                  }).catch(() => {
+                                    toast({
+                                      title: "Error",
+                                      description: "Failed to delete weight discount",
+                                      variant: "destructive"
+                                    });
+                                  });
+                                }
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
