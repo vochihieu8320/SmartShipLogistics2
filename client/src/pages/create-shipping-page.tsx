@@ -447,8 +447,18 @@ export default function CreateShippingPage() {
                             className="px-6 py-5 rounded-lg bg-gradient-to-r from-primary to-blue-600 hover:opacity-90 text-white shadow-md hover:shadow-lg transition-all"
                             onClick={async () => {
                               try {
+                                const currentShipmentId = form.getValues("shipment.id");
+                                if (!currentShipmentId) {
+                                  toast({
+                                    title: "Lỗi",
+                                    description: "Không tìm thấy ID đơn hàng",
+                                    variant: "destructive",
+                                  });
+                                  return;
+                                }
+
                                 const response = await fetch(
-                                  `${API_BASE_URL}/api/v1/shipments/${shipmentId}/complete`,
+                                  `${API_BASE_URL}/api/v1/shipments/${currentShipmentId}/complete`,
                                   {
                                     method: "POST",
                                     headers: {
