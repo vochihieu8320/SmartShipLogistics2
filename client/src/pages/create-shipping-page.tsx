@@ -47,6 +47,26 @@ const createShipmentSchema = z.object({
       address1: z.string().min(1, "Địa chỉ là bắt buộc"),
       address2: z.string().optional(),
       address3: z.string().optional(),
+      phone: z.string().min(1, "Số điện thoại là bắt buộc"),
+      email: z.string().email("Email không hợp lệ"),
+    }),
+    receiver_address_attributes: z.object({
+      name: z.string().min(1, "Tên là bắt buộc"),
+      company: z.string().optional(),
+      country_id: z.number(),
+      postal_code: z.string().min(1, "Mã bưu điện là bắt buộc"),
+      city: z.string().min(1, "Thành phố là bắt buộc"),
+      state: z.string().optional(),
+      address1: z.string().min(1, "Địa chỉ là bắt buộc"),
+      address2: z.string().optional(),
+      address3: z.string().optional(),
+      phone: z.string().min(1, "Số điện thoại là bắt buộc"),
+      email: z.string().email("Email không hợp lệ"),
+    }),
+  }),
+});
+
+type CreateShipmentFormValues = z.infer<typeof createShipmentSchema>;
 
 export default function CreateShippingPage() {
   // Utility functions for price calculations
