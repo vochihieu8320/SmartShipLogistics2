@@ -31,6 +31,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { API_BASE_URL } from "@/config/api";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface Address {
   id: number;
@@ -310,30 +311,30 @@ export default function UsersPage() {
                   </DialogContent>
                 </Dialog>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {addresses.map((address) => (
-                  <Card key={address.id}>
-                    <CardContent className="p-4">
-                      <div className="space-y-2">
-                        <div className="font-semibold">{address.name}</div>
-                        {address.company && (
-                          <div className="text-sm">{address.company}</div>
-                        )}
-                        <div className="text-sm">{address.address1}</div>
-                        {address.address2 && (
-                          <div className="text-sm">{address.address2}</div>
-                        )}
-                        {address.address3 && (
-                          <div className="text-sm">{address.address3}</div>
-                        )}
-                        <div className="text-sm">{`${address.city}, ${address.state} ${address.postal_code}`}</div>
-                        <div className="text-sm">{address.phone}</div>
-                        <div className="text-sm">{address.email}</div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeader>Name</TableHeader>
+                    <TableHeader>Company</TableHeader>
+                    <TableHeader>Address</TableHeader>
+                    <TableHeader>City, State, Zip</TableHeader>
+                    <TableHeader>Phone</TableHeader>
+                    <TableHeader>Email</TableHeader>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {addresses.map((address) => (
+                    <TableRow key={address.id}>
+                      <TableCell>{address.name}</TableCell>
+                      <TableCell>{address.company}</TableCell>
+                      <TableCell>{address.address1}, {address.address2}, {address.address3}</TableCell>
+                      <TableCell>{`${address.city}, ${address.state} ${address.postal_code}`}</TableCell>
+                      <TableCell>{address.phone}</TableCell>
+                      <TableCell>{address.email}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </TabsContent>
           </Tabs>
         </CardContent>
