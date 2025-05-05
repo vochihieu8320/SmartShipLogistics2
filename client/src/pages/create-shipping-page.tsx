@@ -17,6 +17,14 @@ const formatPrice = (amount: number) => {
     currency: "VND",
   }).format(amount);
 };
+
+const calculateTotal = (values: any) => {
+  const otherFee = values.other_fee || 0;
+  const customFee = values.custom_fee || 0;
+  const shippingCost = parseFloat(localStorage.getItem("shipment_total_price") || "0");
+  return otherFee + customFee + shippingCost;
+};
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
