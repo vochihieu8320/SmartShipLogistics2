@@ -157,11 +157,14 @@ export default function PriceManagementPage() {
       for (let [key, value] of formData.entries()) {
         console.log(key, value);
       }
-      const response = await api.post("/seed_prices", formData, {
+      // Use fetch directly for file upload
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/seed_prices`, {
+        method: 'POST',
         headers: {
-          "Content-Type": "multipart/form-data",
-          // Remove Content-Type header to let browser set it with boundary
-        }
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
       });
       if (response.status === 200) {
         toast({
