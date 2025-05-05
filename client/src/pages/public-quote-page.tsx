@@ -97,7 +97,7 @@ export default function PublicQuotePage() {
               state: "Ho Chi Minh",
               address1: "1913 Hanoi Way2",
               phone: "0929477947",
-              email: "chihieu2222@gmail.com"
+              email: "chihieu2222@gmail.com",
             },
             receiver_address_attributes: {
               name: data.receiver_name || "Receiver",
@@ -110,31 +110,34 @@ export default function PublicQuotePage() {
               address2: "",
               address3: "",
               phone: data.phone || "+0000000000",
-              email: data.email || "example@email.com"
+              email: data.email || "example@email.com",
             },
-            packages_attributes: [{
-              carriage_value: 1200,
-              unit_of_weight: "kg_cm",
-              currency: "VND",
-              type_shipping: "items",
-              packaging: "box",
-              items_attributes: data.packages.map(p => ({
-                weight: p.weight,
-                length: p.length,
-                width: p.width,
-                height: p.height,
-                quantity: 1,
-                description: "",
-                value: 0,
-                country_of_origin: "VN",
-                hs_code: "",
-                id: crypto.randomUUID()
-              }))
-            }]
-          }
+            packages_attributes: [
+              {
+                carriage_value: 1200,
+                unit_of_weight: "kg_cm",
+                currency: "VND",
+                type_shipping: "items",
+                packaging: "box",
+                items_attributes: data.packages.map((p) => ({
+                  weight: p.weight,
+                  length: p.length,
+                  width: p.width,
+                  height: p.height,
+                  quantity: 1,
+                  description: "",
+                  value: 0,
+                  country_of_origin: "VN",
+                  hs_code: "",
+                  id: crypto.randomUUID(),
+                })),
+              },
+            ],
+          },
         }),
       });
       const result = await response.json();
+      console.log("result", result);
       setQuotes(result.quotes || []);
     } catch (error) {
       console.error("Error fetching quotes:", error);
@@ -144,7 +147,10 @@ export default function PublicQuotePage() {
   };
 
   const handleQuoteSelect = (quote: any) => {
-    localStorage.setItem("shipment_total_price", quote.prices.total_price.toString());
+    localStorage.setItem(
+      "shipment_total_price",
+      quote.prices.total_price.toString(),
+    );
   };
 
   return (
@@ -291,7 +297,7 @@ export default function PublicQuotePage() {
                               ((packageItem.length || 0) *
                                 (packageItem.width || 0) *
                                 (packageItem.height || 0)) /
-                              1000000
+                              5000
                             ).toFixed(2)}{" "}
                             m³
                           </div>
@@ -321,6 +327,7 @@ export default function PublicQuotePage() {
               {quotes.length > 0 && (
                 <div className="mt-8">
                   <ServiceQuoteForm
+                    shipmentId={1}
                     quotes={quotes}
                     onQuoteSelect={handleQuoteSelect}
                   />
