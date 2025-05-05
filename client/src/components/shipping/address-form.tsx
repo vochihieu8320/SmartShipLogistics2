@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MapPin, User } from "lucide-react";
+import { API_BASE_URL } from "@/config/api";
 
 interface Country {
   id: number;
