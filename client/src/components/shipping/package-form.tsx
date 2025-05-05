@@ -680,7 +680,6 @@ export default function PackageForm({ form, setActiveTab }: PackageFormProps) {
                         setIsLoading(false);
                       }
                     }}
-                    disabled={isLoading}
                     className="w-full md:w-auto px-6 py-2 bg-primary text-white hover:bg-primary/90"
                   >
                     {isLoading ? (
