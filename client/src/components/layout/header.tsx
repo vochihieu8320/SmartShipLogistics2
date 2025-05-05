@@ -120,4 +120,4 @@ const Header = ({ hideAuth = false }: { hideAuth?: boolean }) => {
   );
 };
 
-export default Header;
+export { Header };
