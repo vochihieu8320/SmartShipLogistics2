@@ -320,9 +320,27 @@ export default function UsersPage() {
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Quốc gia</FormLabel>
-                                <FormControl>
-                                  <Select {...field} options={countries.map(country => ({ value: country.id, label: country.name }))}/>
-                                </FormControl>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  value={field.value?.toString()}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Chọn quốc gia" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {countries.map((country) => (
+                                      <SelectItem
+                                        key={country.id}
+                                        value={country.id.toString()}
+                                      >
+                                        {country.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
                               </FormItem>
                             )}
                           />
