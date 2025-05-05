@@ -209,14 +209,17 @@ export default function PriceManagementPage() {
       );
       if (!updatedAmount) return;
 
-      //  API endpoint needs to be defined for updating peak season charges
       await api.put(
-        `/providers/${selectedProvider}/update_peak_season_charges`,
+        `/providers/${selectedProvider}/update_prices`,
         {
-          // Placeholder endpoint
           provider_service_id: selectedService,
-          zone: charge.zone,
-          amount: parseFloat(updatedAmount),
+          fee_type: "peak_season_surcharge",
+          fees: [
+            {
+              zone: charge.zone,
+              other_fee: updatedAmount
+            }
+          ]
         },
       );
 
