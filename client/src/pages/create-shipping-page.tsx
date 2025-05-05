@@ -25,6 +25,12 @@ const calculateTotal = (values: any) => {
   return otherFee + customFee + shippingCost;
 };
 
+const calculateNetPrice = (values: any) => {
+  const shippingCost = parseFloat(localStorage.getItem("shipment_total_price") || "0");
+  const customFee = values.custom_fee || 0;
+  return shippingCost + customFee;
+};
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
