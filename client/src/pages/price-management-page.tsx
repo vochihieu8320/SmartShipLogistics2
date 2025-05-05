@@ -163,6 +163,76 @@ export default function PriceManagementPage() {
     }
   };
 
+  const handleUpdateFee = async (fee: OtherFee) => {
+    try {
+      if (!selectedProvider || !selectedService) return;
+
+      let updatedAmount = prompt(`Update ${fee.display_name}`, fee.amount);
+      if (!updatedAmount) return;
+
+      await api.put(`/providers/${selectedProvider}/update_prices`, {
+        provider_service_id: selectedService,
+        fee_type: fee.display_name === "Phụ phí cao điểm" ? "peak_season_surcharge" : "vat", // Assumed fee_type mapping
+        amount: parseFloat(updatedAmount)
+      });
+
+      toast({
+        title: "Success",
+        description: "Fee updated successfully",
+      });
+
+      // Refresh data
+      const { net_prices, other_fees } = await api.get(
+        `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}`
+      );
+      setPrices(net_prices);
+      setOtherFees(other_fees || []);
+
+    } catch (error) {
+      console.error("Error updating fee:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update fee",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdatePeakSeasonCharge = async (charge: NetPrice) => {
+    try {
+      if (!selectedProvider || !selectedService) return;
+      let updatedAmount = prompt(`Update peak season charge for zone ${charge.zone}`, charge.price);
+      if (!updatedAmount) return;
+
+      //  API endpoint needs to be defined for updating peak season charges
+      await api.put(`/providers/${selectedProvider}/update_peak_season_charges`, { // Placeholder endpoint
+        provider_service_id: selectedService,
+        zone: charge.zone,
+        amount: parseFloat(updatedAmount)
+      });
+
+      toast({
+        title: "Success",
+        description: "Peak season charge updated successfully",
+      });
+
+      // Refresh data (adjust as needed)
+      const response = await api.get(
+        `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}&fee_type=peak_season_surcharge`,
+      );
+      setPeakSeasonCharges(response.other_fees || []);
+
+    } catch (error) {
+      console.error("Error updating peak season charge:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update peak season charge",
+        variant: "destructive",
+      });
+    }
+  };
+
+
   return (
     <DashboardLayout title="Price Management">
       <Card>
@@ -296,31 +366,21 @@ export default function PriceManagementPage() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="font-bold">Weight/Zone</TableHead>
-                        {uniquePeakZones.map((zone) => (
-                          <TableHead
-                            key={zone}
-                            className="text-center font-bold"
-                          >
-                            Zone {zone}
-                          </TableHead>
-                        ))}
+                        <TableHead className="font-bold">Zone</TableHead>
+                        <TableHead className="font-bold">Amount</TableHead>
+                        <TableHead className="font-bold">Action</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {uniquePeakWeights.map((weight) => (
-                        <TableRow key={weight}>
-                          <TableCell className="font-medium">
-                            {weight} kg
+                      {peakSeasonCharges.map((charge) => (
+                        <TableRow key={charge.zone}>
+                          <TableCell className="font-medium">{charge.zone}</TableCell>
+                          <TableCell className="font-medium">{formatPrice(charge.price)}</TableCell>
+                          <TableCell>
+                            <Button variant="outline" size="sm" onClick={() => handleUpdatePeakSeasonCharge(charge)}>
+                              Update
+                            </Button>
                           </TableCell>
-                          {uniquePeakZones.map((zone) => (
-                            <TableCell
-                              key={`${weight}-${zone}`}
-                              className="text-right"
-                            >
-                              {getPeakSeasonPriceForZoneAndWeight(zone, weight)}
-                            </TableCell>
-                          ))}
                         </TableRow>
                       ))}
                     </TableBody>
@@ -356,8 +416,8 @@ export default function PriceManagementPage() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Button variant="outline" size="sm">
-                              Edit
+                            <Button variant="outline" size="sm" onClick={() => handleUpdateFee(fee)}>
+                              Update
                             </Button>
                           </TableCell>
                         </TableRow>
