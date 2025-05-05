@@ -21,12 +21,16 @@ const formatPrice = (amount: number) => {
 const calculateTotal = (values: any) => {
   const otherFee = values.other_fee || 0;
   const customFee = values.custom_fee || 0;
-  const shippingCost = parseFloat(localStorage.getItem("shipment_total_price") || "0");
+  const shippingCost = parseFloat(
+    localStorage.getItem("shipment_total_price") || "0",
+  );
   return otherFee + customFee + shippingCost;
 };
 
 const calculateNetPrice = (values: any) => {
-  const shippingCost = parseFloat(localStorage.getItem("shipment_total_price") || "0");
+  const shippingCost = parseFloat(
+    localStorage.getItem("shipment_total_price") || "0",
+  );
   const customFee = values.custom_fee || 0;
   return shippingCost + customFee;
 };
@@ -663,14 +667,22 @@ export default function CreateShippingPage() {
                                       description:
                                         "Shipment completed with additional charges",
                                       total_price:
-                                        form.getValues("total_price") || parseFloat(localStorage.getItem("shipment_total_price") || "0"),
+                                        form.getValues("total_price") ||
+                                        parseFloat(
+                                          localStorage.getItem(
+                                            "shipment_total_price",
+                                          ) || "0",
+                                        ),
                                     }),
                                   },
                                 );
 
                                 const responseData = await response.json();
                                 if (responseData.success) {
-                                  form.setValue("total_price", responseData.total_price);
+                                  form.setValue(
+                                    "total_price",
+                                    responseData.total_price,
+                                  );
                                 }
 
                                 if (!response.ok) {
