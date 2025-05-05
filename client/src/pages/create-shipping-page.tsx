@@ -47,8 +47,8 @@ const createShipmentSchema = z.object({
       address1: z.string().min(1, "Địa chỉ là bắt buộc"),
       address2: z.string().optional(),
       address3: z.string().optional(),
-      phone: z.string().min(1, "Số điện thoại là bắt buộc"),
-      email: z.string().email("Email không hợp lệ"),
+      phone: z.string().min(1, "Số điện thoại là bắt buộc");
+      email: z.string().email("Email không hợp lệ");
     }),
     receiver_address_attributes: z.object({
       name: z.string().min(1, "Tên là bắt buộc"),
@@ -60,48 +60,8 @@ const createShipmentSchema = z.object({
       address1: z.string().min(1, "Địa chỉ là bắt buộc"),
       address2: z.string().optional(),
       address3: z.string().optional(),
-      phone: z.string().min(1, "Số điện thoại là bắt buộc"),
-      email: z.string().email("Email không hợp lệ"),
-    }),
-  }),
-});
-
-type CreateShipmentFormValues = z.infer<typeof createShipmentSchema>;
-
-export default function CreateShippingPage() {
-  // Utility functions for price calculations
-  const calculateNetPrice = (values: any) => {
-    const basePrice = values.net_price || 0;
-    const customFee = values.custom_fee || 0;
-    return basePrice + customFee;
-  };
-
-  const calculateTotal = (values: any) => {
-    const netPrice = values.net_price || 0;
-    const otherFee = values.other_fee || 0;
-    const fuelCharge = values.fuel_charge || 0;
-    const peakSeasonCharge = values.peak_season_charge || 0;
-    const oversizeCharge = values.oversize_charge || 0;
-    const vatPrice = values.vat_price || 0;
-    
-    return netPrice + otherFee + fuelCharge + peakSeasonCharge +   oversizeCharge + vatPrice;
-  };
-
-      phone: z.string().min(1, "Số điện thoại là bắt buộc"),
-      email: z.string().email("Email không hợp lệ"),
-    }),
-    receiver_address_attributes: z.object({
-      name: z.string().min(1, "Tên là bắt buộc"),
-      company: z.string().optional(),
-      country_id: z.number(),
-      postal_code: z.string().min(1, "Mã bưu điện là bắt buộc"),
-      city: z.string().min(1, "Thành phố là bắt buộc"),
-      state: z.string().optional(),
-      address1: z.string().min(1, "Địa chỉ là bắt buộc"),
-      address2: z.string().optional(),
-      address3: z.string().optional(),
-      phone: z.string().min(1, "Số điện thoại là bắt buộc"),
-      email: z.string().email("Email không hợp lệ"),
+      phone: z.string().min(1, "Số điện thoại là bắt buộc");
+      email: z.string().email("Email không hợp lệ");
     }),
     packages_attributes: z.array(
       z.object({
@@ -473,7 +433,7 @@ export default function CreateShippingPage() {
                           </div>
                           <div className="space-y-6">
                             <ShippingSummary formData={form.getValues()} />
-                            
+
                             <div className="mt-6 space-y-4">
                               <div className="flex justify-between items-center">
                                 <h3 className="text-lg font-medium">Additional Charges</h3>
