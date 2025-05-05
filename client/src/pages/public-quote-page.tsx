@@ -83,17 +83,54 @@ export default function PublicQuotePage() {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          country_id: data.country_id,
-          packages: data.packages.map((p) => ({
-            ...p,
-            // Calculate volumetric weight
-            volume: (p.length * p.width * p.height) / 5000,
-            // Include original measurements
-            weight: p.weight,
-            length: p.length,
-            width: p.width,
-            height: p.height,
-          })),
+          shipment: {
+            provider_id: 1,
+            provider_service_id: 1,
+            status: "created",
+            sender_address_attributes: {
+              name: "Vo Chi Hieu",
+              company: "Hopee",
+              country_id: 245,
+              postal_code: "700001",
+              city: "Hanoi",
+              state: "Ho Chi Minh",
+              address1: "1913 Hanoi Way2",
+              phone: "0929477947",
+              email: "chihieu2222@gmail.com"
+            },
+            receiver_address_attributes: {
+              name: data.receiver_name || "Receiver",
+              company: "",
+              country_id: parseInt(data.country_id),
+              postal_code: "000000",
+              city: data.city || "City",
+              state: "",
+              address1: data.address || "Address",
+              address2: "",
+              address3: "",
+              phone: data.phone || "+0000000000",
+              email: data.email || "example@email.com"
+            },
+            packages_attributes: [{
+              carriage_value: 1200,
+              unit_of_weight: "kg_cm",
+              currency: "VND",
+              type_shipping: "items",
+              packaging: "box",
+              items_attributes: data.packages.map(p => ({
+                weight: p.weight,
+                length: p.length,
+                width: p.width,
+                height: p.height,
+                quantity: 1,
+                description: "",
+                value: 0,
+                country_of_origin: "VN",
+                hs_code: "",
+                id: crypto.randomUUID()
+              }))
+            }]
+          }
         }),
       });
       const result = await response.json();
