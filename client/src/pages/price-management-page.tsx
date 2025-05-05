@@ -172,8 +172,11 @@ export default function PriceManagementPage() {
 
       await api.put(`/providers/${selectedProvider}/update_prices`, {
         provider_service_id: selectedService,
-        fee_type: fee.display_name === "Phụ phí cao điểm" ? "peak_season_surcharge" : "vat", // Assumed fee_type mapping
-        amount: parseFloat(updatedAmount)
+        fee_type:
+          fee.display_name === "Phụ phí cao điểm"
+            ? "peak_season_surcharge"
+            : "vat", // Assumed fee_type mapping
+        amount: parseFloat(updatedAmount),
       });
 
       toast({
@@ -183,11 +186,10 @@ export default function PriceManagementPage() {
 
       // Refresh data
       const { net_prices, other_fees } = await api.get(
-        `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}`
+        `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}`,
       );
       setPrices(net_prices);
       setOtherFees(other_fees || []);
-
     } catch (error) {
       console.error("Error updating fee:", error);
       toast({
@@ -201,15 +203,22 @@ export default function PriceManagementPage() {
   const handleUpdatePeakSeasonCharge = async (charge: NetPrice) => {
     try {
       if (!selectedProvider || !selectedService) return;
-      let updatedAmount = prompt(`Update peak season charge for zone ${charge.zone}`, charge.price);
+      let updatedAmount = prompt(
+        `Update peak season charge for zone ${charge.zone}`,
+        charge.price,
+      );
       if (!updatedAmount) return;
 
       //  API endpoint needs to be defined for updating peak season charges
-      await api.put(`/providers/${selectedProvider}/update_peak_season_charges`, { // Placeholder endpoint
-        provider_service_id: selectedService,
-        zone: charge.zone,
-        amount: parseFloat(updatedAmount)
-      });
+      await api.put(
+        `/providers/${selectedProvider}/update_peak_season_charges`,
+        {
+          // Placeholder endpoint
+          provider_service_id: selectedService,
+          zone: charge.zone,
+          amount: parseFloat(updatedAmount),
+        },
+      );
 
       toast({
         title: "Success",
@@ -221,7 +230,6 @@ export default function PriceManagementPage() {
         `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}&fee_type=peak_season_surcharge`,
       );
       setPeakSeasonCharges(response.other_fees || []);
-
     } catch (error) {
       console.error("Error updating peak season charge:", error);
       toast({
@@ -231,7 +239,6 @@ export default function PriceManagementPage() {
       });
     }
   };
-
 
   return (
     <DashboardLayout title="Price Management">
@@ -374,10 +381,20 @@ export default function PriceManagementPage() {
                     <TableBody>
                       {peakSeasonCharges.map((charge) => (
                         <TableRow key={charge.zone}>
-                          <TableCell className="font-medium">{charge.zone}</TableCell>
-                          <TableCell className="font-medium">{formatPrice(charge.price)}</TableCell>
+                          <TableCell className="font-medium">
+                            {charge.zone}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {formatPrice(charge.amount)}
+                          </TableCell>
                           <TableCell>
-                            <Button variant="outline" size="sm" onClick={() => handleUpdatePeakSeasonCharge(charge)}>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                handleUpdatePeakSeasonCharge(charge)
+                              }
+                            >
                               Update
                             </Button>
                           </TableCell>
@@ -416,7 +433,11 @@ export default function PriceManagementPage() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Button variant="outline" size="sm" onClick={() => handleUpdateFee(fee)}>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUpdateFee(fee)}
+                            >
                               Update
                             </Button>
                           </TableCell>
