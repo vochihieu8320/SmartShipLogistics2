@@ -59,12 +59,10 @@ export default function PriceManagementPage() {
 
   // Fetch weight discounts
   useEffect(() => {
-    if (selectedProvider && selectedService) {
-      api.get("/weight_discounts").then((response) => {
-        setWeightDiscounts(response.weight_discounts || []);
-      });
-    }
-  }, [selectedProvider, selectedService]);
+    api.get("/weight_discounts").then((response) => {
+      setWeightDiscounts(response.weight_discounts || []);
+    });
+  }, []);
 
   // Get unique zones and weights for table headers
   const uniqueZones = [...new Set(prices?.map((p) => p.zone))].sort(
@@ -501,8 +499,7 @@ export default function PriceManagementPage() {
             </TabsContent>
 
             <TabsContent value="weight_discounts">
-              {selectedProvider && selectedService && (
-                <div className="overflow-x-auto">
+              <div className="overflow-x-auto">
                   <div className="flex justify-end mb-4">
                     <Button
                       onClick={() => {
