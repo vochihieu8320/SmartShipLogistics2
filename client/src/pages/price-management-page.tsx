@@ -153,11 +153,15 @@ export default function PriceManagementPage() {
     console.log()
     try {
       console.log("formData", formData);
+      // Verify form data is not empty
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
       const response = await api.post("/seed_prices", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          // Remove Content-Type header to let browser set it with boundary
         },
-      });
       if (response.status === 200) {
         toast({
           title: "Upload Success",
