@@ -48,23 +48,24 @@ const createShipmentSchema = z.object({
       address2: z.string().optional(),
       address3: z.string().optional(),
 
-// Utility functions for price calculations
-const calculateNetPrice = (values: any) => {
-  const basePrice = values.net_price || 0;
-  const customFee = values.custom_fee || 0;
-  return basePrice + customFee;
-};
+export default function CreateShippingPage() {
+  // Utility functions for price calculations
+  const calculateNetPrice = (values: any) => {
+    const basePrice = values.net_price || 0;
+    const customFee = values.custom_fee || 0;
+    return basePrice + customFee;
+  };
 
-const calculateTotal = (values: any) => {
-  const netPrice = values.net_price || 0;
-  const otherFee = values.other_fee || 0;
-  const fuelCharge = values.fuel_charge || 0;
-  const peakSeasonCharge = values.peak_season_charge || 0;
-  const oversizeCharge = values.oversize_charge || 0;
-  const vatPrice = values.vat_price || 0;
-  
-  return netPrice + otherFee + fuelCharge + peakSeasonCharge + oversizeCharge + vatPrice;
-};
+  const calculateTotal = (values: any) => {
+    const netPrice = values.net_price || 0;
+    const otherFee = values.other_fee || 0;
+    const fuelCharge = values.fuel_charge || 0;
+    const peakSeasonCharge = values.peak_season_charge || 0;
+    const oversizeCharge = values.oversize_charge || 0;
+    const vatPrice = values.vat_price || 0;
+    
+    return netPrice + otherFee + fuelCharge + peakSeasonCharge + oversizeCharge + vatPrice;
+  };
 
       phone: z.string().min(1, "Số điện thoại là bắt buộc"),
       email: z.string().email("Email không hợp lệ"),
