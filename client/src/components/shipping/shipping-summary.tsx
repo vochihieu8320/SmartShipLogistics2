@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { API_BASE_URL } from "@/config/api";
 
 interface Product {
   description: string;
@@ -15,62 +14,30 @@ interface Product {
 
 interface ShippingSummaryProps {
   formData: any;
-  shipmentId: number;
 }
 
-export default function ShippingSummary({ formData, shipmentId }: ShippingSummaryProps) {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [shipmentDetails, setShipmentDetails] = useState<any>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch shipment details
-        const response = await fetch(`${API_BASE_URL}/shipments/${shipmentId}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        const data = await response.json();
-        setShipmentDetails(data);
-
-        // Fetch products
-        const productsResponse = await fetch(`${API_BASE_URL}/shipments/${shipmentId}/products`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        const productsData = await productsResponse.json();
-        setProducts(productsData.products || []);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    if (shipmentId) {
-      fetchData();
-    }
-  }, [shipmentId]);
-
+export default function ShippingSummary({ formData }: ShippingSummaryProps) {
   const { shipment } = formData;
 
-  // Get addresses from the correct path in the API structure
+  // Get addresses from the form data
   const sender_address_attributes = shipment?.sender_address_attributes || {};
-  const receiver_address_attributes =
-    shipment?.receiver_address_attributes || {};
+  const receiver_address_attributes = shipment?.receiver_address_attributes || {};
+
+  // Get products from form data
+  const products = shipment?.products || [];
 
   // Get the first package and item (assuming only one for now)
   const firstPackage = shipment?.packages_attributes?.[0] || {};
   const firstItem = firstPackage?.items_attributes?.[0] || {};
 
-  // Calculate volumetric weight
-  const volumeWeight =
-    firstItem.length && firstItem.width && firstItem.height
-      ? (
-          (firstItem.length * firstItem.width * firstItem.height) /
-          5000
-        ).toFixed(1)
-      : "N/A";
+  function formatCurrency(amount: number) {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  }
 
   // Determine which provider is selected
   const getProviderName = (id: number) => {
@@ -81,15 +48,6 @@ export default function ShippingSummary({ formData, shipmentId }: ShippingSummar
         return "Unknown";
     }
   };
-
-  function formatCurrency(amount: number) {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  }
 
   // Determine which service is selected
   const getServiceName = (id: number) => {
@@ -245,7 +203,7 @@ export default function ShippingSummary({ formData, shipmentId }: ShippingSummar
                 </div>
               </div>
             </div>
-            {/* Estimated Price (Placeholder) */}
+            {/* Estimated Price */}
             <div>
               <h4 className="text-md font-medium mb-2">Total Price</h4>
               <div className="bg-muted p-3 rounded-md">
@@ -255,33 +213,32 @@ export default function ShippingSummary({ formData, shipmentId }: ShippingSummar
               </div>
             </div>
           </div>
-
         </div>
 
         {products.length > 0 && (
           <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-3">Danh sách sản phẩm</h3>
+            <h3 className="text-lg font-semibold mb-3">Product List</h3>
             <div className="border rounded-lg overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Mô tả sản phẩm</TableHead>
-                    <TableHead>Số lượng</TableHead>
-                    <TableHead>Xuất xứ</TableHead>
-                    <TableHead>Đơn vị</TableHead>
-                    <TableHead>Đơn giá</TableHead>
-                    <TableHead>Thành tiền</TableHead>
+                    <TableHead>Product Description</TableHead>
+                    <TableHead>Quantity</TableHead>
+                    <TableHead>Origin</TableHead>
+                    <TableHead>Unit</TableHead>
+                    <TableHead>Unit Price</TableHead>
+                    <TableHead>Total</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {products.map((product, index) => (
+                  {products.map((product: Product, index: number) => (
                     <TableRow key={index}>
                       <TableCell>{product.description}</TableCell>
                       <TableCell>{product.quantity}</TableCell>
                       <TableCell>{product.origin}</TableCell>
                       <TableCell>{product.unit}</TableCell>
-                      <TableCell>{product.unit_price}</TableCell>
-                      <TableCell>{product.sub_total}</TableCell>
+                      <TableCell>{formatCurrency(product.unit_price)}</TableCell>
+                      <TableCell>{formatCurrency(product.sub_total)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
