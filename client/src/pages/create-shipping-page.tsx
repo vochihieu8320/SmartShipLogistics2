@@ -290,7 +290,7 @@ export default function CreateShippingPage() {
                           </div>
                         </div>
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                          <PackageForm form={form} />
+                          <PackageForm form={form} setActiveTab={setActiveTab} />
                         </div>
                         <div className="flex justify-end mt-6">
                           <Button

@@ -48,9 +48,10 @@ interface ShipmentItem {
 
 interface PackageFormProps {
   form: UseFormReturn<any>;
+  setActiveTab: (tab: string) => void;
 }
 
-export default function PackageForm({ form }: PackageFormProps) {
+export default function PackageForm({ form, setActiveTab }: PackageFormProps) {
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
   const [tempItem, setTempItem] = useState<ShipmentItem | null>(null);
   const [isLoading, setIsLoading] = useState(false);
