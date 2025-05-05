@@ -47,8 +47,8 @@ const createShipmentSchema = z.object({
       address1: z.string().min(1, "Địa chỉ là bắt buộc"),
       address2: z.string().optional(),
       address3: z.string().optional(),
-      phone: z.string().min(1, "Số điện thoại là bắt buộc");
-      email: z.string().email("Email không hợp lệ");
+      phone: z.string().min(1, "Số điện thoại là bắt buộc"),
+      email: z.string().email("Email không hợp lệ"),
     }),
     receiver_address_attributes: z.object({
       name: z.string().min(1, "Tên là bắt buộc"),
@@ -60,8 +60,8 @@ const createShipmentSchema = z.object({
       address1: z.string().min(1, "Địa chỉ là bắt buộc"),
       address2: z.string().optional(),
       address3: z.string().optional(),
-      phone: z.string().min(1, "Số điện thoại là bắt buộc");
-      email: z.string().email("Email không hợp lệ");
+      phone: z.string().min(1, "Số điện thoại là bắt buộc"),
+      email: z.string().email("Email không hợp lệ"),
     }),
     packages_attributes: z.array(
       z.object({
@@ -436,7 +436,9 @@ export default function CreateShippingPage() {
 
                             <div className="mt-6 space-y-4">
                               <div className="flex justify-between items-center">
-                                <h3 className="text-lg font-medium">Additional Charges</h3>
+                                <h3 className="text-lg font-medium">
+                                  Additional Charges
+                                </h3>
                                 <Dialog>
                                   <DialogTrigger asChild>
                                     <Button variant="outline" size="sm">
@@ -445,9 +447,12 @@ export default function CreateShippingPage() {
                                   </DialogTrigger>
                                   <DialogContent>
                                     <DialogHeader>
-                                      <DialogTitle>Additional Charges</DialogTitle>
+                                      <DialogTitle>
+                                        Additional Charges
+                                      </DialogTitle>
                                       <DialogDescription>
-                                        Only one type of fee can be edited at a time. Please choose carefully.
+                                        Only one type of fee can be edited at a
+                                        time. Please choose carefully.
                                       </DialogDescription>
                                     </DialogHeader>
                                     <Form {...form}>
@@ -457,17 +462,30 @@ export default function CreateShippingPage() {
                                           name="other_fee"
                                           render={({ field }) => (
                                             <FormItem>
-                                              <FormLabel>Other Fee (VND)</FormLabel>
+                                              <FormLabel>
+                                                Other Fee (VND)
+                                              </FormLabel>
                                               <FormControl>
                                                 <Input
                                                   type="number"
                                                   placeholder="Enter other fee"
                                                   {...field}
                                                   onChange={(e) => {
-                                                    field.onChange(parseFloat(e.target.value));
-                                                    const currentValues = form.getValues();
-                                                    const newTotal = calculateTotal(currentValues);
-                                                    form.setValue("total_price", newTotal);
+                                                    field.onChange(
+                                                      parseFloat(
+                                                        e.target.value,
+                                                      ),
+                                                    );
+                                                    const currentValues =
+                                                      form.getValues();
+                                                    const newTotal =
+                                                      calculateTotal(
+                                                        currentValues,
+                                                      );
+                                                    form.setValue(
+                                                      "total_price",
+                                                      newTotal,
+                                                    );
                                                   }}
                                                 />
                                               </FormControl>
@@ -479,20 +497,39 @@ export default function CreateShippingPage() {
                                           name="custom_fee"
                                           render={({ field }) => (
                                             <FormItem>
-                                              <FormLabel>Custom Fee (VND)</FormLabel>
+                                              <FormLabel>
+                                                Custom Fee (VND)
+                                              </FormLabel>
                                               <FormControl>
                                                 <Input
                                                   type="number"
                                                   placeholder="Enter custom fee"
                                                   {...field}
                                                   onChange={(e) => {
-                                                    field.onChange(parseFloat(e.target.value));
-                                                    const currentValues = form.getValues();
+                                                    field.onChange(
+                                                      parseFloat(
+                                                        e.target.value,
+                                                      ),
+                                                    );
+                                                    const currentValues =
+                                                      form.getValues();
                                                     // Recalculate net price based on custom fee
-                                                    const newNetPrice = calculateNetPrice(currentValues);
-                                                    form.setValue("net_price", newNetPrice);
-                                                    const newTotal = calculateTotal(currentValues);
-                                                    form.setValue("total_price", newTotal);
+                                                    const newNetPrice =
+                                                      calculateNetPrice(
+                                                        currentValues,
+                                                      );
+                                                    form.setValue(
+                                                      "net_price",
+                                                      newNetPrice,
+                                                    );
+                                                    const newTotal =
+                                                      calculateTotal(
+                                                        currentValues,
+                                                      );
+                                                    form.setValue(
+                                                      "total_price",
+                                                      newTotal,
+                                                    );
                                                   }}
                                                 />
                                               </FormControl>
@@ -507,16 +544,28 @@ export default function CreateShippingPage() {
                               <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                                 <div className="flex justify-between">
                                   <span>Other Fee:</span>
-                                  <span>{formatPrice(form.getValues("other_fee") || 0)}</span>
+                                  <span>
+                                    {formatPrice(
+                                      form.getValues("other_fee") || 0,
+                                    )}
+                                  </span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span>Custom Fee:</span>
-                                  <span>{formatPrice(form.getValues("custom_fee") || 0)}</span>
+                                  <span>
+                                    {formatPrice(
+                                      form.getValues("custom_fee") || 0,
+                                    )}
+                                  </span>
                                 </div>
                                 <Separator />
                                 <div className="flex justify-between font-medium">
                                   <span>Total Price:</span>
-                                  <span>{formatPrice(form.getValues("total_price") || 0)}</span>
+                                  <span>
+                                    {formatPrice(
+                                      form.getValues("total_price") || 0,
+                                    )}
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -558,16 +607,26 @@ export default function CreateShippingPage() {
                                       Authorization: `Bearer ${localStorage.getItem("token")}`,
                                     },
                                     body: JSON.stringify({
-                                      other_fee: form.getValues("other_fee") || 0,
-                                      fuel_charge: form.getValues("fuel_charge") || 0,
-                                      fuel_rate: form.getValues("fuel_rate") || 0,
-                                      peak_season_charge: form.getValues("peak_season_charge") || 0,
-                                      oversize_charge: form.getValues("oversize_charge") || 0,
-                                      net_price: form.getValues("net_price") || 0,
-                                      vat_price: form.getValues("vat_price") || 0,
+                                      other_fee:
+                                        form.getValues("other_fee") || 0,
+                                      fuel_charge:
+                                        form.getValues("fuel_charge") || 0,
+                                      fuel_rate:
+                                        form.getValues("fuel_rate") || 0,
+                                      peak_season_charge:
+                                        form.getValues("peak_season_charge") ||
+                                        0,
+                                      oversize_charge:
+                                        form.getValues("oversize_charge") || 0,
+                                      net_price:
+                                        form.getValues("net_price") || 0,
+                                      vat_price:
+                                        form.getValues("vat_price") || 0,
                                       vat_rate: form.getValues("vat_rate") || 0,
-                                      description: "Shipment completed with additional charges",
-                                      total_price: form.getValues("total_price") || 0,
+                                      description:
+                                        "Shipment completed with additional charges",
+                                      total_price:
+                                        form.getValues("total_price") || 0,
                                     }),
                                   },
                                 );
