@@ -56,6 +56,19 @@ export default function PriceManagementPage() {
   const [otherFees, setOtherFees] = useState<OtherFee[]>([]);
   const [weightDiscounts, setWeightDiscounts] = useState<any[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [users, setUsers] = useState<any[]>([]);
+  const [selectedUser, setSelectedUser] = useState<string>("");
+
+  // Fetch users
+  useEffect(() => {
+    api.get("/users").then((response) => {
+      // Filter out admin users
+      const nonAdminUsers = response.users?.filter((user: any) => user.role_name !== 'admin') || [];
+      setUsers(nonAdminUsers);
+    }).catch(error => {
+      console.error("Error fetching users:", error);
+    });
+  }, []);
 
   // Fetch weight discounts
   useEffect(() => {
@@ -500,22 +513,46 @@ export default function PriceManagementPage() {
 
             <TabsContent value="weight_discounts">
               <div className="overflow-x-auto">
-                  <div className="flex justify-end mb-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <Select onValueChange={setSelectedUser} value={selectedUser}>
+                      <SelectTrigger className="w-[200px]">
+                        <SelectValue placeholder="Select User" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {users.map((user) => (
+                          <SelectItem key={user.id} value={user.id.toString()}>
+                            {user.name || user.email}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <Button
                       onClick={() => {
                         const minWeight = prompt("Enter minimum weight (kg)");
                         const maxWeight = prompt("Enter maximum weight (kg)");
                         const discountPercentage = prompt("Enter discount percentage");
                         
+                        if (!selectedUser) {
+                          toast({
+                            title: "Error",
+                            description: "Please select a user first",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
                         if (minWeight && maxWeight && discountPercentage) {
                           api.post("/weight_discounts", {
                             weight_discount: {
-                              user_id: 3, // You may want to get this from auth context
+                              user_id: parseInt(selectedUser),
                               min_weight: parseFloat(minWeight),
                               max_weight: parseFloat(maxWeight),
                               discount_percentage: parseFloat(discountPercentage)
                             }
                           }).then(() => {
+                            // Refresh the weight discounts list
+                            api.get("/weight_discounts").then((response) => {
+                              setWeightDiscounts(response.weight_discounts || []);
+                            });
                             toast({
                               title: "Success",
                               description: "Weight discount added successfully"
