@@ -25,6 +25,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import PriceManagementPage from "@/pages/price-management-page";
 import AdminShipmentsPage from "@/pages/admin-shipments-page";
 import AddressManagementPage from "./pages/address-management-page";
+import PublicQuotePage from "@/pages/public-quote-page"; // Import the new component
 
 function App() {
   return (
@@ -59,6 +60,7 @@ function App() {
               <ProtectedRoute path="/admin/settings" component={SettingsPage} />
               <ProtectedRoute path="/admin/prices" component={PriceManagementPage} /> {/* Added price management route */}
               <Route path="/addresses" component={AddressManagementPage} />
+              <Route path="/quote" component={PublicQuotePage} /> {/* Added quote route */}
 
               <Route component={NotFound} />
             </Switch>
