@@ -244,6 +244,19 @@ export default function CreateShippingPage() {
                         </div>
                       </TabsTrigger>
                       <TabsTrigger
+                        value="invoice"
+                        className={`rounded-lg ${activeTab === "invoice" ? "bg-white shadow-md" : ""} transition-all`}
+                      >
+                        <div className="flex flex-col items-center gap-1.5 py-1">
+                          <span
+                            className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "invoice" ? "bg-primary text-white" : "bg-gray-200"}`}
+                          >
+                            3
+                          </span>
+                          <span>Hoá Đơn</span>
+                        </div>
+                      </TabsTrigger>
+                      <TabsTrigger
                         value="review"
                         className={`rounded-lg ${activeTab === "review" ? "bg-white shadow-md" : ""} transition-all`}
                       >
@@ -251,7 +264,7 @@ export default function CreateShippingPage() {
                           <span
                             className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "review" ? "bg-primary text-white" : "bg-gray-200"}`}
                           >
-                            3
+                            4
                           </span>
                           <span>Xác Nhận</span>
                         </div>
@@ -283,11 +296,7 @@ export default function CreateShippingPage() {
                           <Button
                             type="button"
                             onClick={() => setActiveTab("service")}
-                            disabled={
-                              !form.getValues().shipment.provider_service_id ||
-                              !form.getValues().shipment.packages_attributes[0]
-                                .items_attributes?.length
-                            }
+                            disabled={!form.getValues("shipment.provider_service_id")}
                             className="px-6 py-5 rounded-lg gap-2 shadow-md hover:shadow-lg transition-all"
                           >
                             Tiếp Theo
@@ -322,7 +331,7 @@ export default function CreateShippingPage() {
                                     title: "Đã chọn dịch vụ",
                                     description: `Đã chọn ${quote.provider_name} - ${quote.service_name}`,
                                   });
-                                  setActiveTab("review");
+                                  setActiveTab("invoice");
                                 }}
                               />
                             </div>
@@ -354,7 +363,7 @@ export default function CreateShippingPage() {
                               if (
                                 form.getValues().shipment.provider_service_id
                               ) {
-                                setActiveTab("review");
+                                setActiveTab("invoice");
                               } else {
                                 toast({
                                   title: "Chưa chọn dịch vụ",
@@ -370,6 +379,31 @@ export default function CreateShippingPage() {
                             <span className="inline-block ml-1">→</span>
                           </Button>
                         </div>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="invoice" className="mt-6">
+                      {/* Add your invoice form here */}
+                      <div>
+                        {/* Add your invoice input fields and table here */}
+                      </div>
+                      <div className="flex justify-between mt-6">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setActiveTab("service")}
+                          className="px-6 py-5 rounded-lg gap-2"
+                        >
+                          <span className="inline-block mr-1">←</span>
+                          Quay Lại
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={() => setActiveTab("review")}
+                          className="px-6 py-5 rounded-lg gap-2 shadow-md hover:shadow-lg transition-all"
+                        >
+                          Tiếp Theo
+                          <span className="inline-block ml-1">→</span>
+                        </Button>
                       </div>
                     </TabsContent>
                     <TabsContent value="review" className="mt-6">
@@ -393,7 +427,7 @@ export default function CreateShippingPage() {
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() => setActiveTab("service")}
+                            onClick={() => setActiveTab("invoice")}
                             className="px-6 py-5 rounded-lg gap-2"
                           >
                             <span className="inline-block mr-1">←</span>
