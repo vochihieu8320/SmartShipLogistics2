@@ -573,7 +573,16 @@ export default function CreateShippingPage() {
                                 </Dialog>
                               </div>
                               <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                                <div className="flex justify-between">
+                                <div className="flex justify-between font-medium">
+                                  <span>Total Price:</span>
+                                  <span>
+                                    {formatPrice(
+                                      form.getValues("total_price") || 0,
+                                    )}
+                                  </span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between items-center text-gray-600">
                                   <span>Other Fee:</span>
                                   <span>
                                     {formatPrice(
@@ -581,20 +590,11 @@ export default function CreateShippingPage() {
                                     )}
                                   </span>
                                 </div>
-                                <div className="flex justify-between">
+                                <div className="flex justify-between text-gray-600">
                                   <span>Custom Fee:</span>
                                   <span>
                                     {formatPrice(
                                       form.getValues("custom_fee") || 0,
-                                    )}
-                                  </span>
-                                </div>
-                                <Separator />
-                                <div className="flex justify-between font-medium">
-                                  <span>Total Price:</span>
-                                  <span>
-                                    {formatPrice(
-                                      form.getValues("total_price") || 0,
                                     )}
                                   </span>
                                 </div>
