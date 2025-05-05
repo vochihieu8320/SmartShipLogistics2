@@ -37,7 +37,17 @@ const quoteFormSchema = z.object({
   packages: z.array(packageSchema).min(1, "At least one package is required"),
 });
 
+import { AuthProvider } from "@/hooks/use-auth";
+
 export default function PublicQuotePage() {
+  return (
+    <AuthProvider>
+      <PublicQuotePageContent />
+    </AuthProvider>
+  );
+}
+
+function PublicQuotePageContent() {
   const [quotes, setQuotes] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [countries, setCountries] = useState<any[]>([]);
