@@ -76,19 +76,24 @@ export default function PublicQuotePage() {
   const onSubmit = async (data: z.infer<typeof quoteFormSchema>) => {
     setLoading(true);
     try {
-      //Added Bearer token to the request header. Replace 'YOUR_BEARER_TOKEN' with the actual token.
-      const response = await fetch(`${API_BASE_URL}/shipments/quote`, {
+      const response = await fetch(`${API_BASE_URL}/shipments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer YOUR_BEARER_TOKEN`, // Replace with actual token retrieval
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           country_id: data.country_id,
           packages: data.packages.map((p) => ({
             ...p,
-            volume: (p.length * p.width * p.height) / 1000000,
-          })), //Added volume calculation to the request
+            // Calculate volumetric weight
+            volume: (p.length * p.width * p.height) / 5000,
+            // Include original measurements
+            weight: p.weight,
+            length: p.length,
+            width: p.width,
+            height: p.height,
+          })),
         }),
       });
       const result = await response.json();
