@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Header } from "@/components/layout/header";
+import Header from "@/components/layout/header";
 import {
   ChevronRight,
   Package,
