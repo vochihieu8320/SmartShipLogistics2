@@ -84,7 +84,7 @@ export default function CreateShippingPage() {
     const oversizeCharge = values.oversize_charge || 0;
     const vatPrice = values.vat_price || 0;
     
-    return netPrice + otherFee + fuelCharge + peakSeasonCharge + oversizeCharge + vatPrice;
+    return netPrice + otherFee + fuelCharge + peakSeasonCharge +   oversizeCharge + vatPrice;
   };
 
       phone: z.string().min(1, "Số điện thoại là bắt buộc"),
