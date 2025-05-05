@@ -163,6 +163,39 @@ export function registerRoutes(app: Express): Server {
   });
   
   // General tracking API endpoint
+  // Seed prices from Excel file
+  app.post("/api/v1/seed_prices", async (req, res, next) => {
+    try {
+      // Check if we should use the external API
+      if (apiConfig.useExternalApi) {
+        try {
+          console.log('[API] Using external API to seed prices');
+          
+          // Create form data with the file and parameters
+          const formData = new FormData();
+          formData.append('file', req.files.file);
+          formData.append('provider_id', req.body.provider_id);
+          formData.append('provider_service_id', req.body.provider_service_id);
+          
+          // Call the external API
+          const data = await callExternalApi('/seed_prices', 'POST', formData);
+          return res.json(data);
+        } catch (error) {
+          console.error('[API] Error seeding prices:', error);
+          return res.status(500).json({ error: "Failed to seed prices" });
+        }
+      }
+
+      // Return mock response if external API is not used
+      res.json({
+        success: true,
+        message: "Prices seeded successfully"
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   app.get("/api/tracking/:trackingNumber", async (req, res, next) => {
     try {
       const trackingNumber = req.params.trackingNumber;
