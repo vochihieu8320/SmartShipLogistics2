@@ -336,16 +336,16 @@ export default function UsersPage() {
                 </Dialog>
               </div>
               <Table>
-                <TableHead>
+                <TableHeader>
                   <TableRow>
-                    <TableHeader>Name</TableHeader>
-                    <TableHeader>Company</TableHeader>
-                    <TableHeader>Address</TableHeader>
-                    <TableHeader>City, State, Zip</TableHeader>
-                    <TableHeader>Phone</TableHeader>
-                    <TableHeader>Email</TableHeader>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Company</TableHead>
+                    <TableHead>Address</TableHead>
+                    <TableHead>City, State, Zip</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>Email</TableHead>
                   </TableRow>
-                </TableHead>
+                </TableHeader>
                 <TableBody>
                   {addresses.map((address) => (
                     <TableRow key={address.id}>
