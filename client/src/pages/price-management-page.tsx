@@ -134,6 +134,15 @@ export default function PriceManagementPage() {
   };
 
   const handleFileUpload = async (e: any) => {
+    if (!selectedProvider || !selectedService) {
+      toast({
+        title: "Error",
+        description: "Please select a provider and service first",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsUploading(true);
     const file = e.target.files[0];
     const formData = new FormData();
@@ -142,7 +151,11 @@ export default function PriceManagementPage() {
     formData.append("provider_service_id", selectedService);
 
     try {
-      const response = await api.post("/seed_prices", formData);
+      const response = await api.post("/seed_prices", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       if (response.status === 200) {
         toast({
           title: "Upload Success",
