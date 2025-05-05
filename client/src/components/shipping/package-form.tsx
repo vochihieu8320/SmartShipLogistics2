@@ -749,11 +749,6 @@ export default function PackageForm({ form }: PackageFormProps) {
                             "shipment.provider_service_id",
                             quote.id,
                           );
-                          toast({
-                            title: "Đã chọn dịch vụ",
-                            description: `Đã chọn ${quote.provider_name} - ${quote.service_name}`,
-                          });
-                          window.location.href = `/shipping/create?tab=review&shipmentId=${shipmentId}`;
                         }}
                         gridColumns={3}
                       />
