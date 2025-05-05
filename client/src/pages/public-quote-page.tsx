@@ -5,9 +5,22 @@ import { z } from "zod";
 import { API_BASE_URL } from "@/config/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Package, Calculator, Plus, Trash2 } from "lucide-react";
 
@@ -15,12 +28,12 @@ const packageSchema = z.object({
   weight: z.coerce.number().min(0.1, "Weight must be greater than 0"),
   length: z.coerce.number().min(1, "Length must be greater than 0"),
   width: z.coerce.number().min(1, "Width must be greater than 0"),
-  height: z.coerce.number().min(1, "Height must be greater than 0")
+  height: z.coerce.number().min(1, "Height must be greater than 0"),
 });
 
 const quoteFormSchema = z.object({
   country_id: z.string().min(1, "Please select a destination country"),
-  packages: z.array(packageSchema).min(1, "At least one package is required")
+  packages: z.array(packageSchema).min(1, "At least one package is required"),
 });
 
 export default function PublicQuotePage() {
@@ -33,13 +46,13 @@ export default function PublicQuotePage() {
     resolver: zodResolver(quoteFormSchema),
     defaultValues: {
       country_id: "",
-      packages: [{ weight: 1, length: 10, width: 10, height: 10 }]
-    }
+      packages: [{ weight: 1, length: 10, width: 10, height: 10 }],
+    },
   });
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "packages"
+    name: "packages",
   });
 
   useEffect(() => {
@@ -48,8 +61,8 @@ export default function PublicQuotePage() {
       try {
         const response = await fetch(`${API_BASE_URL}/countries`, {
           headers: {
-            Authorization: `Bearer YOUR_BEARER_TOKEN` // Replace with actual token retrieval
-          }
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Replace with actual token retrieval
+          },
         });
         const data = await response.json();
         setCountries(data.countries || []);
@@ -58,7 +71,6 @@ export default function PublicQuotePage() {
       }
     };
     fetchCountries();
-
   }, []);
 
   const onSubmit = async (data: z.infer<typeof quoteFormSchema>) => {
@@ -66,20 +78,23 @@ export default function PublicQuotePage() {
     try {
       //Added Bearer token to the request header. Replace 'YOUR_BEARER_TOKEN' with the actual token.
       const response = await fetch(`${API_BASE_URL}/shipments/quote`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer YOUR_BEARER_TOKEN` // Replace with actual token retrieval
+          "Content-Type": "application/json",
+          Authorization: `Bearer YOUR_BEARER_TOKEN`, // Replace with actual token retrieval
         },
         body: JSON.stringify({
           country_id: data.country_id,
-          packages: data.packages.map(p => ({...p, volume: (p.length * p.width * p.height) / 1000000})) //Added volume calculation to the request
+          packages: data.packages.map((p) => ({
+            ...p,
+            volume: (p.length * p.width * p.height) / 1000000,
+          })), //Added volume calculation to the request
         }),
       });
       const result = await response.json();
       setQuotes(result.quotes || []);
     } catch (error) {
-      console.error('Error fetching quotes:', error);
+      console.error("Error fetching quotes:", error);
     } finally {
       setLoading(false);
     }
@@ -105,14 +120,20 @@ export default function PublicQuotePage() {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4"
+                >
                   <FormField
                     control={form.control}
                     name="country_id"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Destination Country</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select destination country" />
@@ -120,7 +141,10 @@ export default function PublicQuotePage() {
                           </FormControl>
                           <SelectContent>
                             {countries.map((country) => (
-                              <SelectItem key={country.id} value={country.id.toString()}>
+                              <SelectItem
+                                key={country.id}
+                                value={country.id.toString()}
+                              >
                                 {country.name}
                               </SelectItem>
                             ))}
@@ -134,10 +158,12 @@ export default function PublicQuotePage() {
                   <div className="space-y-4">
                     {fields.map((field, index) => {
                       const packageItem = form.getValues(`packages.${index}`);
-                      return(
+                      return (
                         <div key={field.id} className="p-4 border rounded-lg">
                           <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-medium">Package #{index + 1}</h3>
+                            <h3 className="font-medium">
+                              Package #{index + 1}
+                            </h3>
                             {fields.length > 1 && (
                               <Button
                                 type="button"
@@ -158,7 +184,11 @@ export default function PublicQuotePage() {
                                 <FormItem>
                                   <FormLabel>Weight (kg)</FormLabel>
                                   <FormControl>
-                                    <Input type="number" step="0.1" {...field} />
+                                    <Input
+                                      type="number"
+                                      step="0.1"
+                                      {...field}
+                                    />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -209,17 +239,26 @@ export default function PublicQuotePage() {
                           </div>
                           {/* Display volume */}
                           <div className="mt-2 text-sm text-gray-600">
-                            Volume: {((packageItem.length || 0) * (packageItem.width || 0) * (packageItem.height || 0) / 1000000).toFixed(2)} m³
+                            Volume:{" "}
+                            {(
+                              ((packageItem.length || 0) *
+                                (packageItem.width || 0) *
+                                (packageItem.height || 0)) /
+                              1000000
+                            ).toFixed(2)}{" "}
+                            m³
                           </div>
                         </div>
-                      )
+                      );
                     })}
 
                     <Button
                       type="button"
                       variant="outline"
                       className="w-full"
-                      onClick={() => append({ weight: 1, length: 10, width: 10, height: 10 })}
+                      onClick={() =>
+                        append({ weight: 1, length: 10, width: 10, height: 10 })
+                      }
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Add Another Package
@@ -227,18 +266,16 @@ export default function PublicQuotePage() {
                   </div>
 
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? (
-                      <>Calculating...</>
-                    ) : (
-                      <>Calculate Rates</>
-                    )}
+                    {loading ? <>Calculating...</> : <>Calculate Rates</>}
                   </Button>
                 </form>
               </Form>
 
               {quotes.length > 0 && (
                 <div className="mt-8 space-y-4">
-                  <h3 className="font-medium text-lg">Available Shipping Options</h3>
+                  <h3 className="font-medium text-lg">
+                    Available Shipping Options
+                  </h3>
                   <div className="space-y-3">
                     {quotes.map((quote, index) => (
                       <Card key={index}>
@@ -254,7 +291,7 @@ export default function PublicQuotePage() {
                               <p className="text-lg font-bold">
                                 {new Intl.NumberFormat("vi-VN", {
                                   style: "currency",
-                                  currency: "VND"
+                                  currency: "VND",
                                 }).format(quote.total_price)}
                               </p>
                             </div>
