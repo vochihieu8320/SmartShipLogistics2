@@ -1,7 +1,7 @@
+
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -35,8 +35,10 @@ interface ProviderService {
 }
 
 interface NetPrice {
+  id: number;
+  zone: string;
+  price: string;
   weight: string;
-  prices: string;
 }
 
 interface OtherFee {
@@ -54,6 +56,10 @@ export default function PriceManagementPage() {
   const [otherFees, setOtherFees] = useState<OtherFee[]>([]);
   const [countries, setCountries] = useState<any[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Get unique zones and weights for table headers
+  const uniqueZones = [...new Set(prices.map(p => p.zone))].sort((a, b) => parseFloat(a) - parseFloat(b));
+  const uniqueWeights = [...new Set(prices.map(p => p.weight))].sort((a, b) => parseFloat(a) - parseFloat(b));
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -98,6 +104,11 @@ export default function PriceManagementPage() {
     return provider?.services || [];
   };
 
+  const getPriceForZoneAndWeight = (zone: string, weight: string) => {
+    const price = prices.find(p => p.zone === zone && p.weight === weight);
+    return price ? formatPrice(price.price) : "-";
+  };
+
   const handleFileUpload = async (e: any) => {
     setIsUploading(true);
     const file = e.target.files[0];
@@ -127,7 +138,6 @@ export default function PriceManagementPage() {
       setIsUploading(false);
     }
   };
-
 
   return (
     <DashboardLayout title="Price Management">
@@ -177,48 +187,48 @@ export default function PriceManagementPage() {
               </SelectContent>
             </Select>
 
-          <div className="flex items-center gap-2">
-            <input
-              type="file"
-              accept=".xlsx,.xls"
-              onChange={handleFileUpload}
-              className="hidden"
-              id="price-upload"
-              disabled={isUploading}
-            />
-            <Button
-              variant="outline"
-              onClick={() => document.getElementById("price-upload")?.click()}
-              disabled={isUploading}
-            >
-              {isUploading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Đang tải lên...
-                </>
-              ) : (
-                <>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-2"
-                  >
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="17 8 12 3 7 8" />
-                    <line x1="12" y1="3" x2="12" y2="15" />
-                  </svg>
-                  Tải lên bảng giá XLSX
-                </>
-              )}
-            </Button>
-          </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="price-upload"
+                disabled={isUploading}
+              />
+              <Button
+                variant="outline"
+                onClick={() => document.getElementById("price-upload")?.click()}
+                disabled={isUploading}
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Đang tải lên...
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2"
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    Tải lên bảng giá XLSX
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           <Tabs defaultValue="net_prices" className="w-full">
@@ -229,22 +239,32 @@ export default function PriceManagementPage() {
 
             <TabsContent value="net_prices">
               {prices.length > 0 && (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Weight (kg)</TableHead>
-                      <TableHead>Price</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {prices.map((price, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{price.weight}</TableCell>
-                        <TableCell>{formatPrice(price.prices)}</TableCell>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="font-bold">Weight/Zone</TableHead>
+                        {uniqueZones.map((zone) => (
+                          <TableHead key={zone} className="text-center font-bold">
+                            Zone {zone}
+                          </TableHead>
+                        ))}
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {uniqueWeights.map((weight) => (
+                        <TableRow key={weight}>
+                          <TableCell className="font-medium">{weight} kg</TableCell>
+                          {uniqueZones.map((zone) => (
+                            <TableCell key={`${weight}-${zone}`} className="text-right">
+                              {getPriceForZoneAndWeight(zone, weight)}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
             </TabsContent>
 
@@ -264,58 +284,17 @@ export default function PriceManagementPage() {
                         <TableCell>{fee.display_name}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Input
-                              type="text"
-                              value={fee.amount}
-                              onChange={(e) => {
-                                const updatedFees = [...otherFees];
-                                updatedFees[index].amount = e.target.value;
-                                setOtherFees(updatedFees);
-                              }}
-                              className="w-32"
-                            />
+                            {formatPrice(fee.amount)}
                             <span className="text-sm text-gray-600">
                               {fee.unit === 'percentage' && '%'}
                               {fee.unit === 'per_kg' && `VND/kg`}
                               {fee.unit === 'money' && 'VND'}
                             </span>
                           </div>
-                          <div className="text-sm text-gray-500 mt-1">
-                            {fee.unit !== 'percentage' && formatPrice(fee.amount)}
-                          </div>
                         </TableCell>
                         <TableCell>
-                          <Button 
-                            size="sm"
-                            onClick={async () => {
-                              try {
-                                const response = await api.put(
-                                  `/providers/${selectedProvider}/update_prices/?provider_service_id=${selectedService}&country_id=${selectedCountry}`,
-                                  {
-                                    fee_type: fee.type,
-                                    amount: fee.amount
-                                  }
-                                );
-
-                                if (response.status === 200) {
-                                  toast({
-                                    title: "Cập nhật thành công",
-                                    description: `Đã cập nhật ${fee.display_name} thành ${formatPrice(fee.amount)}`,
-                                    variant: "default"
-                                  });
-                                } else {
-                                  throw new Error('Failed to update price');
-                                }
-                              } catch (error) {
-                                toast({
-                                  title: "Lỗi cập nhật",
-                                  description: "Không thể cập nhật giá, vui lòng thử lại",
-                                  variant: "destructive"
-                                });
-                              }
-                            }}
-                          >
-                            Save
+                          <Button variant="outline" size="sm">
+                            Edit
                           </Button>
                         </TableCell>
                       </TableRow>
