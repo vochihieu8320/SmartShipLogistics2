@@ -56,11 +56,18 @@ export default function PriceManagementPage() {
   const [isUploading, setIsUploading] = useState(false);
 
   // Get unique zones and weights for table headers
-  const uniqueZones = [...new Set(prices.map(p => p.zone))].sort((a, b) => parseFloat(a) - parseFloat(b));
-  const uniqueWeights = [...new Set(prices.map(p => p.weight))].sort((a, b) => parseFloat(a) - parseFloat(b));
-  const uniquePeakZones = [...new Set(peakSeasonCharges.map(p => p.zone))].sort((a, b) => parseFloat(a) - parseFloat(b));
-  const uniquePeakWeights = [...new Set(peakSeasonCharges.map(p => p.weight))].sort((a, b) => parseFloat(a) - parseFloat(b));
-
+  const uniqueZones = [...new Set(prices?.map((p) => p.zone))].sort(
+    (a, b) => parseFloat(a) - parseFloat(b),
+  );
+  const uniqueWeights = [...new Set(prices?.map((p) => p.weight))].sort(
+    (a, b) => parseFloat(a) - parseFloat(b),
+  );
+  const uniquePeakZones = [
+    ...new Set(peakSeasonCharges?.map((p) => p.zone)),
+  ].sort((a, b) => parseFloat(a) - parseFloat(b));
+  const uniquePeakWeights = [
+    ...new Set(peakSeasonCharges?.map((p) => p.weight)),
+  ].sort((a, b) => parseFloat(a) - parseFloat(b));
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -88,7 +95,7 @@ export default function PriceManagementPage() {
         } catch (error) {
           console.error("Error fetching prices:", error);
         }
-      }
+      };
       fetchPrices();
     }
   }, [selectedProvider, selectedService]);
@@ -106,12 +113,14 @@ export default function PriceManagementPage() {
   };
 
   const getPriceForZoneAndWeight = (zone: string, weight: string) => {
-    const price = prices.find(p => p.zone === zone && p.weight === weight);
+    const price = prices.find((p) => p.zone === zone && p.weight === weight);
     return price ? formatPrice(price.price) : "-";
   };
 
   const getPeakSeasonPriceForZoneAndWeight = (zone: string, weight: string) => {
-    const price = peakSeasonCharges.find(p => p.zone === zone && p.weight === weight);
+    const price = peakSeasonCharges?.find(
+      (p) => p.zone === zone && p.weight === weight,
+    );
     return price ? formatPrice(price.price) : "-";
   };
 
@@ -227,7 +236,9 @@ export default function PriceManagementPage() {
           <Tabs defaultValue="net_prices" className="w-full">
             <TabsList>
               <TabsTrigger value="net_prices">Giá Gốc</TabsTrigger>
-              <TabsTrigger value="peak_season_charges">Mùa Cao Điểm</TabsTrigger>
+              <TabsTrigger value="peak_season_charges">
+                Mùa Cao Điểm
+              </TabsTrigger>
               <TabsTrigger value="other_fees">Phụ Phí</TabsTrigger>
             </TabsList>
 
@@ -239,7 +250,10 @@ export default function PriceManagementPage() {
                       <TableRow>
                         <TableHead className="font-bold">Weight/Zone</TableHead>
                         {uniqueZones.map((zone) => (
-                          <TableHead key={zone} className="text-center font-bold">
+                          <TableHead
+                            key={zone}
+                            className="text-center font-bold"
+                          >
                             Zone {zone}
                           </TableHead>
                         ))}
@@ -248,9 +262,14 @@ export default function PriceManagementPage() {
                     <TableBody>
                       {uniqueWeights.map((weight) => (
                         <TableRow key={weight}>
-                          <TableCell className="font-medium">{weight} kg</TableCell>
+                          <TableCell className="font-medium">
+                            {weight} kg
+                          </TableCell>
                           {uniqueZones.map((zone) => (
-                            <TableCell key={`${weight}-${zone}`} className="text-right">
+                            <TableCell
+                              key={`${weight}-${zone}`}
+                              className="text-right"
+                            >
                               {getPriceForZoneAndWeight(zone, weight)}
                             </TableCell>
                           ))}
@@ -263,14 +282,17 @@ export default function PriceManagementPage() {
             </TabsContent>
 
             <TabsContent value="peak_season_charges">
-              {peakSeasonCharges.length > 0 && (
+              {peakSeasonCharges && peakSeasonCharges.length > 0 && (
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead className="font-bold">Weight/Zone</TableHead>
                         {uniquePeakZones.map((zone) => (
-                          <TableHead key={zone} className="text-center font-bold">
+                          <TableHead
+                            key={zone}
+                            className="text-center font-bold"
+                          >
                             Zone {zone}
                           </TableHead>
                         ))}
@@ -279,9 +301,14 @@ export default function PriceManagementPage() {
                     <TableBody>
                       {uniquePeakWeights.map((weight) => (
                         <TableRow key={weight}>
-                          <TableCell className="font-medium">{weight} kg</TableCell>
+                          <TableCell className="font-medium">
+                            {weight} kg
+                          </TableCell>
                           {uniquePeakZones.map((zone) => (
-                            <TableCell key={`${weight}-${zone}`} className="text-right">
+                            <TableCell
+                              key={`${weight}-${zone}`}
+                              className="text-right"
+                            >
                               {getPeakSeasonPriceForZoneAndWeight(zone, weight)}
                             </TableCell>
                           ))}
@@ -311,9 +338,9 @@ export default function PriceManagementPage() {
                           <div className="flex items-center gap-2">
                             {formatPrice(fee.amount)}
                             <span className="text-sm text-gray-600">
-                              {fee.unit === 'percentage' && '%'}
-                              {fee.unit === 'per_kg' && `VND/kg`}
-                              {fee.unit === 'money' && 'VND'}
+                              {fee.unit === "percentage" && "%"}
+                              {fee.unit === "per_kg" && `VND/kg`}
+                              {fee.unit === "money" && "VND"}
                             </span>
                           </div>
                         </TableCell>
