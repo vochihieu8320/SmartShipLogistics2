@@ -86,12 +86,18 @@ export default function PriceManagementPage() {
     if (selectedProvider && selectedService) {
       const fetchPrices = async () => {
         try {
-          const { net_prices, peak_season_charges, other_fees } = await api.get(
+          // Fetch net prices and other fees
+          const { net_prices, other_fees } = await api.get(
             `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}`,
           );
           setPrices(net_prices);
-          setPeakSeasonCharges(peak_season_charges);
           setOtherFees(other_fees || []);
+
+          // Fetch peak season charges separately
+          const { net_prices: peakSeasonPrices } = await api.get(
+            `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}&fee_type=peak_season_surcharge`,
+          );
+          setPeakSeasonCharges(peakSeasonPrices || []);
         } catch (error) {
           console.error("Error fetching prices:", error);
         }
@@ -331,25 +337,27 @@ export default function PriceManagementPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {otherFees.map((fee, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{fee.display_name}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {formatPrice(fee.amount)}
-                            <span className="text-sm text-gray-600">
-                              {fee.unit === "percentage" && "%"}
-                              {fee.unit === "per_kg" && `VND/kg`}
-                              {fee.unit === "money" && "VND"}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Button variant="outline" size="sm">
-                            Edit
-                          </Button>
-                        </TableCell>
-                      </TableRow>
+                    {otherFees
+                      .filter(fee => fee.display_name !== "Phụ phí cao điểm")
+                      .map((fee, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{fee.display_name}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {formatPrice(fee.amount)}
+                              <span className="text-sm text-gray-600">
+                                {fee.unit === "percentage" && "%"}
+                                {fee.unit === "per_kg" && `VND/kg`}
+                                {fee.unit === "money" && "VND"}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Button variant="outline" size="sm">
+                              Edit
+                            </Button>
+                          </TableCell>
+                        </TableRow>
                     ))}
                   </TableBody>
                 </Table>
