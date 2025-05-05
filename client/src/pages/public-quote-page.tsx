@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Package, Calculator, Plus, Trash2 } from "lucide-react";
+import ServiceQuoteForm from "@/components/shipping/service-quote-form";
 
 const packageSchema = z.object({
   weight: z.coerce.number().min(0.1, "Weight must be greater than 0"),
@@ -140,6 +141,10 @@ export default function PublicQuotePage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleQuoteSelect = (quote: any) => {
+    localStorage.setItem("shipment_total_price", quote.prices.total_price.toString());
   };
 
   return (
@@ -314,34 +319,11 @@ export default function PublicQuotePage() {
               </Form>
 
               {quotes.length > 0 && (
-                <div className="mt-8 space-y-4">
-                  <h3 className="font-medium text-lg">
-                    Available Shipping Options
-                  </h3>
-                  <div className="space-y-3">
-                    {quotes.map((quote, index) => (
-                      <Card key={index}>
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <h4 className="font-medium">{quote.name}</h4>
-                              <p className="text-sm text-gray-500">
-                                Estimated delivery: {quote.estimated_days} days
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-lg font-bold">
-                                {new Intl.NumberFormat("vi-VN", {
-                                  style: "currency",
-                                  currency: "VND",
-                                }).format(quote.total_price)}
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                <div className="mt-8">
+                  <ServiceQuoteForm
+                    quotes={quotes}
+                    onQuoteSelect={handleQuoteSelect}
+                  />
                 </div>
               )}
             </CardContent>
