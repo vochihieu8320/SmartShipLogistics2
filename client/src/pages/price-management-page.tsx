@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,25 +50,23 @@ export default function PriceManagementPage() {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [selectedProvider, setSelectedProvider] = useState<string>("");
   const [selectedService, setSelectedService] = useState<string>("");
-  const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [prices, setPrices] = useState<NetPrice[]>([]);
+  const [peakSeasonCharges, setPeakSeasonCharges] = useState<NetPrice[]>([]);
   const [otherFees, setOtherFees] = useState<OtherFee[]>([]);
-  const [countries, setCountries] = useState<any[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
   // Get unique zones and weights for table headers
   const uniqueZones = [...new Set(prices.map(p => p.zone))].sort((a, b) => parseFloat(a) - parseFloat(b));
   const uniqueWeights = [...new Set(prices.map(p => p.weight))].sort((a, b) => parseFloat(a) - parseFloat(b));
+  const uniquePeakZones = [...new Set(peakSeasonCharges.map(p => p.zone))].sort((a, b) => parseFloat(a) - parseFloat(b));
+  const uniquePeakWeights = [...new Set(peakSeasonCharges.map(p => p.weight))].sort((a, b) => parseFloat(a) - parseFloat(b));
+
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [providersData, countriesData] = await Promise.all([
-          api.get("/providers"),
-          api.get("/countries"),
-        ]);
+        const providersData = await api.get("/providers");
         setProviders(providersData.providers);
-        setCountries(countriesData.countries);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -79,18 +76,22 @@ export default function PriceManagementPage() {
   }, []);
 
   useEffect(() => {
-    if (selectedProvider && selectedService && selectedCountry) {
-      api
-        .get(
-          `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}&country_id=${selectedCountry}`,
-        )
-        .then((data) => {
-          setPrices(data.net_prices);
-          setOtherFees(data.other_fees || []);
-        })
-        .catch((error) => console.error("Error fetching prices:", error));
+    if (selectedProvider && selectedService) {
+      const fetchPrices = async () => {
+        try {
+          const { net_prices, peak_season_charges, other_fees } = await api.get(
+            `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}`,
+          );
+          setPrices(net_prices);
+          setPeakSeasonCharges(peak_season_charges);
+          setOtherFees(other_fees || []);
+        } catch (error) {
+          console.error("Error fetching prices:", error);
+        }
+      }
+      fetchPrices();
     }
-  }, [selectedProvider, selectedService, selectedCountry]);
+  }, [selectedProvider, selectedService]);
 
   const formatPrice = (price: string) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -106,6 +107,11 @@ export default function PriceManagementPage() {
 
   const getPriceForZoneAndWeight = (zone: string, weight: string) => {
     const price = prices.find(p => p.zone === zone && p.weight === weight);
+    return price ? formatPrice(price.price) : "-";
+  };
+
+  const getPeakSeasonPriceForZoneAndWeight = (zone: string, weight: string) => {
+    const price = peakSeasonCharges.find(p => p.zone === zone && p.weight === weight);
     return price ? formatPrice(price.price) : "-";
   };
 
@@ -174,19 +180,6 @@ export default function PriceManagementPage() {
               </SelectContent>
             </Select>
 
-            <Select onValueChange={setSelectedCountry}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Select Country" />
-              </SelectTrigger>
-              <SelectContent>
-                {countries.map((country) => (
-                  <SelectItem key={country.id} value={country.id.toString()}>
-                    {country.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
             <div className="flex items-center gap-2">
               <input
                 type="file"
@@ -234,6 +227,7 @@ export default function PriceManagementPage() {
           <Tabs defaultValue="net_prices" className="w-full">
             <TabsList>
               <TabsTrigger value="net_prices">Giá Gốc</TabsTrigger>
+              <TabsTrigger value="peak_season_charges">Mùa Cao Điểm</TabsTrigger>
               <TabsTrigger value="other_fees">Phụ Phí</TabsTrigger>
             </TabsList>
 
@@ -258,6 +252,37 @@ export default function PriceManagementPage() {
                           {uniqueZones.map((zone) => (
                             <TableCell key={`${weight}-${zone}`} className="text-right">
                               {getPriceForZoneAndWeight(zone, weight)}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="peak_season_charges">
+              {peakSeasonCharges.length > 0 && (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="font-bold">Weight/Zone</TableHead>
+                        {uniquePeakZones.map((zone) => (
+                          <TableHead key={zone} className="text-center font-bold">
+                            Zone {zone}
+                          </TableHead>
+                        ))}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {uniquePeakWeights.map((weight) => (
+                        <TableRow key={weight}>
+                          <TableCell className="font-medium">{weight} kg</TableCell>
+                          {uniquePeakZones.map((zone) => (
+                            <TableCell key={`${weight}-${zone}`} className="text-right">
+                              {getPeakSeasonPriceForZoneAndWeight(zone, weight)}
                             </TableCell>
                           ))}
                         </TableRow>
