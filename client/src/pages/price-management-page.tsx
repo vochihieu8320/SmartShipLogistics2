@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/services/api";
+import { Loader2 } from "@/components/ui/loader";
 
 interface Provider {
   id: number;
@@ -52,6 +53,7 @@ export default function PriceManagementPage() {
   const [prices, setPrices] = useState<NetPrice[]>([]);
   const [otherFees, setOtherFees] = useState<OtherFee[]>([]);
   const [countries, setCountries] = useState<any[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -95,6 +97,37 @@ export default function PriceManagementPage() {
     const provider = providers.find((p) => p.id.toString() === providerId);
     return provider?.services || [];
   };
+
+  const handleFileUpload = async (e: any) => {
+    setIsUploading(true);
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("provider_id", selectedProvider);
+    formData.append("provider_service_id", selectedService);
+
+    try {
+      const response = await api.post("/api/v1/seed_prices", formData);
+      if (response.status === 200) {
+        toast({
+          title: "Upload Success",
+          description: "Prices uploaded successfully",
+          variant: "default",
+        });
+      } else {
+        throw new Error("Failed to upload prices");
+      }
+    } catch (error) {
+      toast({
+        title: "Upload Error",
+        description: "Failed to upload prices. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
 
   return (
     <DashboardLayout title="Price Management">
@@ -143,6 +176,49 @@ export default function PriceManagementPage() {
                 ))}
               </SelectContent>
             </Select>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={handleFileUpload}
+              className="hidden"
+              id="price-upload"
+              disabled={isUploading}
+            />
+            <Button
+              variant="outline"
+              onClick={() => document.getElementById("price-upload")?.click()}
+              disabled={isUploading}
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang tải lên...
+                </>
+              ) : (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-2"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                  Tải lên bảng giá XLSX
+                </>
+              )}
+            </Button>
+          </div>
           </div>
 
           <Tabs defaultValue="net_prices" className="w-full">
@@ -220,7 +296,7 @@ export default function PriceManagementPage() {
                                     amount: fee.amount
                                   }
                                 );
-                                
+
                                 if (response.status === 200) {
                                   toast({
                                     title: "Cập nhật thành công",
