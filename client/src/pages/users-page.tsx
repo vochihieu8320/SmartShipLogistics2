@@ -32,6 +32,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { API_BASE_URL } from "@/config/api";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import Select from "@/components/ui/select";
 
 interface Address {
   id: number;
@@ -51,6 +52,7 @@ interface Address {
 export default function UsersPage() {
   const [activeTab, setActiveTab] = useState("list");
   const [addresses, setAddresses] = useState<Address[]>([]);
+  const [countries, setCountries] = useState<{id: number; name: string}[]>([]);
   const { user, isLoading, logoutMutation } = useAuth();
   const [, navigate] = useLocation();
   const { toast } = useToast();
@@ -75,6 +77,27 @@ export default function UsersPage() {
       toast({
         title: "Error",
         description: "Failed to load addresses",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const fetchCountries = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/countries`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const data = await response.json();
+      if (data.success) {
+        setCountries(data.countries);
+      }
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load countries",
         variant: "destructive",
       });
     }
@@ -113,6 +136,7 @@ export default function UsersPage() {
   };
 
   useEffect(() => {
+    fetchCountries();
     if (!isLoading && (!user || user.role !== "admin")) {
       navigate("/auth");
     }
@@ -295,9 +319,9 @@ export default function UsersPage() {
                             name="country_id"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>ID Quốc gia</FormLabel>
+                                <FormLabel>Quốc gia</FormLabel>
                                 <FormControl>
-                                  <Input type="number" {...field} />
+                                  <Select {...field} options={countries.map(country => ({ value: country.id, label: country.name }))}/>
                                 </FormControl>
                               </FormItem>
                             )}
