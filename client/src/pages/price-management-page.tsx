@@ -38,8 +38,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 
 
