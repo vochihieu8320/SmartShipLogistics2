@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { X, Plus, Save } from "lucide-react";
@@ -64,13 +65,13 @@ export default function ProductForm({ form }: { form: UseFormReturn }) {
       if (!response.ok) throw new Error('Failed to save products');
 
       toast({
-        title: "Success",
-        description: "Products saved successfully",
+        title: "Thành công",
+        description: "Đã lưu thông tin sản phẩm",
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to save products",
+        title: "Lỗi",
+        description: "Không thể lưu thông tin sản phẩm",
         variant: "destructive",
       });
     }
@@ -78,16 +79,16 @@ export default function ProductForm({ form }: { form: UseFormReturn }) {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border">
+      <div className="border rounded-lg overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Description</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead>Origin</TableHead>
-              <TableHead>Unit</TableHead>
-              <TableHead>Unit Price</TableHead>
-              <TableHead>Sub Total</TableHead>
+            <TableRow className="bg-muted/50">
+              <TableHead>Mô tả sản phẩm</TableHead>
+              <TableHead>Số lượng</TableHead>
+              <TableHead>Xuất xứ</TableHead>
+              <TableHead>Đơn vị</TableHead>
+              <TableHead>Đơn giá</TableHead>
+              <TableHead>Thành tiền</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -98,6 +99,7 @@ export default function ProductForm({ form }: { form: UseFormReturn }) {
                   <Input
                     value={product.description}
                     onChange={(e) => handleProductChange(index, 'description', e.target.value)}
+                    placeholder="Nhập mô tả"
                   />
                 </TableCell>
                 <TableCell>
@@ -117,9 +119,9 @@ export default function ProductForm({ form }: { form: UseFormReturn }) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="VN">Vietnam</SelectItem>
-                      <SelectItem value="US">United States</SelectItem>
-                      <SelectItem value="CN">China</SelectItem>
+                      <SelectItem value="VN">Việt Nam</SelectItem>
+                      <SelectItem value="US">Hoa Kỳ</SelectItem>
+                      <SelectItem value="CN">Trung Quốc</SelectItem>
                     </SelectContent>
                   </Select>
                 </TableCell>
@@ -132,9 +134,9 @@ export default function ProductForm({ form }: { form: UseFormReturn }) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="pcs">PCS</SelectItem>
+                      <SelectItem value="pcs">Cái</SelectItem>
                       <SelectItem value="kg">KG</SelectItem>
-                      <SelectItem value="box">Box</SelectItem>
+                      <SelectItem value="box">Thùng</SelectItem>
                     </SelectContent>
                   </Select>
                 </TableCell>
@@ -171,7 +173,7 @@ export default function ProductForm({ form }: { form: UseFormReturn }) {
           className="gap-2"
         >
           <Plus className="h-4 w-4" />
-          Add Product
+          Thêm sản phẩm
         </Button>
 
         <Button
@@ -181,7 +183,7 @@ export default function ProductForm({ form }: { form: UseFormReturn }) {
           disabled={products.length === 0}
         >
           <Save className="h-4 w-4" />
-          Save Products
+          Lưu thông tin
         </Button>
       </div>
     </div>

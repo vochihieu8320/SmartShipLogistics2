@@ -382,9 +382,18 @@ export default function CreateShippingPage() {
                       </div>
                     </TabsContent>
                     <TabsContent value="invoice" className="mt-6">
-                      {/* Add your invoice form here */}
-                      <div>
-                        {/* Add your invoice input fields and table here */}
+                      <div className="space-y-6">
+                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                          <div className="mb-4 flex items-center">
+                            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
+                              <span className="text-xl font-bold">$</span>
+                            </div>
+                            <h3 className="text-xl font-semibold">
+                              Thông Tin Hoá Đơn
+                            </h3>
+                          </div>
+                          {shipmentId && <ProductForm form={form} />}
+                        </div>
                       </div>
                       <div className="flex justify-between mt-6">
                         <Button
