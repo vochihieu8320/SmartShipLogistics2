@@ -94,10 +94,19 @@ export default function PriceManagementPage() {
           setOtherFees(other_fees || []);
 
           // Fetch peak season charges separately
-          const { net_prices: peakSeasonPrices } = await api.get(
-            `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}&fee_type=peak_season_surcharge`,
-          );
-          setPeakSeasonCharges(peakSeasonPrices || []);
+          try {
+            const response = await api.get(
+              `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}&fee_type=peak_season_surcharge`,
+            );
+            if (response.success && response.net_prices) {
+              setPeakSeasonCharges(response.net_prices);
+            } else {
+              setPeakSeasonCharges([]);
+            }
+          } catch (error) {
+            console.error("Error fetching peak season charges:", error);
+            setPeakSeasonCharges([]);
+          }
         } catch (error) {
           console.error("Error fetching prices:", error);
         }
@@ -358,7 +367,7 @@ export default function PriceManagementPage() {
                             </Button>
                           </TableCell>
                         </TableRow>
-                    ))}
+                      ))}
                   </TableBody>
                 </Table>
               )}
