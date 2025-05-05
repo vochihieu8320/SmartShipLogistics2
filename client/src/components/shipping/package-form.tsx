@@ -749,6 +749,7 @@ export default function PackageForm({ form }: PackageFormProps) {
                             "shipment.provider_service_id",
                             quote.id,
                           );
+                          setActiveTab("invoice");
                         }}
                         gridColumns={3}
                       />
