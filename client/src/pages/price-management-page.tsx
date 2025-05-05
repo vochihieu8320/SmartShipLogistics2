@@ -169,10 +169,27 @@ export default function PriceManagementPage() {
       });
       if (response.status === 200) {
         toast({
-          title: "Upload Success",
+          title: "Upload Success", 
           description: "Prices uploaded successfully",
           variant: "default",
         });
+        
+        // Refetch prices after successful upload
+        try {
+          const { net_prices, other_fees } = await api.get(
+            `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}`,
+          );
+          setPrices(net_prices);
+          setOtherFees(other_fees || []);
+
+          // Refetch peak season charges
+          const peakResponse = await api.get(
+            `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}&fee_type=peak_season_surcharge`,
+          );
+          setPeakSeasonCharges(peakResponse.other_fees || []);
+        } catch (error) {
+          console.error("Error refreshing prices:", error);
+        }
       } else {
         throw new Error("Failed to upload prices");
       }
