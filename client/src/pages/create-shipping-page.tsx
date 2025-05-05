@@ -410,21 +410,19 @@ export default function CreateShippingPage() {
                     </TabsContent>
                     <TabsContent value="review" className="mt-6">
                       <div className="space-y-6">
-                        {shipmentId && (
-                          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                            <div className="mb-4 flex items-center">
-                              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3">
-                                <span className="text-xl font-bold">✓</span>
-                              </div>
-                              <h3 className="text-xl font-semibold">
-                                Chi Tiết Đơn Hàng
-                              </h3>
+                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                          <div className="mb-4 flex items-center">
+                            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3">
+                              <span className="text-xl font-bold">✓</span>
                             </div>
-                            <div className="space-y-6">
-                              <ShippingSummary formData={form.getValues()} />
-                            </div>
+                            <h3 className="text-xl font-semibold">
+                              Chi Tiết Đơn Hàng
+                            </h3>
                           </div>
-                        )}
+                          <div className="space-y-6">
+                            <ShippingSummary formData={form.getValues()} />
+                          </div>
+                        </div>
                         <div className="flex justify-between mt-6">
                           <Button
                             type="button"
