@@ -231,19 +231,6 @@ export default function CreateShippingPage() {
                         </div>
                       </TabsTrigger>
                       <TabsTrigger
-                        value="service"
-                        className={`rounded-lg ${activeTab === "service" ? "bg-white shadow-md" : ""} transition-all`}
-                      >
-                        <div className="flex flex-col items-center gap-1.5 py-1">
-                          <span
-                            className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "service" ? "bg-primary text-white" : "bg-gray-200"}`}
-                          >
-                            2
-                          </span>
-                          <span>Chọn Dịch Vụ</span>
-                        </div>
-                      </TabsTrigger>
-                      <TabsTrigger
                         value="invoice"
                         className={`rounded-lg ${activeTab === "invoice" ? "bg-white shadow-md" : ""} transition-all`}
                       >
@@ -251,7 +238,7 @@ export default function CreateShippingPage() {
                           <span
                             className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "invoice" ? "bg-primary text-white" : "bg-gray-200"}`}
                           >
-                            3
+                            2
                           </span>
                           <span>Hoá Đơn</span>
                         </div>
@@ -264,7 +251,7 @@ export default function CreateShippingPage() {
                           <span
                             className={`w-6 h-6 flex items-center justify-center rounded-full ${activeTab === "review" ? "bg-primary text-white" : "bg-gray-200"}`}
                           >
-                            4
+                            3
                           </span>
                           <span>Xác Nhận</span>
                         </div>
@@ -290,13 +277,18 @@ export default function CreateShippingPage() {
                           </div>
                         </div>
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                          <PackageForm form={form} setActiveTab={setActiveTab} />
+                          <PackageForm
+                            form={form}
+                            setActiveTab={setActiveTab}
+                          />
                         </div>
                         <div className="flex justify-end mt-6">
                           <Button
                             type="button"
                             onClick={() => setActiveTab("service")}
-                            disabled={!form.getValues("shipment.provider_service_id")}
+                            disabled={
+                              !form.getValues("shipment.provider_service_id")
+                            }
                             className="px-6 py-5 rounded-lg gap-2 shadow-md hover:shadow-lg transition-all"
                           >
                             Tiếp Theo
