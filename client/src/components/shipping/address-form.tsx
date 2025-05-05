@@ -24,6 +24,21 @@ interface Country {
   code: string;
 }
 
+interface Address {
+  id: number;
+  name: string;
+  company: string;
+  country_id: number;
+  postal_code: string;
+  city: string;
+  state: string;
+  address1: string;
+  address2: string;
+  address3: string;
+  phone: string;
+  email: string;
+}
+
 interface AddressFormProps {
   form: UseFormReturn<any>;
   type: "sender" | "receiver";
@@ -32,13 +47,49 @@ interface AddressFormProps {
 
 export default function AddressForm({ form, type, title }: AddressFormProps) {
   const [countries, setCountries] = useState<Country[]>([]);
+  const [defaultAddresses, setDefaultAddresses] = useState<Address[]>([]);
   const baseField =
     type === "sender"
       ? "shipment.sender_address_attributes"
       : "shipment.receiver_address_attributes";
   const isReceiver = type === "receiver";
 
+  const handleAddressSelect = (address: Address) => {
+    form.setValue(`${baseField}.name`, address.name);
+    form.setValue(`${baseField}.company`, address.company);
+    form.setValue(`${baseField}.country_id`, address.country_id);
+    form.setValue(`${baseField}.postal_code`, address.postal_code);
+    form.setValue(`${baseField}.city`, address.city);
+    form.setValue(`${baseField}.state`, address.state);
+    form.setValue(`${baseField}.address1`, address.address1);
+    form.setValue(`${baseField}.address2`, address.address2);
+    form.setValue(`${baseField}.address3`, address.address3);
+    form.setValue(`${baseField}.phone`, address.phone);
+    form.setValue(`${baseField}.email`, address.email);
+  };
+
   useEffect(() => {
+    if (!isReceiver) {
+      const fetchDefaultAddresses = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/users/list_default_addresses`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+          const data = await response.json();
+          setDefaultAddresses(data.addresses || []);
+          
+          // Auto-select first address if available
+          if (data.addresses?.length > 0) {
+            handleAddressSelect(data.addresses[0]);
+          }
+        } catch (error) {
+          console.error("Error fetching default addresses:", error);
+        }
+      };
+      fetchDefaultAddresses();
+    }
     // Set default country for sender
     if (!isReceiver) {
       form.setValue(`${baseField}.country_id`, 1); // Vietnam ID
@@ -62,13 +113,35 @@ export default function AddressForm({ form, type, title }: AddressFormProps) {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center mb-2">
-        <div
-          className={`w-10 h-10 rounded-full ${isReceiver ? "bg-blue-100 text-blue-600" : "bg-primary/20 text-primary"} flex items-center justify-center mr-3`}
-        >
-          {isReceiver ? <MapPin size={20} /> : <User size={20} />}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center">
+          <div
+            className={`w-10 h-10 rounded-full ${isReceiver ? "bg-blue-100 text-blue-600" : "bg-primary/20 text-primary"} flex items-center justify-center mr-3`}
+          >
+            {isReceiver ? <MapPin size={20} /> : <User size={20} />}
+          </div>
+          <h3 className="text-xl font-semibold">{title}</h3>
         </div>
-        <h3 className="text-xl font-semibold">{title}</h3>
+        
+        {!isReceiver && (
+          <Select
+            onValueChange={(value) => {
+              const address = defaultAddresses.find(a => a.id.toString() === value);
+              if (address) handleAddressSelect(address);
+            }}
+          >
+            <SelectTrigger className="w-[260px]">
+              <SelectValue placeholder="Chọn địa chỉ mặc định" />
+            </SelectTrigger>
+            <SelectContent>
+              {defaultAddresses.map((address) => (
+                <SelectItem key={address.id} value={address.id.toString()}>
+                  {address.name} - {address.address1}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
