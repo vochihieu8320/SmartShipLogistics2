@@ -150,7 +150,7 @@ export default function PriceManagementPage() {
     formData.append("provider_id", selectedProvider);
     formData.append("provider_service_id", selectedService);
 
-    console.log()
+    console.log();
     try {
       console.log("formData", formData);
       // Verify form data is not empty
@@ -158,13 +158,14 @@ export default function PriceManagementPage() {
         console.log(key, value);
       }
       // Use fetch directly for file upload
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const response = await fetch(`${API_BASE_URL}/seed_prices`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
-        body: formData
+        body: formData,
       });
       if (response.status === 200) {
         toast({
