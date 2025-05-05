@@ -41,6 +41,7 @@ import { Loader2 } from "lucide-react";
 import AddressForm from "@/components/shipping/address-form";
 import PackageForm from "@/components/shipping/package-form";
 import ProductForm from "@/components/shipping/product-form";
+import { Input } from "@/components/ui/input";
 
 const createShipmentSchema = z.object({
   shipment: z.object({
@@ -648,10 +649,15 @@ export default function CreateShippingPage() {
                                       description:
                                         "Shipment completed with additional charges",
                                       total_price:
-                                        form.getValues("total_price") || 0,
+                                        form.getValues("total_price") || parseFloat(localStorage.getItem("shipment_total_price") || "0"),
                                     }),
                                   },
                                 );
+
+                                const responseData = await response.json();
+                                if (responseData.success) {
+                                  form.setValue("total_price", responseData.total_price);
+                                }
 
                                 if (!response.ok) {
                                   throw new Error(
