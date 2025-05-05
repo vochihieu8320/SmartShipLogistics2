@@ -98,7 +98,7 @@ export default function PriceManagementPage() {
             const response = await api.get(
               `/providers/${selectedProvider}/prices/?provider_service_id=${selectedService}&fee_type=peak_season_surcharge`,
             );
-            setPeakSeasonCharges(response.net_prices || []);
+            setPeakSeasonCharges(response.other_fees || []);
           } catch (error) {
             console.error("Error fetching peak season charges:", error);
             setPeakSeasonCharges([]);
@@ -129,10 +129,8 @@ export default function PriceManagementPage() {
   };
 
   const getPeakSeasonPriceForZoneAndWeight = (zone: string, weight: string) => {
-    const price = peakSeasonCharges?.find(
-      (p) => p.zone === zone && p.weight === weight,
-    );
-    return price ? formatPrice(price.price) : "-";
+    const price = peakSeasonCharges?.find((p) => p.zone === zone);
+    return price ? formatPrice(price.amount) : "-";
   };
 
   const handleFileUpload = async (e: any) => {
@@ -343,7 +341,7 @@ export default function PriceManagementPage() {
                   </TableHeader>
                   <TableBody>
                     {otherFees
-                      .filter(fee => fee.display_name !== "Phụ phí cao điểm")
+                      .filter((fee) => fee.display_name !== "Phụ phí cao điểm")
                       .map((fee, index) => (
                         <TableRow key={index}>
                           <TableCell>{fee.display_name}</TableCell>
