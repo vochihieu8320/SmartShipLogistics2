@@ -161,7 +161,8 @@ export default function PriceManagementPage() {
         headers: {
           "Content-Type": "multipart/form-data",
           // Remove Content-Type header to let browser set it with boundary
-        },
+        }
+      });
       if (response.status === 200) {
         toast({
           title: "Upload Success",
