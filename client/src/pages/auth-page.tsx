@@ -2,14 +2,40 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "wouter";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { InsertUser, loginUserSchema, insertUserSchema, LoginCredentials, UserRole } from "@shared/schema";
+import {
+  InsertUser,
+  loginUserSchema,
+  insertUserSchema,
+  LoginCredentials,
+  UserRole,
+} from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Package, ArrowRight, Loader2 } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -66,7 +92,8 @@ export default function AuthPage() {
             Hệ Thống Quản Lý Vận Chuyển Hiện Đại
           </h1>
           <p className="text-lg mb-8">
-            SmartShip Pro giúp bạn quản lý vận chuyển, theo dõi giao hàng, xử lý thanh toán và tạo báo cáo chi tiết - tất cả trong một nền tảng.
+            SmartShip Pro giúp bạn quản lý vận chuyển, theo dõi giao hàng, xử lý
+            thanh toán và tạo báo cáo chi tiết - tất cả trong một nền tảng.
           </p>
           <ul className="space-y-4">
             <li className="flex items-center">
@@ -101,40 +128,33 @@ function LoginForm() {
     resolver: zodResolver(loginUserSchema),
     defaultValues: {
       username: "", // username field will contain email for API compatibility
-      password: ""
-    }
+      password: "",
+    },
   });
 
   function onSubmit(data: LoginCredentials) {
     loginMutation.mutate(data, {
       onSuccess: (response) => {
-        if (response.success) {
-          toast({
-            title: "Đăng nhập thành công",
-            description: "Chào mừng bạn quay trở lại!",
-            variant: "default"
-          });
-          // Navigate based on user role
-          if (response.user.role === "admin" || response.user.role === "manager") {
-            navigate("/admin");
-          } else {
-            navigate("/");
-          }
+        toast({
+          title: "Đăng nhập thành công",
+          description: "Chào mừng bạn quay trở lại!",
+          variant: "default",
+        });
+
+        // Navigate based on user role
+        if (response.role === "admin" || response.role === "manager") {
+          navigate("/admin");
         } else {
-          toast({
-            title: "Đăng nhập thất bại",
-            description: "Tài khoản hoặc mật khẩu không chính xác",
-            variant: "destructive"
-          });
+          navigate("/");
         }
       },
       onError: (error) => {
         toast({
           title: "Lỗi",
           description: error.message || "Không thể kết nối đến máy chủ",
-          variant: "destructive"
+          variant: "destructive",
         });
-      }
+      },
     });
   }
 
@@ -148,10 +168,10 @@ function LoginForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input 
+                <Input
                   type="email"
-                  placeholder="Enter your email" 
-                  {...field} 
+                  placeholder="Enter your email"
+                  {...field}
                   autoComplete="email"
                 />
               </FormControl>
@@ -167,9 +187,9 @@ function LoginForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input 
-                  type="password" 
-                  placeholder="Enter your password" 
+                <Input
+                  type="password"
+                  placeholder="Enter your password"
                   {...field}
                   autoComplete="current-password"
                 />
@@ -184,7 +204,11 @@ function LoginForm() {
           <span className="font-medium">admin@example.com / password123</span>
         </div>
 
-        <Button type="submit" className="w-full mt-6" disabled={loginMutation.isPending}>
+        <Button
+          type="submit"
+          className="w-full mt-6"
+          disabled={loginMutation.isPending}
+        >
           {loginMutation.isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -214,8 +238,8 @@ function RegisterForm({ onSuccess }: RegisterFormProps) {
       password: "",
       email: "",
       fullName: "",
-      role: UserRole.STAFF
-    }
+      role: UserRole.STAFF,
+    },
   });
 
   function onSubmit(data: InsertUser) {
@@ -234,7 +258,7 @@ function RegisterForm({ onSuccess }: RegisterFormProps) {
           description: error.message || "An unexpected error occurred",
           variant: "destructive",
         });
-      }
+      },
     });
   }
 
@@ -290,7 +314,11 @@ function RegisterForm({ onSuccess }: RegisterFormProps) {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Create a password" {...field} />
+                <Input
+                  type="password"
+                  placeholder="Create a password"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -320,7 +348,11 @@ function RegisterForm({ onSuccess }: RegisterFormProps) {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={registerMutation.isPending}
+        >
           {registerMutation.isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

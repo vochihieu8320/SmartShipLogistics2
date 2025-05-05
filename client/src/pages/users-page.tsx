@@ -1,10 +1,27 @@
-
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import UserTable from "@/components/user-management/user-table";
 import UserForm from "@/components/user-management/user-form";
@@ -40,11 +57,14 @@ export default function UsersPage() {
 
   const fetchAddresses = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/users/list_default_addresses`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+      const response = await fetch(
+        `${API_BASE_URL}/users/list_default_addresses`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         },
-      });
+      );
       const data = await response.json();
       if (data.success) {
         setAddresses(data.addresses);
@@ -61,15 +81,18 @@ export default function UsersPage() {
 
   const onSubmit = async (data: any) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/users/create_default_address`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+      const response = await fetch(
+        `${API_BASE_URL}/users/create_default_address`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(data),
         },
-        body: JSON.stringify(data),
-      });
-      
+      );
+
       if (response.ok) {
         toast({
           title: "Success",
@@ -89,10 +112,10 @@ export default function UsersPage() {
   };
 
   useEffect(() => {
-    if (!isLoading && (!user || user.role !== 'admin')) {
-      navigate('/auth');
+    if (!isLoading && (!user || user.role !== "admin")) {
+      navigate("/auth");
     }
-    if (user && user.role === 'admin') {
+    if (user && user.role === "admin") {
       fetchAddresses();
     }
   }, [user, isLoading, navigate]);
@@ -104,8 +127,8 @@ export default function UsersPage() {
           title: "Đăng xuất thành công",
           description: "Bạn đã đăng xuất khỏi hệ thống",
         });
-        navigate('/auth');
-      }
+        navigate("/auth");
+      },
     });
   };
 
@@ -113,10 +136,10 @@ export default function UsersPage() {
     return <div>Đang tải...</div>;
   }
 
-  if (!user || user.role !== 'admin') {
+  if (!user || user.role !== "admin") {
     return null;
   }
-  
+
   return (
     <DashboardLayout title="Quản Lý Người Dùng">
       <Card className="mb-8">
@@ -132,9 +155,9 @@ export default function UsersPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          <Tabs 
-            defaultValue="list" 
-            value={activeTab} 
+          <Tabs
+            defaultValue="list"
+            value={activeTab}
             onValueChange={setActiveTab}
             className="space-y-4"
           >
@@ -143,11 +166,11 @@ export default function UsersPage() {
               <TabsTrigger value="create">Tạo Người Dùng Mới</TabsTrigger>
               <TabsTrigger value="addresses">Quản Lý Địa Chỉ</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="list" className="space-y-4">
               <UserTable />
             </TabsContent>
-            
+
             <TabsContent value="create" className="space-y-4">
               <UserForm onSuccess={() => setActiveTab("list")} />
             </TabsContent>
@@ -163,7 +186,10 @@ export default function UsersPage() {
                       <DialogTitle>Tạo Địa Chỉ Mới</DialogTitle>
                     </DialogHeader>
                     <Form {...form}>
-                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <form
+                        onSubmit={form.handleSubmit(onSubmit)}
+                        className="space-y-4"
+                      >
                         <div className="grid grid-cols-2 gap-4">
                           <FormField
                             control={form.control}
@@ -276,7 +302,9 @@ export default function UsersPage() {
                             )}
                           />
                         </div>
-                        <Button type="submit" className="w-full">Tạo Địa Chỉ</Button>
+                        <Button type="submit" className="w-full">
+                          Tạo Địa Chỉ
+                        </Button>
                       </form>
                     </Form>
                   </DialogContent>
@@ -288,10 +316,16 @@ export default function UsersPage() {
                     <CardContent className="p-4">
                       <div className="space-y-2">
                         <div className="font-semibold">{address.name}</div>
-                        {address.company && <div className="text-sm">{address.company}</div>}
+                        {address.company && (
+                          <div className="text-sm">{address.company}</div>
+                        )}
                         <div className="text-sm">{address.address1}</div>
-                        {address.address2 && <div className="text-sm">{address.address2}</div>}
-                        {address.address3 && <div className="text-sm">{address.address3}</div>}
+                        {address.address2 && (
+                          <div className="text-sm">{address.address2}</div>
+                        )}
+                        {address.address3 && (
+                          <div className="text-sm">{address.address3}</div>
+                        )}
                         <div className="text-sm">{`${address.city}, ${address.state} ${address.postal_code}`}</div>
                         <div className="text-sm">{address.phone}</div>
                         <div className="text-sm">{address.email}</div>
