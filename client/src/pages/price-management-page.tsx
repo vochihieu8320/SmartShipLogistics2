@@ -142,7 +142,7 @@ export default function PriceManagementPage() {
       });
       return;
     }
-    
+
     setIsUploading(true);
     const file = e.target.files[0];
     const formData = new FormData();
@@ -150,13 +150,12 @@ export default function PriceManagementPage() {
     formData.append("provider_id", selectedProvider);
     formData.append("provider_service_id", selectedService);
 
+    console.log()
     try {
+      console.log("formData", formData);
       const response = await api.post("/seed_prices", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
       if (response.status === 200) {
