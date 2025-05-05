@@ -39,6 +39,11 @@ export default function HomePage() {
                   Track Shipment <Search className="h-4 w-4" />
                 </Button>
               </Link>
+              <Link href="/quote">
+                <Button size="lg" variant="outline" className="gap-2">
+                  Get Quote <Calculator className="h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="hidden md:block relative">
