@@ -1,12 +1,57 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { API_BASE_URL } from "@/config/api";
+
+interface Product {
+  description: string;
+  quantity: number;
+  origin: string;
+  unit: string;
+  unit_price: number;
+  sub_total: number;
+}
 
 interface ShippingSummaryProps {
   formData: any;
+  shipmentId: number;
 }
 
-export default function ShippingSummary({ formData }: ShippingSummaryProps) {
+export default function ShippingSummary({ formData, shipmentId }: ShippingSummaryProps) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [shipmentDetails, setShipmentDetails] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch shipment details
+        const response = await fetch(`${API_BASE_URL}/shipments/${shipmentId}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        const data = await response.json();
+        setShipmentDetails(data);
+
+        // Fetch products
+        const productsResponse = await fetch(`${API_BASE_URL}/shipments/${shipmentId}/products`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        const productsData = await productsResponse.json();
+        setProducts(productsData.products || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    if (shipmentId) {
+      fetchData();
+    }
+  }, [shipmentId]);
+
   const { shipment } = formData;
 
   // Get addresses from the correct path in the API structure
@@ -205,12 +250,45 @@ export default function ShippingSummary({ formData }: ShippingSummaryProps) {
               <h4 className="text-md font-medium mb-2">Total Price</h4>
               <div className="bg-muted p-3 rounded-md">
                 <p className="text-sm text-muted-foreground mb-1">
-                  {formatCurrency(localStorage.getItem("shipment_total_price"))}
+                  {formatCurrency(parseInt(localStorage.getItem("shipment_total_price") || "0"))}
                 </p>
               </div>
             </div>
           </div>
+
         </div>
+
+        {products.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-3">Danh sách sản phẩm</h3>
+            <div className="border rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Mô tả sản phẩm</TableHead>
+                    <TableHead>Số lượng</TableHead>
+                    <TableHead>Xuất xứ</TableHead>
+                    <TableHead>Đơn vị</TableHead>
+                    <TableHead>Đơn giá</TableHead>
+                    <TableHead>Thành tiền</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {products.map((product, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{product.description}</TableCell>
+                      <TableCell>{product.quantity}</TableCell>
+                      <TableCell>{product.origin}</TableCell>
+                      <TableCell>{product.unit}</TableCell>
+                      <TableCell>{product.unit_price}</TableCell>
+                      <TableCell>{product.sub_total}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

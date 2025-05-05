@@ -442,11 +442,11 @@ export default function CreateShippingPage() {
                             onClick={async () => {
                               try {
                                 const response = await fetch(
-                                  `${API_BASE_URL}/shipments/${shipmentId}/complete`,
+                                  `${API_BASE_URL}/api/v1/shipments/${shipmentId}/complete`,
                                   {
                                     method: "POST",
                                     headers: {
-                                      Authorization: `${localStorage.getItem("token")}`,
+                                      Authorization: `Bearer ${localStorage.getItem("token")}`,
                                     },
                                   },
                                 );

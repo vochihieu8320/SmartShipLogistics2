@@ -62,12 +62,15 @@ export default function ProductForm({ form }: { form: UseFormReturn }) {
         body: JSON.stringify({ products })
       });
 
+      const data = await response.json();
       if (!response.ok) throw new Error('Failed to save products');
 
       toast({
         title: "Thành công",
-        description: "Đã lưu thông tin sản phẩm",
+        description: "Đã lưu thông tin sản phẩm thành công",
       });
+      
+      return data;
     } catch (error) {
       toast({
         title: "Lỗi",
