@@ -25,6 +25,14 @@ const createShipmentSchema = z.object({
     provider_id: z.number().default(1),
     provider_service_id: z.number().default(1),
     status: z.string().default("created"),
+    products: z.array(z.object({
+      description: z.string(),
+      quantity: z.number(),
+      origin: z.string(),
+      unit: z.string(),
+      unit_price: z.number(),
+      sub_total: z.number(),
+    })).default([]),
     sender_address_attributes: z.object({
       name: z.string().min(1, "Tên là bắt buộc"),
       company: z.string().optional(),

@@ -19,7 +19,10 @@ interface Product {
 }
 
 export default function ProductForm({ form }: { form: UseFormReturn }) {
-  const [products, setProducts] = useState<Product[]>([]);
+  const products = form.watch("shipment.products") || [];
+  const setProducts = (newProducts: Product[]) => {
+    form.setValue("shipment.products", newProducts);
+  };
   const { toast } = useToast();
 
   const handleAddProduct = () => {
