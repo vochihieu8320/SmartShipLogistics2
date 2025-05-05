@@ -31,6 +31,7 @@ function App() {
       <AuthProvider>
         <ThemeProvider defaultTheme="light" storageKey="smartship-theme">
           <TooltipProvider>
+            <Toaster />
             <Switch>
               {/* Auth route - always public */}
               <Route path="/auth" component={AuthPage} />
